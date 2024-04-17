@@ -24,7 +24,8 @@
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.34.1",
-    "globals": "^15.0.0"
+    "globals": "^15.0.0",
+    "prettier": "3.2.5"
   },
   "private": true
 }
