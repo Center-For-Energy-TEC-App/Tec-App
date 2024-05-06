@@ -1,6 +1,9 @@
-name: Lint, Check Format, and Generate JSDocs
+name: Eslint / Prettier, checking formatting / common bugs
 on:
   push:
+    
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: write
@@ -10,8 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install modules
-        run: yarn
+      - name: Install pnpm
+        run: npm install pnpm
+      - name: pnpm install
+        run: pnpm install
       - name: Run ESLint
         run: npm run lint
 
@@ -19,7 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install modules
-        run: yarn
-      - name: Check if Prettier could format code
-        run: npx prettier --check --no-config .
+      - name: Install pnpm
+        run: npm install pnpm
+      - name: pnpm install
+        run: pnpm install
+      - name: Format code using prettier
+        run: pnpm exec prettier . --write
