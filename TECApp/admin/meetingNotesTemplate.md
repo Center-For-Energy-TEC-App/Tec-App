@@ -6,7 +6,7 @@
 
 #### Present Members:
 
-- Chia Han 
+- Chia Han
 
 - Yoto
 
@@ -18,24 +18,14 @@
 
 #### (unresolved business)
 
-  
-
 #### New business/agenda
-
-  
 
 #### Undiscussed business for next meeting
 
-  
-
 ### Decisions made
-
-  
 
 #### (Topic 1)
 
 (Note dissenting opinions)
 
-  
-
-#### Meeting finished at: 5pm*
+#### Meeting finished at: 5pm\*

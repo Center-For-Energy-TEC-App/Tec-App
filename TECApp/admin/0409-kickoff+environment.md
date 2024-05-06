@@ -6,7 +6,7 @@
 
 #### Present Members:
 
-- Chia Han 
+- Chia Han
 
 - Yoto
 
@@ -18,25 +18,18 @@
 
 #### (unresolved business)
 
-  
-
 #### New business/agenda
+
 - Meetings with Mike?
 - set up environment
 - go through issues
 - styling guidelines
 - documentation?
-  
 
 #### Undiscussed business for next meeting
 
-  
-
 ### Decisions made
-
-  
 
 #### (Topic 1)
 
 (Note dissenting opinions)
-
