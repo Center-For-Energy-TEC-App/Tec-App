@@ -1,25 +1,25 @@
 name: Lint, Check Format, and Generate JSDocs
 on:
-  push:
+    push:
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  lint_check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install modules
-        run: yarn
-      - name: Run ESLint
-        run: npm run lint
+    lint_check:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Install modules
+              run: yarn
+            - name: Run ESLint
+              run: npm run lint
 
-  format_check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install modules
-        run: yarn
-      - name: Check if Prettier could format code
-        run: npx prettier --check --no-config .
+    format_check:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Install modules
+              run: yarn
+            - name: Check if Prettier could format code
+              run: npx prettier --check --no-config .

@@ -6,13 +6,13 @@
 
 #### Present Members:
 
-- Chia Han
+-   Chia Han
 
-- Yoto
+-   Yoto
 
-- Andrew
+-   Andrew
 
-- Tyler
+-   Tyler
 
 ### Agenda
 

@@ -6,13 +6,13 @@
 
 #### Present Members:
 
-- Chia Han
+-   Chia Han
 
-- Yoto
+-   Yoto
 
-- Andrew
+-   Andrew
 
-- Tyler
+-   Tyler
 
 ### Agenda
 
@@ -20,11 +20,11 @@
 
 #### New business/agenda
 
-- Meetings with Mike?
-- set up environment
-- go through issues
-- styling guidelines
-- documentation?
+-   Meetings with Mike?
+-   set up environment
+-   go through issues
+-   styling guidelines
+-   documentation?
 
 #### Undiscussed business for next meeting
 
