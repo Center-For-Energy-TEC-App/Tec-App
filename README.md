@@ -18,6 +18,6 @@ Run these commands for linting and formating.
 
 - `pnpm exec prettier . --write` - This command will automatically format code according to the prettierrc guidelines
 
-- `pnpm eslint [filename]` - This command currently doesn't work, still working on a fix
+- `pnpm eslint [filename]` - This command currently works on eslint 8.57.0, and finds common issues that helps to prevent future bugs. If the command is not working, check that the eslint version on your computer is 8.57 using `eslint --v`. If a different version, try `pnpm upgrade eslint@^8.56.0`.
 
 [React Native Doc](https://reactnative.dev/docs/environment-setup) I ended up using to setup the environment
