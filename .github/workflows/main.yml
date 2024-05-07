@@ -13,14 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: List files
-        run: cd ..
-      - name: List files2
-        run: ls -la
-      - name: Change working directory
-        run: cd TECApp
-      - name: Install modules
-        run: yarn
       - name: Run ESLint
         run: npm run lint
   format_check:
