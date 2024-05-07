@@ -14,6 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: List files
+        run: cd ..
+      - name: List files2
         run: ls -la
       - name: Change working directory
         run: cd TECApp
