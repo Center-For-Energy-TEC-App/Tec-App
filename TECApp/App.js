@@ -6,9 +6,11 @@ import { Home } from "./src/pages/Home"
 export default function App() {
 
   const Stack = createNativeStackNavigator();
+  
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator screenOptions={{headerShown: false,
+      contentStyle:{backgroundColor:"#1C2B47"}}}>
         <Stack.Screen name="Home" component={Home}/>
       </Stack.Navigator>
     </NavigationContainer>

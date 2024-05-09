@@ -6,7 +6,8 @@
     "start": "expo start --tunnel",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "lint-fix": ""
   },
   "dependencies": {
     "@babel/runtime": "^7.24.4",
@@ -24,7 +25,8 @@
     "react-native-svg": "^14.1.0",
     "react-native-svg-pan-zoom": "^0.1.2",
     "react-native-web": "^0.19.11",
-    "react-router-dom": "^6.22.3"
+    "react-router-dom": "^6.22.3",
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
