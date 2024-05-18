@@ -21,3 +21,5 @@ Run these commands for linting and formating.
 - `pnpm eslint [filename]` - This command currently works on eslint 8.57.0, and finds common issues that helps to prevent future bugs. If the command is not working, check that the eslint version on your computer is 8.57 using `eslint --v`. If a different version, try `pnpm upgrade eslint@^8.56.0`.
 
 [React Native Doc](https://reactnative.dev/docs/environment-setup) I ended up using to setup the environment
+
+Download the .env file in the Secrets folder in the Google Drive and put it in the app repo
