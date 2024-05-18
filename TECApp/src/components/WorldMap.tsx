@@ -19,12 +19,14 @@ export const WorldMap = () => {
 
   return (
     <ReactNativeZoomableView
-      minZoom={1}
-      initialZoom={1}
+      minZoom={1.5}
+      initialZoom={1.5}
       maxZoom={3}
       bindToBorders={true}
-      panBoundaryPadding={500}
+      // panBoundaryPadding={500}
       zoomStep={0}
+      contentHeight={-500}
+      contentWidth={1250}
       // contentWidth={200}
       style={web ? webStyles.container : mobileStyles.container}
     >
