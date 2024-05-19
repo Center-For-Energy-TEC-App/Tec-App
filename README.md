@@ -5,6 +5,10 @@ pnpm install
 pnpm start
 ``` 
 
+If running into issues getting the app started using the QR code for the phone version
+
+try `npm install expo@latest`
+
 if running into issues - might need to download expo, npm, react, react-native
 
 try `npm add @babel/runtime`
@@ -21,3 +25,4 @@ Run these commands for linting and formating.
 - `pnpm eslint [filename]` - This command currently works on eslint 8.57.0, and finds common issues that helps to prevent future bugs. If the command is not working, check that the eslint version on your computer is 8.57 using `eslint --v`. If a different version, try `pnpm upgrade eslint@^8.56.0`.
 
 [React Native Doc](https://reactnative.dev/docs/environment-setup) I ended up using to setup the environment
+
