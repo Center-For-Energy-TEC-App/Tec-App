@@ -1,5 +1,3 @@
-(Name your file the date-topic.md (mmddyy-topic.md). For example 011621-kickoff.md.)
-
 # Meeting Minutes: 05/07, 5:30 pm - 6:30 pm
 
 #### dev meeting at DIB
@@ -35,6 +33,3 @@
 - andrew / tyler ---> mysql
 - 50 hours ish / week for development
 - ask mike if he wants a meeting with the dev team
-
-### Decisions made
-
