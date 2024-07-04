@@ -79,6 +79,7 @@ const mobileStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#1C2B47',
+    zIndex: -1,
     // backgroundColor: "white"
   },
   svg: {
