@@ -31,6 +31,14 @@
       "eas": {
         "projectId": "34278a3e-ba24-4041-81dc-9c190a29c4b4"
       }
-    }
+    },
+    "plugins": [
+      [
+      "expo-font",
+      {
+        "fonts": ["./assets/fonts/BrixSans.otf"]
+      }
+    ]
+    ]
   }
 }
