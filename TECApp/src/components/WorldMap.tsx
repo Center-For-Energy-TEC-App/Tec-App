@@ -17,6 +17,19 @@ export const WorldMap = () => {
     .fitSize([width * widthScale, height], data)
   const pathGenerator = d3.geoPath().projection(projection)
 
+  const colorMap = {
+    NAM: '#9ED7F5',
+    LAM: '#78B85D',
+    EUR: '#0D5BA5',
+    SSA: '#01ABE7',
+    MEA: '#F8EE88',
+    NEE: '#E78C68',
+    CHN: '#C06998',
+    IND: '#978E86',
+    SEA: '#DC4340',
+    OPA: '#A86937',
+  }
+
   return (
     <ReactNativeZoomableView
       minZoom={1.5}
@@ -36,15 +49,16 @@ export const WorldMap = () => {
             <Path
               d={pathGenerator(feature)}
               key={index}
-              stroke="#1C2B47"
-              strokeWidth={0.25}
-              fill="#2c4166"
+              stroke="#FFF"
+              strokeWidth={2.5}
+              fill={colorMap[feature.properties.region]}
+              // fill="none"
               //@ts-expect-error: to allow clicking to work on web
               onClick={() => {
-                alert(feature.properties.admin)
+                alert(feature.properties.region)
               }}
               onPress={() => {
-                alert(feature.properties.admin)
+                alert(feature.properties.region)
               }}
             ></Path>
           ))}
