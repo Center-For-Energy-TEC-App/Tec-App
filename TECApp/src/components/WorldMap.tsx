@@ -1,11 +1,14 @@
 import * as d3 from 'd3'
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import { StyleSheet, Dimensions, Platform } from 'react-native'
 import data from '../../GeoChart.world.geo.json'
 import Svg, { Path, G } from 'react-native-svg'
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view'
+import { getAll } from '../api/requests'
 
 export const WorldMap = () => {
+  const [test, setTest] = useState<string>();
+
   const web = Platform.OS == 'web'
 
   const width = Dimensions.get('window').width
@@ -16,6 +19,25 @@ export const WorldMap = () => {
     .geoNaturalEarth1()
     .fitSize([width * widthScale, height], data)
   const pathGenerator = d3.geoPath().projection(projection)
+
+  const colorMap = {
+    NAM: '#9ED7F5',
+    LAM: '#78B85D',
+    EUR: '#0D5BA5',
+    SSA: '#01ABE7',
+    MEA: '#F8EE88',
+    NEE: '#E78C68',
+    CHN: '#C06998',
+    IND: '#978E86',
+    SEA: '#DC4340',
+    OPA: '#A86937',
+  }
+
+  useEffect(()=>{
+    getAll().then(result=>{
+      setTest(result)
+    })
+  })
 
   return (
     <ReactNativeZoomableView
@@ -36,15 +58,16 @@ export const WorldMap = () => {
             <Path
               d={pathGenerator(feature)}
               key={index}
-              stroke="#1C2B47"
-              strokeWidth={0.25}
-              fill="#2c4166"
+              stroke="#FFF"
+              strokeWidth={2.5}
+              fill={colorMap[feature.properties.region]}
+              // fill="none"
               //@ts-expect-error: to allow clicking to work on web
               onClick={() => {
-                alert(feature.properties.admin)
+                alert(test)
               }}
               onPress={() => {
-                alert(feature.properties.admin)
+                alert(test)
               }}
             ></Path>
           ))}
@@ -79,6 +102,7 @@ const mobileStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#1C2B47',
+    zIndex: -1,
     // backgroundColor: "white"
   },
   svg: {
