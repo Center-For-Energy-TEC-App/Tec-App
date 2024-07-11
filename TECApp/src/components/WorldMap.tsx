@@ -1,11 +1,14 @@
 import * as d3 from 'd3'
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import { StyleSheet, Dimensions, Platform } from 'react-native'
 import data from '../../GeoChart.world.geo.json'
 import Svg, { Path, G } from 'react-native-svg'
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view'
+import { getAll } from '../api/requests'
 
 export const WorldMap = () => {
+  const [test, setTest] = useState<string>();
+
   const web = Platform.OS == 'web'
 
   const width = Dimensions.get('window').width
@@ -29,6 +32,12 @@ export const WorldMap = () => {
     SEA: '#DC4340',
     OPA: '#A86937',
   }
+
+  useEffect(()=>{
+    getAll().then(result=>{
+      setTest(result)
+    })
+  })
 
   return (
     <ReactNativeZoomableView
@@ -55,10 +64,10 @@ export const WorldMap = () => {
               // fill="none"
               //@ts-expect-error: to allow clicking to work on web
               onClick={() => {
-                alert(feature.properties.region)
+                alert(test)
               }}
               onPress={() => {
-                alert(feature.properties.region)
+                alert(test)
               }}
             ></Path>
           ))}
