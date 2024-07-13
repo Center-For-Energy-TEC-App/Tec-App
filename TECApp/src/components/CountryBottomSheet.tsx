@@ -24,12 +24,12 @@ const CountryBottomSheet = ({ selectedCountry }: CountryBottomSheetProps) => {
           <View style={styles.countryInfoContainer}>
             <Text style={styles.countryName}>{selectedCountry}</Text>
             <View style={styles.tabContainer}>
-              <TouchableOpacity onPress={() => setActiveTab('renewables')} style={styles.tab}>
+              <TouchableOpacity onPress={() => setActiveTab('renewables')}>
                 <Text style={activeTab === 'renewables' ? styles.activeTab : styles.inactiveTab}>
                   Distribute Renewables
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setActiveTab('visualizations')} style={styles.tab}>
+              <TouchableOpacity onPress={() => setActiveTab('visualizations')}>
                 <Text style={activeTab === 'visualizations' ? styles.activeTab : styles.inactiveTab}>
                   Data Visualizations
                 </Text>
@@ -72,13 +72,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 8,
     gap: 43,
-  },
-  tab: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontStyle: 'normal',
-    color: '#000',
-    fontWeight: '400'
   },
   activeTab: {
     fontWeight: '700',

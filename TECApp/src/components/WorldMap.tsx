@@ -21,6 +21,20 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
     .fitSize([width * widthScale, height], data)
   const pathGenerator = d3.geoPath().projection(projection)
 
+  const colorMap = {
+    NAM: '#9ED7F5',
+    LAM: '#78B85D',
+    EUR: '#0D5BA5',
+    SSA: '#01ABE7',
+    MEA: '#F8EE88',
+    NEE: '#E78C68',
+    CHN: '#C06998',
+    IND: '#978E86',
+    SEA: '#DC4340',
+    OPA: '#A86937',
+  }
+
+
   return (
     <ReactNativeZoomableView
       minZoom={1.5}
@@ -40,16 +54,17 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
             <Path
               d={pathGenerator(feature)}
               key={index}
-              stroke="#1C2B47"
-              strokeWidth={0.25}
-              fill="#2c4166"
+              stroke="#FFF"
+              strokeWidth={2.5}
+              fill={colorMap[feature.properties.region]}
+              // fill="none"
               //@ts-expect-error: to allow clicking to work on web
               onClick={() => {
                 //onSelectCountry here rather than alert
-                onSelectCountry(feature.properties.admin)
+                onSelectCountry(feature.properties.region)
               }}
               onPress={() => {
-                onSelectCountry(feature.properties.admin)
+                onSelectCountry(feature.properties.region)
               }}
             ></Path>
           ))}
@@ -84,6 +99,7 @@ const mobileStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#1C2B47',
+    zIndex: -1,
     // backgroundColor: "white"
   },
   svg: {
