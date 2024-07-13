@@ -5,7 +5,11 @@ import data from '../../GeoChart.world.geo.json'
 import Svg, { Path, G } from 'react-native-svg'
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view'
 
-export const WorldMap = () => {
+export interface WorldMapProps {
+  onSelectCountry: (country: string) => void
+}
+
+export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
   const web = Platform.OS == 'web'
 
   const width = Dimensions.get('window').width
@@ -41,10 +45,11 @@ export const WorldMap = () => {
               fill="#2c4166"
               //@ts-expect-error: to allow clicking to work on web
               onClick={() => {
-                alert(feature.properties.admin)
+                //onSelectCountry here rather than alert
+                onSelectCountry(feature.properties.admin)
               }}
               onPress={() => {
-                alert(feature.properties.admin)
+                onSelectCountry(feature.properties.admin)
               }}
             ></Path>
           ))}

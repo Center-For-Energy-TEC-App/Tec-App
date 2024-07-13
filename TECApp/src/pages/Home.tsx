@@ -1,23 +1,32 @@
 import { WorldMap } from '../components/WorldMap'
-import BottomSheet from '@gorhom/bottom-sheet'
-import React from 'react'
-import { useMemo } from 'react'
-import { Text, View } from 'react-native'
+import CountryBottomSheet from '../components/CountryBottomSheet'
+import React, { useState } from 'react'
+import { View, StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 export const Home = () => {
-  const snapPoints = useMemo(() => ['25%', '50%', '70%'], [])
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null)
 
+  const handleCountrySelect = (country: string) => {
+    setSelectedCountry(country);
+  }
   return (
-    <View style={{flex:1}}>
-      <WorldMap />
-      <GestureHandlerRootView>
-        <BottomSheet snapPoints={snapPoints}>
-          <View>
-            <Text>This is awesome!</Text>
-          </View>
-        </BottomSheet>
-      </GestureHandlerRootView>
+    <GestureHandlerRootView style={styles.gestureHandler}>
+    <View style={styles.container}>
+      <WorldMap onSelectCountry={handleCountrySelect} />
+      <CountryBottomSheet selectedCountry={selectedCountry ?? ''} />
     </View>
+    </GestureHandlerRootView>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  gestureHandler: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+})
