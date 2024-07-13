@@ -1,9 +1,10 @@
 import * as d3 from 'd3'
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import { StyleSheet, Dimensions, Platform } from 'react-native'
 import data from '../../GeoChart.world.geo.json'
 import Svg, { Path, G } from 'react-native-svg'
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view'
+import { getAll } from '../api/requests'
 
 export interface WorldMapProps {
   onSelectCountry: (country: string) => void
@@ -57,7 +58,6 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
               stroke="#FFF"
               strokeWidth={2.5}
               fill={colorMap[feature.properties.region]}
-              // fill="none"
               //@ts-expect-error: to allow clicking to work on web
               onClick={() => {
                 //onSelectCountry here rather than alert
