@@ -6,9 +6,11 @@ import Svg, { Path, G } from 'react-native-svg'
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view'
 import { getAll } from '../api/requests'
 
-export const WorldMap = () => {
-  const [test, setTest] = useState<string>();
+export interface WorldMapProps {
+  onSelectCountry: (country: string) => void
+}
 
+export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
   const web = Platform.OS == 'web'
 
   const width = Dimensions.get('window').width
@@ -33,11 +35,6 @@ export const WorldMap = () => {
     OPA: '#A86937',
   }
 
-  useEffect(()=>{
-    getAll().then(result=>{
-      setTest(result)
-    })
-  })
 
   return (
     <ReactNativeZoomableView
@@ -61,13 +58,13 @@ export const WorldMap = () => {
               stroke="#FFF"
               strokeWidth={2.5}
               fill={colorMap[feature.properties.region]}
-              // fill="none"
               //@ts-expect-error: to allow clicking to work on web
               onClick={() => {
-                alert(test)
+                //onSelectCountry here rather than alert
+                onSelectCountry(feature.properties.region)
               }}
               onPress={() => {
-                alert(test)
+                onSelectCountry(feature.properties.region)
               }}
             ></Path>
           ))}
