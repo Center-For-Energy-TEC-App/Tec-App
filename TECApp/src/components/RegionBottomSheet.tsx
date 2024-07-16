@@ -10,7 +10,7 @@ export interface RegionBottomSheetProps {
 }
 
 const RegionBottomSheet = ({ selectedRegion }: RegionBottomSheetProps) => {
-  const snapPoints = useMemo(() => ['10%', '25%', '50%'], [])
+  const snapPoints = useMemo(() => ['10%', '25%', '50%', '80%'], [])
   const bottomSheetRef = useRef<BottomSheet>(null)
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
