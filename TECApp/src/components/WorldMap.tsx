@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Dimensions, Platform } from 'react-native'
 import data from '../../GeoChart.world.geo.json'
 import Svg, { Path, G } from 'react-native-svg'
@@ -35,6 +35,18 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
     OPA: '#A86937',
   }
 
+  const regionMap = {
+    NAM: 'North America',
+    LAM: 'Latin America',
+    SSA: 'Sub-Saharan Africa',
+    MEA: 'Middle East & North Africa',
+    EUR: 'Europe',
+    NEE: 'North East Eurasia',
+    IND: 'Indian Subcontinent',
+    CHN: 'Greater China',
+    SEA: 'South East Asia',
+    OPA: 'OECD Pacific',
+  }
 
   return (
     <ReactNativeZoomableView
@@ -61,10 +73,10 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
               //@ts-expect-error: to allow clicking to work on web
               onClick={() => {
                 //onSelectCountry here rather than alert
-                onSelectCountry(feature.properties.region)
+                onSelectCountry(regionMap[feature.properties.region])
               }}
               onPress={() => {
-                onSelectCountry(feature.properties.region)
+                onSelectCountry(regionMap[feature.properties.region])
               }}
             ></Path>
           ))}

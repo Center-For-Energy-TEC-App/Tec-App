@@ -13,19 +13,19 @@ export const Home = () => {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null)
 
   const handleRegionSelect = (region: string) => {
-    setSelectedRegion(region);
+    setSelectedRegion(region)
   }
 
   return (
     <View style={mobileStyles.appWrapper}>
       <GestureHandlerRootView style={mobileStyles.gestureHandler}>
-      <WelcomePopup />
-      <WorldMap onSelectCountry={handleRegionSelect}/>
-      <RegionBottomSheet selectedRegion={selectedRegion ?? ''} />
-      <View style={mobileStyles.trackerWrapper}>
-        <Tracker type="temperature" />
-        <Tracker type="renewable" />
-      </View>
+        <WelcomePopup />
+        <WorldMap onSelectCountry={handleRegionSelect} />
+        <RegionBottomSheet selectedRegion={selectedRegion ?? ''} />
+        <View style={mobileStyles.trackerWrapper}>
+          <Tracker type="temperature" />
+          <Tracker type="renewable" />
+        </View>
       </GestureHandlerRootView>
     </View>
   )
