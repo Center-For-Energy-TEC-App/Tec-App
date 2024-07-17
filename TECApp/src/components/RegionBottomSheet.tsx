@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useRef, useState } from 'react'
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native'
-import BottomSheet from '@gorhom/bottom-sheet'
+import { Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
+import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations'
 
@@ -9,7 +9,7 @@ export interface RegionBottomSheetProps {
 }
 
 const RegionBottomSheet = ({ selectedRegion }: RegionBottomSheetProps) => {
-  const snapPoints = useMemo(() => ['10%', '25%', '50%'], [])
+  const snapPoints = useMemo(() => ['10%', '50%', '90%'], [])
   const bottomSheetRef = useRef<BottomSheet>(null)
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
