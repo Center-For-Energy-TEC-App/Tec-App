@@ -8,7 +8,7 @@ const DataVisualizations = () => {
   const [activeButton, setActiveButton] = useState('BAU Comparison')
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.buttonsWrapper}>
         <ScrollView horizontal={true}>
           <TouchableOpacity
@@ -54,12 +54,14 @@ const DataVisualizations = () => {
       ) : (
         <RegionalComparison />
       )}
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    maxWidth: '100%',
+  },
   text: {
     color: '#000',
     fontFamily: 'Roboto',

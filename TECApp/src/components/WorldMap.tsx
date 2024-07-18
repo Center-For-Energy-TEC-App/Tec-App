@@ -18,6 +18,7 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
 
   const projection = d3
     .geoNaturalEarth1()
+    //@ts-expect-error: weird property error with map
     .fitSize([width * widthScale, height], data)
   const pathGenerator = d3.geoPath().projection(projection)
 
@@ -38,6 +39,7 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
         <G>
           {data.features.map((feature, index) => (
             <Path
+              //@ts-expect-error: weird property error with map
               d={pathGenerator(feature)}
               key={index}
               stroke="#FFF"
