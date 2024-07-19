@@ -71,7 +71,7 @@ const RegionBottomSheet = ({ selectedRegion }: RegionBottomSheetProps) => {
             {activeTab === 'renewables' ? (
               <DistributeRenewables />
             ) : (
-              <DataVisualizations />
+              <DataVisualizations region={selectedRegion} />
             )}
           </View>
         ) : (

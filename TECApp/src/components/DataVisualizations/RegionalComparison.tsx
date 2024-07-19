@@ -2,7 +2,7 @@ import React, { View, Text, StyleSheet } from 'react-native'
 
 export const RegionalComparison = () => {
   return (
-    <View>
+    <View style={{ width: '100%' }}>
       <Text style={styles.header}>Regional Comparison</Text>
       <Text style={styles.body}>
         This graph compares the total renewable energy generation between two or

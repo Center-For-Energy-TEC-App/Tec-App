@@ -4,11 +4,17 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { BAUComparison } from './BAUComparison'
 import { RegionalComparison } from './RegionalComparison'
 
-const DataVisualizations = () => {
+type DataVisualizationsProps = {
+  region: string
+}
+const DataVisualizations = ({ region }: DataVisualizationsProps) => {
   const [activeButton, setActiveButton] = useState('BAU Comparison')
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ display: 'flex', alignItems: 'flex-start' }}
+    >
       <View style={styles.buttonsWrapper}>
         <ScrollView horizontal={true}>
           <TouchableOpacity
@@ -50,7 +56,7 @@ const DataVisualizations = () => {
         </ScrollView>
       </View>
       {activeButton === 'BAU Comparison' ? (
-        <BAUComparison />
+        <BAUComparison region={region} />
       ) : (
         <RegionalComparison />
       )}
@@ -60,7 +66,7 @@ const DataVisualizations = () => {
 
 const styles = StyleSheet.create({
   container: {
-    maxWidth: '100%',
+    width: '100%',
   },
   text: {
     color: '#000',
