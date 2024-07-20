@@ -17,7 +17,8 @@ const RegionBottomSheet = ({ selectedRegion }: RegionBottomSheetProps) => {
 
   useEffect(() => {
     if (selectedRegion) {
-      bottomSheetRef.current?.snapToIndex(1) // Snap to 25% when a region is selected
+      bottomSheetRef.current?.snapToIndex(2) // Snap to 25% when a region is selected
+      setActiveTab('renewables')
     }
   }, [selectedRegion])
 

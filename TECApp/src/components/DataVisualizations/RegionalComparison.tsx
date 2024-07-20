@@ -10,6 +10,7 @@ import { SelectBarArrow } from '../../SVGs/SelectBarArrow'
 import Checkbox from 'expo-checkbox'
 import { CurveObject, LineGraph } from './LineGraph'
 import * as d3 from 'd3'
+import { GraphKey } from './GraphKey'
 
 type RegionObject = {
   region: string
@@ -39,7 +40,7 @@ const colorMap = {
   'Latin America': '#78B85D',
   Europe: '#0D5BA5',
   'Sub-Saharan Africa': '#01ABE7',
-  'Middle East & North Africa': '#F8EE88',
+  'Middle East & N. Africa': '#F8EE88',
   'North East Eurasia': '#E78C68',
   'Greater China': '#C06998',
   'Indian Subcontinent': '#978E86',
@@ -157,7 +158,7 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
     { region: 'North America', selected: false, data: dummyNAM },
     { region: 'Latin America', selected: false, data: dummyLAM },
     { region: 'Europe', selected: false, data: dummyEUR },
-    { region: 'Middle East & North Africa', selected: false, data: dummyMEA },
+    { region: 'Middle East & N. Africa', selected: false, data: dummyMEA },
     { region: 'Sub-Saharan Africa', selected: false, data: dummySSA },
     { region: 'North East Eurasia', selected: false, data: dummyNEE },
     { region: 'South East Asia', selected: false, data: dummySEA },
@@ -237,18 +238,13 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
     setCurrLineCurves(newLineCurves)
   }, [numSelected])
 
-  /*
-  TODO:
-  -Add keys
-  -Bold region name in the header
-  -Click-out overlay
-  -Change region names to be shorter maybe
-  -Custom checkbox?
-  -Optimize
-  */
-
   return (
-    <View style={{ width: '100%' }}>
+    <Pressable
+      onPress={() => {
+        if (dropdown) setDropdown(false)
+      }}
+      style={{ width: '100%' }}
+    >
       <Text style={styles.header}>Regional Comparison</Text>
       <Text style={styles.body}>
         This graph compares the total renewable energy generation between two or
@@ -305,13 +301,26 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
       </View>
       {gradientCurve && currLineCurves && (
         <View style={styles.graphContainer}>
-          <LineGraph
-            gradientCurve={gradientCurve}
-            lineCurves={currLineCurves}
-          />
+          <View style={styles.graphInnerContainer}>
+            <GraphKey label={region.toUpperCase()} color={colorMap[region]} />
+            {dropdownOptions
+              .filter((item) => item.selected)
+              .map((e, key) => (
+                <GraphKey
+                  key={key}
+                  label={e.region.toUpperCase()}
+                  color={colorMap[e.region]}
+                />
+              ))}
+            <LineGraph
+              gradientCurve={gradientCurve}
+              lineCurves={currLineCurves}
+            />
+          </View>
         </View>
       )}
-    </View>
+      <View style={{ height: 50 }} />
+    </Pressable>
   )
 }
 
@@ -332,7 +341,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 5,
     marginTop: 30,
-    marginBottom: 50,
+    marginBottom: 20,
   },
 
   selectBarWrapper: {
@@ -342,7 +351,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectBar: {
-    width: 215,
+    width: 195,
     height: 34,
     borderRadius: 4,
     backgroundColor: '#FFF',
@@ -356,7 +365,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   dropdown: {
-    width: 215,
+    width: 195,
     display: 'flex',
     flexDirection: 'column',
     borderRadius: 4,
@@ -394,5 +403,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-end',
     gap: 4,
+  },
+  clickOutOverlay: {
+    position: 'relative',
   },
 })

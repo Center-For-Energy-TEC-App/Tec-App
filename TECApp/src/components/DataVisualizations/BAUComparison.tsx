@@ -1,7 +1,6 @@
 import React, { Text, StyleSheet, Dimensions, View } from 'react-native'
 import * as d3 from 'd3'
-import { AlteredRenewablesKey } from './GraphKeys/AlteredRenewablesKey'
-import { BAUKey } from './GraphKeys/BAUKey'
+import { GraphKey } from './GraphKey'
 import { LineGraph } from './LineGraph'
 
 const vw = Dimensions.get('window').width
@@ -83,8 +82,8 @@ export const BAUComparison = ({ region }: BAUComparisonProps) => {
       </View>
       <View style={styles.graphContainer}>
         <View style={styles.graphInnerContainer}>
-          <AlteredRenewablesKey />
-          <BAUKey />
+          <GraphKey label="ALTERED RENEWABLES" color="#C66AAA" />
+          <GraphKey label="BUSINESS-AS-USUAL" color="#58C4D4" />
           <LineGraph
             gradientCurve={{ curve: BAU_curve, color: '#9ED7F5' }}
             lineCurves={[{ curve: altered_curve, color: '#C66AAA' }]}
