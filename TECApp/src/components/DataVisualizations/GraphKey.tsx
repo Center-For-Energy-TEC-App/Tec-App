@@ -1,13 +1,17 @@
 import React, { StyleSheet, View, Text } from 'react-native'
 import Svg, { Rect } from 'react-native-svg'
 
-export const BAUKey = () => {
+type GraphKeyProps = {
+  label: string
+  color: string
+}
+export const GraphKey = ({ label, color }: GraphKeyProps) => {
   return (
     <View style={styles.graphKeyContainer}>
       <Svg width={7} height={7}>
-        <Rect width={7} height={7} fill="#58C4D4" />
+        <Rect width={7} height={7} fill={color} />
       </Svg>
-      <Text style={styles.graphKeyText}>BUSINESS-AS-USUAL</Text>
+      <Text style={styles.graphKeyText}>{label}</Text>
     </View>
   )
 }

@@ -58,7 +58,7 @@ const DataVisualizations = ({ region }: DataVisualizationsProps) => {
       {activeButton === 'BAU Comparison' ? (
         <BAUComparison region={region} />
       ) : (
-        <RegionalComparison />
+        <RegionalComparison region={region} />
       )}
     </ScrollView>
   )

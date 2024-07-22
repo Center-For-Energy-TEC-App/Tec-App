@@ -11139,7 +11139,7 @@
       {
         "type": "Feature",
         "properties": {
-          "region": "Middle East & North Africa",
+          "region": "Middle East & N. Africa",
           "regionAbrv": "MEA",
           "color": "#F8EE88"          },
         "geometry": {
