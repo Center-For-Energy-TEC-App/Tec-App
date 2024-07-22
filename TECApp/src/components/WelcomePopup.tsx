@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { StyleSheet, View, Text, Pressable } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { RightArrow } from '../SVGs/RightArrow'
 import { LeftArrow } from '../SVGs/LeftArrow'
 import { PaginationCircle } from '../SVGs/PaginationCircle'
@@ -104,12 +104,12 @@ export const WelcomePopup = () => {
               <PaginationCircle filled={popupState == 3} />
               <PaginationCircle filled={popupState == 4} />
             </View>
-            <Pressable
+            <TouchableOpacity
               onPress={() => setPopupState(5)}
               style={mobileStyles.skipButton}
             >
               <Text style={{ color: '#FFF', fontSize: 16 }}>Skip Tutorial</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </>
       ) : (
