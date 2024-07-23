@@ -223,7 +223,7 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
         .x((d) => x(d.year))
         .y1((d) => y(d.value))
         .y0(graphHeight + offset)
-        .curve(d3.curveBumpX)(
+        .curve(d3.curveMonotoneX)(
         dropdownOptions.find((item) => item.region === region).data,
       ),
       region: region,
@@ -235,7 +235,7 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
         .line<DataPoint>()
         .x((d) => x(d.year))
         .y((d) => y(d.value))
-        .curve(d3.curveBumpX)(
+        .curve(d3.curveMonotoneX)(
         dropdownOptions.find((item) => item.region === region).data,
       ),
       region: region,
@@ -249,7 +249,7 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
           .line<DataPoint>()
           .x((d) => x(d.year))
           .y((d) => y(d.value))
-          .curve(d3.curveBumpX)(i.data),
+          .curve(d3.curveMonotoneX)(i.data),
         region: i.region,
       }
       lineCurves.push(curve)
