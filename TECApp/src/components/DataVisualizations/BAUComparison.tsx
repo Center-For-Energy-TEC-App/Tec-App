@@ -12,26 +12,25 @@ const graphWidth = vw * 0.8
 const leftMargin = 60
 
 const dummyBAU = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
+  { year: 2024, value:Math.random() * 12 + 4 },
   { year: 2026, value: Math.random() * 12 + 4 },
   { year: 2027, value: Math.random() * 12 + 4 },
-  { year: 2028, value: Math.random() * 12 + 4 },
-  { year: 2029, value: Math.random() * 12 + 4 },
-  { year: 2030, value: Math.random() * 12 + 4 },
+  { year: 2028, value:Math.random() * 12 + 4},
+  { year: 2029, value:Math.random() * 12 + 4 },
+  { year: 2030, value:Math.random() * 12 + 4 },
 ]
 const dummyAltered = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
-  { year: 2026, value: Math.random() * 12 + 4 },
-  { year: 2027, value: Math.random() * 12 + 4 },
+  { year: 2024, value:Math.random() * 12 + 4},
+  { year: 2025, value:Math.random() * 12 + 4},
+  { year: 2026, value:Math.random() * 12 + 4},
+  { year: 2027, value:Math.random() * 12 + 4 },
   { year: 2028, value: Math.random() * 12 + 4 },
   { year: 2029, value: Math.random() * 12 + 4 },
   { year: 2030, value: Math.random() * 12 + 4 },
 ]
 
-const yMin = 0
-const yMax = 20
+const yMin = Math.min(Math.min(...dummyBAU.map(val=>val.value)), Math.min(...dummyAltered.map(val=>val.value)))
+const yMax = Math.max(Math.max(...dummyBAU.map(val=>val.value)), Math.max(...dummyAltered.map(val=>val.value)))
 
 const xMin = 2024
 const xMax = 2030
@@ -55,18 +54,24 @@ export const BAUComparison = ({ region }: BAUComparisonProps) => {
     .domain([xMin, xMax])
     .range([leftMargin, graphWidth])
 
-  const BAU_curve = d3
+  const BAU_gradient = d3
     .area<DataPoint>()
     .x((d) => x(d.year))
     .y1((d) => y(d.value))
     .y0(graphHeight + offset)
-    .curve(d3.curveNatural)(dummyBAU)
+    .curve(d3.curveBumpX)(dummyBAU)
+
+    const BAU_curve = d3
+    .line<DataPoint>()
+    .x((d) => x(d.year))
+    .y((d) => y(d.value))
+    .curve(d3.curveBumpX)(dummyBAU)
 
   const altered_curve = d3
     .line<DataPoint>()
     .x((d) => x(d.year))
     .y((d) => y(d.value))
-    .curve(d3.curveNatural)(dummyAltered)
+    .curve(d3.curveBumpX)(dummyAltered)
 
   return (
     <View style={{ width: '100%' }}>
@@ -85,6 +90,9 @@ export const BAUComparison = ({ region }: BAUComparisonProps) => {
           <GraphKey label="ALTERED RENEWABLES" color="#C66AAA" />
           <GraphKey label="BUSINESS-AS-USUAL" color="#58C4D4" />
           <LineGraph
+            yMin={yMin}
+            yMax={yMax}
+            gradient={{curve: BAU_gradient, color: '#9ED7F5'}}
             gradientCurve={{ curve: BAU_curve, color: '#9ED7F5' }}
             lineCurves={[{ curve: altered_curve, color: '#C66AAA' }]}
           />
