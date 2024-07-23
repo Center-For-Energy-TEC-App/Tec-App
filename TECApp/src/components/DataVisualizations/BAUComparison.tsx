@@ -13,6 +13,7 @@ const leftMargin = 60
 
 const dummyBAU = [
   { year: 2024, value: Math.random() * 12 + 4 },
+  { year: 2025, value: Math.random() * 12 + 4 },
   { year: 2026, value: Math.random() * 12 + 4 },
   { year: 2027, value: Math.random() * 12 + 4 },
   { year: 2028, value: Math.random() * 12 + 4 },
