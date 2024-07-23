@@ -49,13 +49,13 @@ const colorMap = {
 }
 
 const dummyNAM = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
-  { year: 2026, value: Math.random() * 12 + 4 },
-  { year: 2027, value: Math.random() * 12 + 4 },
-  { year: 2028, value: Math.random() * 12 + 4 },
-  { year: 2029, value: Math.random() * 12 + 4 },
-  { year: 2030, value: Math.random() * 12 + 4 },
+  { year: 2024, value: 4 },
+  { year: 2025, value: 6 },
+  { year: 2026, value: 5 },
+  { year: 2027, value: 4.8 },
+  { year: 2028, value: 6.2 },
+  { year: 2029, value: 5.8 },
+  { year: 2030, value: 5 },
 ]
 const dummyLAM = [
   { year: 2024, value: Math.random() * 12 + 4 },
@@ -88,13 +88,13 @@ const dummyMEA = [
 ]
 
 const dummySSA = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
-  { year: 2026, value: Math.random() * 12 + 4 },
-  { year: 2027, value: Math.random() * 12 + 4 },
-  { year: 2028, value: Math.random() * 12 + 4 },
-  { year: 2029, value: Math.random() * 12 + 4 },
-  { year: 2030, value: Math.random() * 12 + 4 },
+  { year: 2024, value: 0.2 },
+  { year: 2025, value: 0.1 },
+  { year: 2026, value: 0.15 },
+  { year: 2027, value: 0.12 },
+  { year: 2028, value: 0.09 },
+  { year: 2029, value: 0.19 },
+  { year: 2030, value: 0.25 },
 ]
 
 const dummyNEE = [
@@ -146,9 +146,6 @@ const dummyOPA = [
   { year: 2030, value: Math.random() * 12 + 4 },
 ]
 
-const yMin = 0
-const yMax = 20
-
 const xMin = 2024
 const xMax = 2030
 
@@ -167,43 +164,12 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
     { region: 'Indian Subcontinent', selected: false, data: dummyIND },
   ])
   const [numSelected, setNumSelected] = useState<number>(0)
-  const [currLineCurves, setCurrLineCurves] = useState<CurveObject[]>(undefined)
+  const [yMin, setYMin] = useState<number>()
+  const [yMax, setyMax] = useState<number>()
 
-  const y = d3
-    .scaleLinear()
-    .domain([yMin, yMax])
-    .range([graphHeight + offset, offset])
-  const x = d3
-    .scaleLinear()
-    .domain([xMin, xMax])
-    .range([leftMargin, graphWidth])
-
-  const gradientCurve = {
-    color: colorMap[region],
-    curve: d3
-      .area<DataPoint>()
-      .x((d) => x(d.year))
-      .y1((d) => y(d.value))
-      .y0(graphHeight + offset)
-      .curve(d3.curveNatural)(
-      dropdownOptions.find((item) => item.region === region).data,
-    ),
-    region: region,
-  }
-
-  const lineCurves = []
-  for (const i of dropdownOptions.filter((item) => item.region !== region)) {
-    const curve = {
-      color: colorMap[i.region],
-      curve: d3
-        .line<DataPoint>()
-        .x((d) => x(d.year))
-        .y((d) => y(d.value))
-        .curve(d3.curveNatural)(i.data),
-      region: i.region,
-    }
-    lineCurves.push(curve)
-  }
+  const [currGradient, setCurrGradient] = useState<CurveObject>()
+  const [currGradientCurve, setCurrGradientCurve] = useState<CurveObject>()
+  const [currLineCurves, setCurrLineCurves] = useState<CurveObject[]>()
 
   const onCheck = (key: number) => {
     if (numSelected < 4 || dropdownOptions[key].selected) {
@@ -224,18 +190,71 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
   }
 
   useEffect(() => {
-    const selectedRegions = dropdownOptions.filter((item) => item.selected)
+    const selectedRegions = dropdownOptions.filter((item) => item.selected) //regions checked
+    const allVisibleRegions = [
+      ...selectedRegions,
+      dropdownOptions.find((item) => item.region === region),
+    ] //all curves on graph
 
-    const newLineCurves = []
-    for (const i of selectedRegions) {
-      const curve = lineCurves.find(
-        (item) => item.region === i.region && item.region !== region,
-      )
-      if (curve) {
-        newLineCurves.push(curve)
-      }
+    let yMin = Number.POSITIVE_INFINITY
+    let yMax = Number.NEGATIVE_INFINITY
+
+    for (const i of allVisibleRegions) {
+      yMin = Math.min(yMin, Math.min(...i.data.map((val) => val.value)))
+      yMax = Math.max(yMax, Math.max(...i.data.map((val) => val.value)))
     }
-    setCurrLineCurves(newLineCurves)
+
+    setYMin(yMin)
+    setyMax(yMax)
+
+    const y = d3
+      .scaleLinear()
+      .domain([yMin, yMax])
+      .range([graphHeight + offset, offset])
+    const x = d3
+      .scaleLinear()
+      .domain([xMin, xMax])
+      .range([leftMargin, graphWidth])
+
+    setCurrGradient({
+      color: colorMap[region],
+      curve: d3
+        .area<DataPoint>()
+        .x((d) => x(d.year))
+        .y1((d) => y(d.value))
+        .y0(graphHeight + offset)
+        .curve(d3.curveMonotoneX)(
+        dropdownOptions.find((item) => item.region === region).data,
+      ),
+      region: region,
+    })
+
+    setCurrGradientCurve({
+      color: colorMap[region],
+      curve: d3
+        .line<DataPoint>()
+        .x((d) => x(d.year))
+        .y((d) => y(d.value))
+        .curve(d3.curveMonotoneX)(
+        dropdownOptions.find((item) => item.region === region).data,
+      ),
+      region: region,
+    })
+
+    const lineCurves = []
+    for (const i of selectedRegions) {
+      const curve = {
+        color: colorMap[i.region],
+        curve: d3
+          .line<DataPoint>()
+          .x((d) => x(d.year))
+          .y((d) => y(d.value))
+          .curve(d3.curveMonotoneX)(i.data),
+        region: i.region,
+      }
+      lineCurves.push(curve)
+    }
+    setCurrLineCurves(lineCurves)
   }, [numSelected])
 
   return (
@@ -299,7 +318,7 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
           )}
         </View>
       </View>
-      {gradientCurve && currLineCurves && (
+      {currGradientCurve && currLineCurves && (
         <View style={styles.graphContainer}>
           <View style={styles.graphInnerContainer}>
             <GraphKey label={region.toUpperCase()} color={colorMap[region]} />
@@ -313,7 +332,10 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
                 />
               ))}
             <LineGraph
-              gradientCurve={gradientCurve}
+              yMin={yMin}
+              yMax={yMax}
+              gradient={currGradient}
+              gradientCurve={currGradientCurve}
               lineCurves={currLineCurves}
             />
           </View>

@@ -18,9 +18,6 @@ const offset = 20
 const graphWidth = vw * 0.8
 const leftMargin = 60
 
-const verticalAxis = [0, 4, 8, 12, 16, 20]
-const horizontalAxis = [2024, 2026, 2028, 2030]
-
 export type CurveObject = {
   color: string
   curve: string
@@ -28,16 +25,37 @@ export type CurveObject = {
 }
 
 type LineGraphProps = {
+  gradient: CurveObject
   gradientCurve: CurveObject
   lineCurves: CurveObject[]
+  yMin: number
+  yMax: number
 }
 
-export const LineGraph = ({ gradientCurve, lineCurves }: LineGraphProps) => {
+export const LineGraph = ({
+  gradient,
+  gradientCurve,
+  lineCurves,
+  yMin,
+  yMax,
+}: LineGraphProps) => {
+  const yRange = yMax - yMin
+
+  const verticalAxis = [
+    yMin,
+    yMin + yRange * 0.2,
+    yMin + yRange * 0.4,
+    yMin + yRange * 0.6,
+    yMin + yRange * 0.8,
+    yMax,
+  ]
+  const horizontalAxis = [2024, 2026, 2028, 2030]
+
   return (
     <Svg width={graphWidth} height={svgHeight}>
       <Defs>
         <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0" stopColor={gradientCurve.color} stopOpacity={0.8} />
+          <Stop offset="0" stopColor={gradientCurve.color} stopOpacity={0.9} />
           <Stop offset="1" stopColor="#FFF" stopOpacity={0.01} />
         </LinearGradient>
       </Defs>
@@ -50,20 +68,22 @@ export const LineGraph = ({ gradientCurve, lineCurves }: LineGraphProps) => {
               key={key}
               x1={leftMargin}
               x2={graphWidth}
-              y1={graphHeight * (e / 20) + offset}
-              y2={graphHeight * (e / 20) + offset}
+              y1={(graphHeight * (e - yMin)) / yRange + offset}
+              y2={(graphHeight * (e - yMin)) / yRange + offset}
               stroke="#E9E9E9"
               strokeWidth={2}
             />
             <TextSvg
               strokeWidth={0.1}
-              y={graphHeight * ((20 - e) / 20) + offset + 3.5}
-              x={e >= 10 ? leftMargin - 22.5 : leftMargin - 17.5}
+              y={
+                (graphHeight * (yMax + yMin - e - yMin)) / yRange + offset + 3.5
+              }
+              x={e >= 10 ? leftMargin - 25 : leftMargin - 20}
               fontSize={10}
               fill="#9E9FA7"
               stroke="#9E9FA7"
             >
-              {e}
+              {e.toFixed(1)}
             </TextSvg>
           </G>
         ))}
@@ -110,10 +130,16 @@ export const LineGraph = ({ gradientCurve, lineCurves }: LineGraphProps) => {
       {/* Graph Curves */}
       <G>
         <Path
+          d={gradient.curve}
+          strokeWidth={0}
+          stroke={gradient.color}
+          fill="url(#grad)"
+        />
+        <Path
           d={gradientCurve.curve}
           strokeWidth={2}
           stroke={gradientCurve.color}
-          fill="url(#grad)"
+          fill="none"
         />
         {lineCurves.map((curveObject, key) => (
           <Path
@@ -124,30 +150,6 @@ export const LineGraph = ({ gradientCurve, lineCurves }: LineGraphProps) => {
             stroke={curveObject.color}
           />
         ))}
-        <Line
-          x1={leftMargin}
-          x2={graphWidth}
-          y1={graphHeight + offset}
-          y2={graphHeight + offset}
-          stroke="#E9E9E9"
-          strokeWidth={2}
-        />
-        <Line
-          x1={leftMargin}
-          x2={leftMargin}
-          y1={graphHeight + offset + 3}
-          y2={0}
-          stroke="#FFF"
-          strokeWidth={2.2}
-        ></Line>
-        <Line
-          x1={graphWidth}
-          x2={graphWidth}
-          y1={graphHeight + offset + 3}
-          y2={0}
-          stroke="#FFF"
-          strokeWidth={2.2}
-        ></Line>
       </G>
     </Svg>
   )
