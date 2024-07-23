@@ -18,7 +18,6 @@ const offset = 20
 const graphWidth = vw * 0.8
 const leftMargin = 60
 
-
 export type CurveObject = {
   color: string
   curve: string
@@ -26,17 +25,30 @@ export type CurveObject = {
 }
 
 type LineGraphProps = {
-  gradient: CurveObject,
+  gradient: CurveObject
   gradientCurve: CurveObject
   lineCurves: CurveObject[]
-  yMin: number,
-  yMax: number,
+  yMin: number
+  yMax: number
 }
 
-export const LineGraph = ({ gradient, gradientCurve, lineCurves, yMin, yMax }: LineGraphProps) => {
-  const yRange = yMax-yMin;
+export const LineGraph = ({
+  gradient,
+  gradientCurve,
+  lineCurves,
+  yMin,
+  yMax,
+}: LineGraphProps) => {
+  const yRange = yMax - yMin
 
-  const verticalAxis = [yMin, yMin+yRange*0.2, yMin+yRange*0.4, yMin+yRange*0.6, yMin+yRange*0.8, yMax]
+  const verticalAxis = [
+    yMin,
+    yMin + yRange * 0.2,
+    yMin + yRange * 0.4,
+    yMin + yRange * 0.6,
+    yMin + yRange * 0.8,
+    yMax,
+  ]
   const horizontalAxis = [2024, 2026, 2028, 2030]
 
   return (
@@ -56,14 +68,16 @@ export const LineGraph = ({ gradient, gradientCurve, lineCurves, yMin, yMax }: L
               key={key}
               x1={leftMargin}
               x2={graphWidth}
-              y1={graphHeight * (e-yMin)/yRange + offset}
-              y2={graphHeight * (e-yMin)/yRange + offset}
+              y1={(graphHeight * (e - yMin)) / yRange + offset}
+              y2={(graphHeight * (e - yMin)) / yRange + offset}
               stroke="#E9E9E9"
               strokeWidth={2}
             />
             <TextSvg
               strokeWidth={0.1}
-              y={graphHeight * ((yMax+yMin)-e-yMin)/yRange + offset + 3.5}
+              y={
+                (graphHeight * (yMax + yMin - e - yMin)) / yRange + offset + 3.5
+              }
               x={e >= 10 ? leftMargin - 25 : leftMargin - 20}
               fontSize={10}
               fill="#9E9FA7"

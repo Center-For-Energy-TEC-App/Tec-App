@@ -38,7 +38,7 @@ const leftMargin = 60
 const colorMap = {
   'North America': '#9ED7F5',
   'Latin America': '#78B85D',
-  'Europe': '#0D5BA5',
+  Europe: '#0D5BA5',
   'Sub-Saharan Africa': '#01ABE7',
   'Middle East & N. Africa': '#F8EE88',
   'North East Eurasia': '#E78C68',
@@ -167,10 +167,9 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
   const [yMin, setYMin] = useState<number>()
   const [yMax, setyMax] = useState<number>()
 
-  const [currGradient, setCurrGradient] = useState<CurveObject>();
-  const [currGradientCurve, setCurrGradientCurve] = useState<CurveObject>();
+  const [currGradient, setCurrGradient] = useState<CurveObject>()
+  const [currGradientCurve, setCurrGradientCurve] = useState<CurveObject>()
   const [currLineCurves, setCurrLineCurves] = useState<CurveObject[]>()
-
 
   const onCheck = (key: number) => {
     if (numSelected < 4 || dropdownOptions[key].selected) {
@@ -191,53 +190,56 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
   }
 
   useEffect(() => {
-    const selectedRegions = dropdownOptions.filter(item => item.selected)     //regions checked
-    const allVisibleRegions = [...selectedRegions, dropdownOptions.find(item=>item.region===region)] //all curves on graph
-    
+    const selectedRegions = dropdownOptions.filter((item) => item.selected) //regions checked
+    const allVisibleRegions = [
+      ...selectedRegions,
+      dropdownOptions.find((item) => item.region === region),
+    ] //all curves on graph
+
     let yMin = Number.POSITIVE_INFINITY
     let yMax = Number.NEGATIVE_INFINITY
 
-    for(const i of allVisibleRegions){
-      yMin = Math.min(yMin, Math.min(...i.data.map(val=>val.value)))
-      yMax = Math.max(yMax, Math.max(...i.data.map(val=>val.value)))
+    for (const i of allVisibleRegions) {
+      yMin = Math.min(yMin, Math.min(...i.data.map((val) => val.value)))
+      yMax = Math.max(yMax, Math.max(...i.data.map((val) => val.value)))
     }
 
     setYMin(yMin)
     setyMax(yMax)
 
     const y = d3
-    .scaleLinear()
-    .domain([yMin, yMax])
-    .range([graphHeight + offset, offset])
+      .scaleLinear()
+      .domain([yMin, yMax])
+      .range([graphHeight + offset, offset])
     const x = d3
       .scaleLinear()
       .domain([xMin, xMax])
       .range([leftMargin, graphWidth])
 
-      setCurrGradient({
-        color: colorMap[region],
-        curve: d3
-          .area<DataPoint>()
-          .x((d) => x(d.year))
-          .y1((d) => y(d.value))
-          .y0(graphHeight + offset)
-          .curve(d3.curveBumpX)(
-          dropdownOptions.find((item) => item.region === region).data,
-        ),
-        region: region,
-      })
+    setCurrGradient({
+      color: colorMap[region],
+      curve: d3
+        .area<DataPoint>()
+        .x((d) => x(d.year))
+        .y1((d) => y(d.value))
+        .y0(graphHeight + offset)
+        .curve(d3.curveBumpX)(
+        dropdownOptions.find((item) => item.region === region).data,
+      ),
+      region: region,
+    })
 
     setCurrGradientCurve({
-        color: colorMap[region],
-        curve: d3
-          .line<DataPoint>()
-          .x((d) => x(d.year))
-          .y((d) => y(d.value))
-          .curve(d3.curveBumpX)(
-          dropdownOptions.find((item) => item.region === region).data,
-        ),
-        region: region,
-      })
+      color: colorMap[region],
+      curve: d3
+        .line<DataPoint>()
+        .x((d) => x(d.year))
+        .y((d) => y(d.value))
+        .curve(d3.curveBumpX)(
+        dropdownOptions.find((item) => item.region === region).data,
+      ),
+      region: region,
+    })
 
     const lineCurves = []
     for (const i of selectedRegions) {
@@ -252,8 +254,7 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
       }
       lineCurves.push(curve)
     }
-    setCurrLineCurves(lineCurves)  
-
+    setCurrLineCurves(lineCurves)
   }, [numSelected])
 
   return (
