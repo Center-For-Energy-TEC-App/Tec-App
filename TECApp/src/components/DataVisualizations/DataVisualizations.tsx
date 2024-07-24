@@ -35,30 +35,53 @@ const DataVisualizations = ({ region }: DataVisualizationsProps) => {
               BAU Comparison
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setActiveButton('Regional Comparison')}
-            style={
-              activeButton === 'Regional Comparison'
-                ? styles.activeButton
-                : styles.inactiveButton
-            }
-          >
-            <Text
+          {region === 'Global' ? (
+            <TouchableOpacity
+              onPress={() => setActiveButton('Carbon Budget')}
               style={
-                activeButton === 'Regional Comparison'
-                  ? styles.activeButtonText
-                  : styles.inactiveButtonText
+                activeButton === 'Carbon Budget'
+                  ? styles.activeButton
+                  : styles.inactiveButton
               }
             >
-              Regional Comparison
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={
+                  activeButton === 'Carbon Budget'
+                    ? styles.activeButtonText
+                    : styles.inactiveButtonText
+                }
+              >
+                Carbon Budget
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => setActiveButton('Regional Comparison')}
+              style={
+                activeButton === 'Regional Comparison'
+                  ? styles.activeButton
+                  : styles.inactiveButton
+              }
+            >
+              <Text
+                style={
+                  activeButton === 'Regional Comparison'
+                    ? styles.activeButtonText
+                    : styles.inactiveButtonText
+                }
+              >
+                Regional Comparison
+              </Text>
+            </TouchableOpacity>
+          )}
         </ScrollView>
       </View>
       {activeButton === 'BAU Comparison' ? (
         <BAUComparison region={region} />
-      ) : (
+      ) : activeButton === 'Regional Comparison' ? (
         <RegionalComparison region={region} />
+      ) : (
+        <></>
       )}
     </ScrollView>
   )

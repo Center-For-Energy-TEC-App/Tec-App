@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import React from 'react'
 import { StyleSheet, Dimensions, Platform } from 'react-native'
 import data from '../../GeoChart.world.geo.json'
-import Svg, { Path, G } from 'react-native-svg'
+import Svg, { Path, G, Rect } from 'react-native-svg'
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view'
 
 export interface WorldMapProps {
@@ -24,6 +24,7 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
 
   return (
     <ReactNativeZoomableView
+      onMoveShouldSetPanResponderCapture={() => true}
       minZoom={1.5}
       initialZoom={1.5}
       maxZoom={3}
@@ -37,6 +38,14 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
     >
       <Svg style={web ? webStyles.svg : mobileStyles.svg}>
         <G>
+          <Rect
+            x={0}
+            y={0}
+            height="100%"
+            width="100%"
+            fill="#1C2B47"
+            onPress={() => onSelectCountry('Global')}
+          />
           {data.features.map((feature, index) => (
             <Path
               //@ts-expect-error: weird property error with map
@@ -68,7 +77,6 @@ const webStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1C2B47',
     // backgroundColor: "white"
   },
   svg: {

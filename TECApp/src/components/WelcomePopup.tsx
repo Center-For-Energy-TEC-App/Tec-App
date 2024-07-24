@@ -108,7 +108,9 @@ export const WelcomePopup = () => {
               onPress={() => setPopupState(5)}
               style={mobileStyles.skipButton}
             >
-              <Text style={{ color: '#FFF', fontSize: 16 }}>Skip Tutorial</Text>
+              <Text style={{ color: '#FFF', fontSize: 16 }}>
+                {popupState == 4 ? "Let's Begin!" : 'Skip Tutorial'}
+              </Text>
             </TouchableOpacity>
           </View>
         </>
@@ -188,7 +190,7 @@ const mobileStyles = StyleSheet.create({
   header: {
     textAlign: 'center',
     fontSize: 24,
-    fontFamily: 'Brix-Sans',
+    fontFamily: 'Brix Sans',
     fontStyle: 'normal',
     fontWeight: '400',
   },

@@ -12,13 +12,14 @@ const graphWidth = vw * 0.8
 const leftMargin = 60
 
 const dummyBAU = [
-  { year: 2024, value: 10},
+  { year: 2024, value: 10 },
   { year: 2025, value: 12 },
   { year: 2026, value: 14 },
   { year: 2027, value: 9 },
   { year: 2028, value: 11.5 },
   { year: 2029, value: 13 },
-  { year: 2030, value: 15},]
+  { year: 2030, value: 15 },
+]
 const dummyAltered = [
   { year: 2024, value: Math.random() * 12 + 4 },
   { year: 2025, value: Math.random() * 12 + 4 },
@@ -110,7 +111,7 @@ export const BAUComparison = ({ region }: BAUComparisonProps) => {
 
 const styles = StyleSheet.create({
   header: {
-    fontFamily: 'Brix-Sans',
+    fontFamily: 'Brix Sans',
     fontSize: 24,
     marginBottom: 8,
   },

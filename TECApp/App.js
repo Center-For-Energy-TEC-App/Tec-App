@@ -12,7 +12,7 @@ export default function App() {
   const Stack = createNativeStackNavigator()
   
   const [loaded, error] = useFonts({
-    'Brix-Sans': require('./assets/fonts/BrixSans.otf'),
+    'Brix Sans': require('./assets/fonts/BrixSans.otf'),
   });
 
   useEffect(() => {
