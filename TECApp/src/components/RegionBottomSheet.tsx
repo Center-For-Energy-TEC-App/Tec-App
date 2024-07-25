@@ -1,9 +1,8 @@
 import React, { useMemo, useEffect, useRef, useState } from 'react'
-import { Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
-import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet'
+import { Text, View, StyleSheet, TouchableOpacity } from 'react-native'
+import BottomSheet from '@gorhom/bottom-sheet'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations'
-import { TextInput } from 'react-native-gesture-handler'
 
 export interface RegionBottomSheetProps {
   selectedRegion: string
