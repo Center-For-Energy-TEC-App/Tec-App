@@ -33,10 +33,9 @@ const dummyData = [
 ]
 
 const dummy1Point5Limit = 10
-const dummy2Point0Limit = 18
+const dummy2Point0Limit = 20
 
 const yMin = Math.min(...dummyData.map((val) => val.value))
-
 const yMax = Math.max(...dummyData.map((val) => val.value))
 
 const xMin = 2024
@@ -65,10 +64,7 @@ export const CarbonBudget = () => {
 
   const dummyData2 = dummyData.filter((val) => val.year >= dummy2Point0Year)
 
-  const y = d3
-    .scaleLinear()
-    .domain([yMin, yMax])
-    .range([graphHeight + offset, offset])
+  const y = d3.scaleLinear().domain([yMin, yMax]).range([graphHeight, 0])
   const x = d3
     .scaleLinear()
     .domain([xMin, xMax])
@@ -78,14 +74,14 @@ export const CarbonBudget = () => {
     .area<DataPoint>()
     .x((d) => x(d.year))
     .y1((d) => y(d.value))
-    .y0(graphHeight + offset)
+    .y0(graphHeight)
     .curve(d3.curveMonotoneX)(dummyData1)
 
   const carbon_gradient2 = d3
     .area<DataPoint>()
     .x((d) => x(d.year))
     .y1((d) => y(d.value))
-    .y0(graphHeight + offset)
+    .y0(graphHeight)
     .curve(d3.curveMonotoneX)(dummyData2)
 
   const carbon_curve1 = d3
@@ -112,6 +108,12 @@ export const CarbonBudget = () => {
   ]
   const horizontalAxis = [2024, 2026, 2028, 2030]
 
+  //helper method for calculating y coordinate based on graph value
+  //calculated as proportion of graph height from the top
+  const calculateY = (val: number) => {
+    return (graphHeight * (yMax - val)) / yRange
+  }
+
   return (
     <View style={{ width: '100%' }}>
       <Text style={styles.header}>Carbon Budget</Text>
@@ -136,21 +138,21 @@ export const CarbonBudget = () => {
               </LinearGradient>
             </Defs>
             {/* Graph frame */}
-            <G>
+            <G y={offset}>
               {verticalAxis.map((e, key) => (
                 <G key={key}>
                   <Line
                     key={key}
                     x1={leftMargin}
                     x2={graphWidth}
-                    y1={(graphHeight * (e - yMin)) / yRange + offset}
-                    y2={(graphHeight * (e - yMin)) / yRange + offset}
+                    y1={calculateY(e)}
+                    y2={calculateY(e)}
                     stroke="#E9E9E9"
                     strokeWidth={2}
                   />
                   <TextSvg
                     strokeWidth={0.1}
-                    y={(graphHeight * (yMax - e)) / yRange + offset + 3.5}
+                    y={calculateY(e) + 3.5}
                     x={e >= 10 ? leftMargin - 25 : leftMargin - 20}
                     fontSize={10}
                     fill="#9E9FA7"
@@ -168,7 +170,7 @@ export const CarbonBudget = () => {
                 fontWeight={400}
                 fontFamily="Roboto"
                 fontSize={14}
-                x={-(graphHeight + offset - 50)}
+                x={-(graphHeight - 50)}
                 y={15}
               >
                 Emissions (GT)
@@ -177,7 +179,7 @@ export const CarbonBudget = () => {
                 <TextSvg
                   key={key}
                   x={graphWidth * (-(2024 - e) / 8.3) + leftMargin}
-                  y={graphHeight + offset + 25}
+                  y={graphHeight + 25}
                   strokeWidth={0.1}
                   fontWeight={700}
                   fontSize={10}
@@ -195,13 +197,13 @@ export const CarbonBudget = () => {
                 fontFamily="Roboto"
                 fontSize={14}
                 x={graphWidth / 2}
-                y={graphHeight + offset + 50}
+                y={graphHeight + 50}
               >
                 Years
               </TextSvg>
             </G>
             {/* Graph Curves */}
-            <G>
+            <G y={offset}>
               <Path d={carbon_gradient1} strokeWidth={0} fill={'url(#grad1)'} />
               <Path d={carbon_gradient2} strokeWidth={0} fill={'url(#grad2)'} />
               <Path
@@ -218,13 +220,7 @@ export const CarbonBudget = () => {
               />
               <Rect
                 x={leftMargin}
-                y={
-                  (graphHeight *
-                    (yMax - dummyData1[dummyData1.length - 1].value)) /
-                    yRange +
-                  offset -
-                  25
-                }
+                y={calculateY(dummyData1[dummyData1.length - 1].value) - 25}
                 width={62}
                 height={20}
                 rx={4}
@@ -241,13 +237,7 @@ export const CarbonBudget = () => {
                 letterSpacing={0.787}
                 fontSize={8}
                 x={leftMargin + 3}
-                y={
-                  (graphHeight *
-                    (yMax - dummyData1[dummyData1.length - 1].value)) /
-                    yRange +
-                  offset -
-                  12
-                }
+                y={calculateY(dummyData1[dummyData1.length - 1].value) - 12}
               >
                 2.0°C LIMIT
               </TextSvg>
@@ -255,32 +245,18 @@ export const CarbonBudget = () => {
                 strokeDasharray="6"
                 x1={leftMargin}
                 x2={graphWidth}
-                y1={
-                  (graphHeight *
-                    (yMax - dummyData1[dummyData1.length - 1].value)) /
-                    yRange +
-                  offset
-                }
-                y2={
-                  (graphHeight *
-                    (yMax - dummyData1[dummyData1.length - 1].value)) /
-                    yRange +
-                  offset
-                }
+                y1={calculateY(dummyData1[dummyData1.length - 1].value)}
+                y2={calculateY(dummyData1[dummyData1.length - 1].value)}
                 stroke="#58C4D4"
                 strokeWidth={1}
               />
               <Rect
-              opacity={0.5}
+                opacity={0.5}
                 x={leftMargin}
                 y={
-                  (graphHeight *
-                    (yMax -
-                      dummyData.find((val) => val.year == dummy1Point5Year)
-                        .value)) /
-                    yRange +
-                  offset -
-                  25
+                  calculateY(
+                    dummyData.find((val) => val.year == dummy1Point5Year).value,
+                  ) - 25
                 }
                 width={62}
                 height={20}
@@ -291,7 +267,7 @@ export const CarbonBudget = () => {
                 strokeWidth={1}
               />
               <TextSvg
-              opacity={0.5}
+                opacity={0.5}
                 stroke="#58C4D4"
                 fill="#58C4D4"
                 strokeWidth={0.05}
@@ -300,38 +276,24 @@ export const CarbonBudget = () => {
                 fontSize={8}
                 x={leftMargin + 3}
                 y={
-                  (graphHeight *
-                    (yMax -
-                      dummyData.find((val) => val.year == dummy1Point5Year)
-                        .value)) /
-                    yRange +
-                  offset -
-                  12
+                  calculateY(
+                    dummyData.find((val) => val.year == dummy1Point5Year).value,
+                  ) - 12
                 }
               >
                 1.5°C LIMIT
               </TextSvg>
               <Line
-              opacity={0.5}
+                opacity={0.5}
                 strokeDasharray="6"
                 x1={leftMargin}
                 x2={graphWidth}
-                y1={
-                  (graphHeight *
-                    (yMax -
-                      dummyData.find((val) => val.year == dummy1Point5Year)
-                        .value)) /
-                    yRange +
-                  offset
-                }
-                y2={
-                  (graphHeight *
-                    (yMax -
-                      dummyData.find((val) => val.year == dummy1Point5Year)
-                        .value)) /
-                    yRange +
-                  offset
-                }
+                y1={calculateY(
+                  dummyData.find((val) => val.year == dummy1Point5Year).value,
+                )}
+                y2={calculateY(
+                  dummyData.find((val) => val.year == dummy1Point5Year).value,
+                )}
                 stroke="#58C4D4"
                 strokeWidth={1}
               />

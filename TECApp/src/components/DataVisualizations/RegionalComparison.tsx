@@ -30,7 +30,6 @@ type RegionalComparisonProps = {
 const vw = Dimensions.get('window').width
 
 const graphHeight = 190
-const offset = 20
 
 const graphWidth = vw * 0.8
 const leftMargin = 60
@@ -162,14 +161,15 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
     { region: 'OECD Pacific', selected: false, data: dummyOPA },
     { region: 'Greater China', selected: false, data: dummyCHN },
     { region: 'Indian Subcontinent', selected: false, data: dummyIND },
-  ])
-  const [numSelected, setNumSelected] = useState<number>(0)
-  const [yMin, setYMin] = useState<number>()
-  const [yMax, setyMax] = useState<number>()
+  ]) //keeps track of state of every checkbox
+  const [numSelected, setNumSelected] = useState<number>(0) //easier way to keep track than parsing above state every time
 
-  const [currGradient, setCurrGradient] = useState<CurveObject>()
-  const [currGradientCurve, setCurrGradientCurve] = useState<CurveObject>()
-  const [currLineCurves, setCurrLineCurves] = useState<CurveObject[]>()
+  const [yMin, setYMin] = useState<number>() //dynamic yMin based on what's selected
+  const [yMax, setyMax] = useState<number>() //dynamic yMax based on what's selected
+
+  const [currGradient, setCurrGradient] = useState<CurveObject>() //current region gradient
+  const [currGradientCurve, setCurrGradientCurve] = useState<CurveObject>() //current region curve
+  const [currLineCurves, setCurrLineCurves] = useState<CurveObject[]>() //curves of all checked regions
 
   const onCheck = (key: number) => {
     if (numSelected < 4 || dropdownOptions[key].selected) {
@@ -189,12 +189,13 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
     }
   }
 
+  //all calculations rerun when new region selected/unselected
   useEffect(() => {
     const selectedRegions = dropdownOptions.filter((item) => item.selected) //regions checked
     const allVisibleRegions = [
       ...selectedRegions,
       dropdownOptions.find((item) => item.region === region),
-    ] //all curves on graph
+    ] //regions checked + current region
 
     let yMin = Number.POSITIVE_INFINITY
     let yMax = Number.NEGATIVE_INFINITY
@@ -207,10 +208,7 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
     setYMin(yMin)
     setyMax(yMax)
 
-    const y = d3
-      .scaleLinear()
-      .domain([yMin, yMax])
-      .range([graphHeight + offset, offset])
+    const y = d3.scaleLinear().domain([yMin, yMax]).range([graphHeight, 0])
     const x = d3
       .scaleLinear()
       .domain([xMin, xMax])
@@ -222,7 +220,7 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
         .area<DataPoint>()
         .x((d) => x(d.year))
         .y1((d) => y(d.value))
-        .y0(graphHeight + offset)
+        .y0(graphHeight)
         .curve(d3.curveMonotoneX)(
         dropdownOptions.find((item) => item.region === region).data,
       ),

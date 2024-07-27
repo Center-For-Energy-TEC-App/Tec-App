@@ -5,7 +5,7 @@ import { LeftArrow } from '../SVGs/LeftArrow'
 import { PaginationCircle } from '../SVGs/PaginationCircle'
 
 export const WelcomePopup = () => {
-  const [popupState, setPopupState] = useState(0)
+  const [popupState, setPopupState] = useState(0) //states 0-4 represent 5 slides
 
   return (
     <>
