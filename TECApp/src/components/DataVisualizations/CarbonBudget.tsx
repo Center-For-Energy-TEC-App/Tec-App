@@ -50,6 +50,7 @@ export const CarbonBudget = () => {
   let sum = 0
   let dummy1Point5Year: number
   let dummy2Point0Year: number
+  //calculating x-axis position of each temperature limit
   for (const i of dummyData) {
     sum += i.value
     if (!dummy1Point5Year && sum > dummy1Point5Limit) {
@@ -60,8 +61,8 @@ export const CarbonBudget = () => {
     }
   }
 
+  //separate data based on 2 degree limit
   const dummyData1 = dummyData.filter((val) => val.year <= dummy2Point0Year)
-
   const dummyData2 = dummyData.filter((val) => val.year >= dummy2Point0Year)
 
   const y = d3.scaleLinear().domain([yMin, yMax]).range([graphHeight, 0])
