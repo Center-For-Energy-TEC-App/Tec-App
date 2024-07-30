@@ -3,13 +3,17 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { Tracker } from './Tracker'
+import { ScrollView } from 'react-native-gesture-handler'
 
 export const GlobalDashboard = () => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
   )
   return (
-    <View style={styles.regionInfoContainer}>
+    <ScrollView
+      style={styles.regionInfoContainer}
+      contentContainerStyle={{ alignItems: 'flex-start' }}
+    >
       <Text style={styles.regionName}>Global Climate Dashboard</Text>
       <Text style={styles.body}>
         Set default global renewable values and keep track of your progress
@@ -70,7 +74,7 @@ export const GlobalDashboard = () => {
       ) : (
         <DataVisualizations region="Global" />
       )}
-    </View>
+    </ScrollView>
   )
 }
 
@@ -78,7 +82,6 @@ const styles = StyleSheet.create({
   regionInfoContainer: {
     flex: 1,
     width: '100%',
-    alignItems: 'flex-start',
   },
   regionName: {
     color: '#000',

@@ -11,9 +11,9 @@ import Svg, {
 
 const vw = Dimensions.get('window').width
 
-const svgHeight = 300
-const graphHeight = 190
-const offset = 20
+const svgHeight = 300 //height of whole svg
+const graphHeight = 190 //height of graph graph
+const offset = 20 //graph starts this amount from the top of the svg container (allows for axes label to peek out above strict graph limits)
 
 const graphWidth = vw * 0.8
 const leftMargin = 60
@@ -24,12 +24,16 @@ export type CurveObject = {
   region?: string
 }
 
+/*
+ * Note: we separate gradient and gradientCurve because having a single area curve
+ * forces borders on all sides when we only want the stroked curve on the top of the gradient
+ */
 type LineGraphProps = {
-  gradient: CurveObject
-  gradientCurve: CurveObject
-  lineCurves: CurveObject[]
-  yMin: number
-  yMax: number
+  gradient: CurveObject //area curve for gradient
+  gradientCurve: CurveObject //line curve for gradient border
+  lineCurves: CurveObject[] //generic line curves
+  yMin: number //minimum y-axis value of data
+  yMax: number //maximum y-axis value of data
 }
 
 export const LineGraph = ({
@@ -41,6 +45,7 @@ export const LineGraph = ({
 }: LineGraphProps) => {
   const yRange = yMax - yMin
 
+  //y-axis label calculations
   const verticalAxis = [
     yMin,
     yMin + yRange * 0.2,
@@ -51,8 +56,15 @@ export const LineGraph = ({
   ]
   const horizontalAxis = [2024, 2026, 2028, 2030]
 
+  //helper method for calculating y coordinate based on graph value
+  //calculated as proportion of graph height from the top
+  const calculateY = (val: number) => {
+    return (graphHeight * (yMax - val)) / yRange
+  }
+
   return (
     <Svg width={graphWidth} height={svgHeight}>
+      {/* Gradient definitions*/}
       <Defs>
         <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
           <Stop offset="0" stopColor={gradientCurve.color} stopOpacity={0.9} />
@@ -61,24 +73,22 @@ export const LineGraph = ({
       </Defs>
 
       {/* Graph frame */}
-      <G>
+      <G y={offset}>
         {verticalAxis.map((e, key) => (
           <G key={key}>
             <Line
               key={key}
               x1={leftMargin}
               x2={graphWidth}
-              y1={(graphHeight * (e - yMin)) / yRange + offset}
-              y2={(graphHeight * (e - yMin)) / yRange + offset}
+              y1={calculateY(e)}
+              y2={calculateY(e)}
               stroke="#E9E9E9"
               strokeWidth={2}
             />
             <TextSvg
               strokeWidth={0.1}
-              y={
-                (graphHeight * (yMax + yMin - e - yMin)) / yRange + offset + 3.5
-              }
-              x={e >= 10 ? leftMargin - 25 : leftMargin - 20}
+              y={calculateY(e) + 3.5}
+              x={e >= 10 ? leftMargin - 25 : leftMargin - 20} //double digits take up more space
               fontSize={10}
               fill="#9E9FA7"
               stroke="#9E9FA7"
@@ -95,7 +105,7 @@ export const LineGraph = ({
           fontWeight={400}
           fontFamily="Roboto"
           fontSize={14}
-          x={-(graphHeight + offset - 30)}
+          x={-(graphHeight - 30)}
           y={15}
         >
           Renewable Capacity (TW)
@@ -104,7 +114,7 @@ export const LineGraph = ({
           <TextSvg
             key={key}
             x={graphWidth * (-(2024 - e) / 8.3) + leftMargin}
-            y={graphHeight + offset + 25}
+            y={graphHeight + 25}
             strokeWidth={0.1}
             fontWeight={700}
             fontSize={10}
@@ -122,13 +132,13 @@ export const LineGraph = ({
           fontFamily="Roboto"
           fontSize={14}
           x={graphWidth / 2}
-          y={graphHeight + offset + 50}
+          y={graphHeight + 50}
         >
           Years
         </TextSvg>
       </G>
       {/* Graph Curves */}
-      <G>
+      <G y={offset}>
         <Path
           d={gradient.curve}
           strokeWidth={0}

@@ -6,7 +6,6 @@ import { LineGraph } from './LineGraph'
 const vw = Dimensions.get('window').width
 
 const graphHeight = 190
-const offset = 20
 
 const graphWidth = vw * 0.8
 const leftMargin = 60
@@ -30,10 +29,13 @@ const dummyAltered = [
   { year: 2030, value: Math.random() * 12 + 4 },
 ]
 
+//min of both datasets
 const yMin = Math.min(
   Math.min(...dummyBAU.map((val) => val.value)),
   Math.min(...dummyAltered.map((val) => val.value)),
 )
+
+//max of both datasets
 const yMax = Math.max(
   Math.max(...dummyBAU.map((val) => val.value)),
   Math.max(...dummyAltered.map((val) => val.value)),
@@ -52,28 +54,30 @@ type BAUComparisonProps = {
 }
 
 export const BAUComparison = ({ region }: BAUComparisonProps) => {
-  const y = d3
-    .scaleLinear()
-    .domain([yMin, yMax])
-    .range([graphHeight + offset, offset])
+  //define y-axis scale
+  const y = d3.scaleLinear().domain([yMin, yMax]).range([graphHeight, 0])
+  //define x-axis scale
   const x = d3
     .scaleLinear()
     .domain([xMin, xMax])
     .range([leftMargin, graphWidth])
 
+  //define BAU area curve (just gradient)
   const BAU_gradient = d3
     .area<DataPoint>()
     .x((d) => x(d.year))
     .y1((d) => y(d.value))
-    .y0(graphHeight + offset)
+    .y0(graphHeight)
     .curve(d3.curveMonotoneX)(dummyBAU)
 
+  //define BAU line curve
   const BAU_curve = d3
     .line<DataPoint>()
     .x((d) => x(d.year))
     .y((d) => y(d.value))
     .curve(d3.curveMonotoneX)(dummyBAU)
 
+  //define altered renewables line curve
   const altered_curve = d3
     .line<DataPoint>()
     .x((d) => x(d.year))

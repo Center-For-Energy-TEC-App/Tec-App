@@ -3,6 +3,7 @@ import { Text, StyleSheet, View, ScrollView } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { BAUComparison } from './BAUComparison'
 import { RegionalComparison } from './RegionalComparison'
+import { CarbonBudget } from './CarbonBudget'
 
 type DataVisualizationsProps = {
   region: string
@@ -81,7 +82,7 @@ const DataVisualizations = ({ region }: DataVisualizationsProps) => {
       ) : activeButton === 'Regional Comparison' ? (
         <RegionalComparison region={region} />
       ) : (
-        <></>
+        <CarbonBudget />
       )}
     </ScrollView>
   )
