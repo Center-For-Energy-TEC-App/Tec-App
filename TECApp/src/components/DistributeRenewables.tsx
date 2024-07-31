@@ -1,47 +1,108 @@
-import React from 'react'
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-} from 'react-native'
-import Slider from '@react-native-community/slider'
-import { WindIcon } from '../SVGs/DistributeRenewablesIcons/WindIcon'
-import { SolarIcon } from '../SVGs/DistributeRenewablesIcons/SolarIcon'
-import { HydroIcon } from '../SVGs/DistributeRenewablesIcons/HydroIcon'
-import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon'
-import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon'
-import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon'
-import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
+  Modal,
+} from 'react-native';
+import { Slider } from '@miblanchard/react-native-slider';
+import { WindIcon } from '../SVGs/DistributeRenewablesIcons/WindIcon';
+import { SolarIcon } from '../SVGs/DistributeRenewablesIcons/SolarIcon';
+import { HydroIcon } from '../SVGs/DistributeRenewablesIcons/HydroIcon';
+import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon';
+import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon';
+import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon';
+import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon';
 
 const DistributeRenewables = () => {
+  const [selectedSlider, setSelectedSlider] = useState<string | null>(null);
+  const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
+
+  const renderTrackMark = (index: number, mark: string) => (
+    <View style={styles.trackMarkContainer} key={index}>
+      <View style={styles.trackMark} />
+      <Text style={styles.trackMarkLabel}>{mark}</Text>
+    </View>
+  );
+
+  const handleSlidingStart = (label: string) => {
+    setSelectedSlider(label);
+  };
+
+  const getSourceColor = (label: string) => {
+    switch (label) {
+      case 'Wind':
+        return '#C66AAA';
+      case 'Solar':
+        return '#F8CE46';
+      case 'Hydropower':
+        return '#58C4D4';
+      case 'Biomass':
+        return '#779448';
+      case 'Geothermal':
+        return '#BF9336';
+      case 'Nuclear*':
+        return '#EE8E35';
+      default:
+        return '#B5B1AA';
+    }
+  };
+
+  const toggleTooltip = (label: string) => {
+    setVisibleTooltip(visibleTooltip === label ? null : label);
+  };
+
+  const renderTooltip = (label: string, text: string) => (
+    <Modal
+      transparent={true}
+      visible={visibleTooltip === label}
+      onRequestClose={() => setVisibleTooltip(null)}
+    >
+      <View style={styles.tooltipOverlay}>
+        <View style={styles.tooltip}>
+          <Text style={styles.tooltipText}>{text}</Text>
+          <TouchableOpacity
+            style={styles.tooltipCloseButton}
+            onPress={() => setVisibleTooltip(null)}
+          >
+            <Text style={styles.tooltipCloseButtonText}>X</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+
   const renderSlider = (label, IconComponent, tooltip) => (
-    <View style={styles.sliderContainer}>
+    <View style={styles.sliderContainer} key={label}>
       <View style={styles.labelContainer}>
         <IconComponent width={22} height={22} />
         <Text style={styles.label}>{label}</Text>
-        <TouchableOpacity>
-          <ToolTipIcon></ToolTipIcon>
+        <TouchableOpacity onPress={() => toggleTooltip(label)}>
+          <ToolTipIcon />
         </TouchableOpacity>
       </View>
+      {renderTooltip(label, tooltip)}
       <View style={styles.sliderWrapper}>
-        <Text style={styles.sliderStartLabel}>2024</Text>
         <Slider
-          style={styles.slider}
+          containerStyle={styles.slider}
           minimumValue={2024}
           maximumValue={2035}
-          value={0}
-          thumbTintColor="#B5B1AA"
-          minimumTrackTintColor="#B5B1AA"
+          value={0.1}
+          thumbTintColor={selectedSlider === label ? getSourceColor(label) : '#B5B1AA'}
+          minimumTrackTintColor={getSourceColor(label)}
           maximumTrackTintColor="#B5B1AA"
+          trackMarks={[2024, 2027.5, 2030]}
+          renderTrackMarkComponent={(index) => renderTrackMark(index, ['2024', 'BAU', 'GV'][index])}
+          onSlidingStart={() => handleSlidingStart(label)}
         />
         <View style={styles.sliderValueBox}>
           <Text style={styles.sliderValue}>000 GW</Text>
         </View>
       </View>
     </View>
-  )
+  );
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -54,12 +115,12 @@ const DistributeRenewables = () => {
         <Text style={styles.capacityProportionText}>Renewable Capacity Proportions</Text>
         <View style={styles.bar}></View>
       </View>
-      {renderSlider('Wind', WindIcon, 'Wind power tooltip text')}
-      {renderSlider('Solar', SolarIcon, 'Solar power tooltip text')}
-      {renderSlider('Hydropower', HydroIcon, 'Hydropower tooltip text')}
-      {renderSlider('Biomass', BiomassIcon, 'Biomass tooltip text')}
-      {renderSlider('Geothermal', GeothermalIcon, 'Geothermal tooltip text')}
-      {renderSlider('Nuclear*', NuclearIcon, 'Nuclear power tooltip text')}
+      {renderSlider('Wind', WindIcon, 'Wind power involves using wind turbines to convert moving air in the form of kinetic energy into electrical energy. Wind power is captured through wind turbines that rotate when wind passes through them.')}
+      {renderSlider('Solar', SolarIcon, 'Solar power converts sunlight into electrical energy through photovoltaic panels. This energy can be used to generate electricity or can be stored in batteries.')}
+      {renderSlider('Hydropower', HydroIcon, 'Hydropower generates electricity using the energy of water. This is harnessed by using turbines and generators to convert the natural kinetic energy of water into electricity.')}
+      {renderSlider('Biomass', BiomassIcon, 'Most biomass power systems are generated by the direct combustion of organic materials such as crops and waste products, which are burned and produce steam that drives a generator. ')}
+      {renderSlider('Geothermal', GeothermalIcon, 'Geothermal power is generated from heat within the Earth’s core. Geothermal wells and heat exchangers are used to tap into reservoirs of steam and hot water.')}
+      {renderSlider('Nuclear*', NuclearIcon, 'Nuclear power is generated through nuclear reactions, typically involving the splitting of atoms to release energy. This is then harnessed to generate electricity.')}
 
       <Text style={styles.nuclearNote}>
         *Not a renewable energy source, but supports carbon reduction goals by
@@ -87,7 +148,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 16,
   },
-  capacityProportionContainer:{
+  capacityProportionContainer: {
     display: 'flex',
     flexDirection: 'column',
     paddingHorizontal: 10,
@@ -124,20 +185,38 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#000',
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '400',
   },
+  tooltipOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
   tooltip: {
-    marginLeft: 8,
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    position: 'relative',
+  },
+  tooltipText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  tooltipCloseButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  tooltipCloseButtonText: {
+    fontSize: 16,
+    color: '#000',
   },
   sliderWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  sliderStartLabel: {
-    color: '#000',
-    fontSize: 14,
-    marginRight: 8,
   },
   slider: {
     flex: 1,
@@ -154,8 +233,8 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 14,
   },
-  spacer:{
-    marginTop: 46
+  spacer: {
+    marginTop: 46,
   },
   nuclearNote: {
     color: '#757678',
@@ -179,6 +258,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '400',
   },
-})
+  trackMarkContainer: {
+    paddingTop: 20,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  trackMark: {
+    width: 1,
+    height: 21,
+    backgroundColor: '#B5B1AA',
+  },
+  trackMarkLabel: {
+    color: '#B5B1AA',
+    fontSize: 17
+  },
+});
 
-export default DistributeRenewables
+export default DistributeRenewables;
