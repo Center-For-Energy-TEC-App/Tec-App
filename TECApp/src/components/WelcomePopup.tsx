@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { StyleSheet, View, Text, Pressable } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { RightArrow } from '../SVGs/RightArrow'
 import { LeftArrow } from '../SVGs/LeftArrow'
 import { PaginationCircle } from '../SVGs/PaginationCircle'
 
 export const WelcomePopup = () => {
-  const [popupState, setPopupState] = useState(0)
+  const [popupState, setPopupState] = useState(0) //states 0-4 represent 5 slides
 
   return (
     <>
@@ -104,12 +104,14 @@ export const WelcomePopup = () => {
               <PaginationCircle filled={popupState == 3} />
               <PaginationCircle filled={popupState == 4} />
             </View>
-            <Pressable
+            <TouchableOpacity
               onPress={() => setPopupState(5)}
               style={mobileStyles.skipButton}
             >
-              <Text style={{ color: '#FFF', fontSize: 16 }}>Skip Tutorial</Text>
-            </Pressable>
+              <Text style={{ color: '#FFF', fontSize: 16 }}>
+                {popupState == 4 ? "Let's Begin!" : 'Skip Tutorial'}
+              </Text>
+            </TouchableOpacity>
           </View>
         </>
       ) : (
@@ -188,7 +190,7 @@ const mobileStyles = StyleSheet.create({
   header: {
     textAlign: 'center',
     fontSize: 24,
-    fontFamily: 'Brix-Sans',
+    fontFamily: 'Brix Sans',
     fontStyle: 'normal',
     fontWeight: '400',
   },

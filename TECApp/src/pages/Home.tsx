@@ -1,6 +1,6 @@
 import { Dimensions, StyleSheet, View } from 'react-native'
 import { WorldMap } from '../components/WorldMap'
-import RegionBottomSheet from '../components/RegionBottomSheet'
+import { BottomSheet } from '../components/BottomSheet'
 import { WelcomePopup } from '../components/WelcomePopup'
 import React, { useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -10,7 +10,7 @@ const vw = Dimensions.get('window').width
 const vh = Dimensions.get('window').height
 
 export const Home = () => {
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(null)
+  const [selectedRegion, setSelectedRegion] = useState<string>('Global')
 
   const handleRegionSelect = (region: string) => {
     setSelectedRegion(region)
@@ -21,7 +21,10 @@ export const Home = () => {
       <GestureHandlerRootView style={mobileStyles.gestureHandler}>
         <WelcomePopup />
         <WorldMap onSelectCountry={handleRegionSelect} />
-        <RegionBottomSheet selectedRegion={selectedRegion ?? ''} />
+        <BottomSheet
+          selectedRegion={selectedRegion}
+          onSwipeDown={() => setSelectedRegion('Global')}
+        />
         <View style={mobileStyles.trackerWrapper}>
           <Tracker type="temperature" />
           <Tracker type="renewable" />

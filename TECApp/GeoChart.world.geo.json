@@ -4,7 +4,9 @@
       {
         "type": "Feature",
         "properties": {
-          "region": "EUR"
+          "region": "Europe",
+          "regionAbrv": "EUR",
+          "color": "#0D5BA5"
         },
         "geometry": {
           "coordinates": [
@@ -3151,7 +3153,9 @@
       {
         "type": "Feature",
         "properties": {
-          "region": "NEE"
+          "region": "North East Eurasia",
+          "regionAbrv": "NEE",
+          "color": "#E78C68"
         },
         "geometry": {
           "coordinates": [
@@ -5703,8 +5707,9 @@
       {
         "type": "Feature",
         "properties": {
-          "region": "IND"
-        },
+          "region": "Indian Subcontinent",
+          "regionAbrv": "IND",
+          "color": "#978E86"        },
         "geometry": {
           "coordinates": [
             [
@@ -6534,8 +6539,9 @@
       {
         "type": "Feature",
         "properties": {
-          "region": "SSA"
-        },
+          "region": "Sub-Saharan Africa",
+          "regionAbrv": "SSA",
+          "color": "#01ABE7"        },
         "geometry": {
           "coordinates": [
             [
@@ -7481,8 +7487,9 @@
       {
         "type": "Feature",
         "properties": {
-          "region": "LAM"
-        },
+          "region": "Latin America",
+          "regionAbrv": "LAM",
+          "color": "#78B85D"         },
         "geometry": {
           "coordinates": [
             [
@@ -11132,8 +11139,9 @@
       {
         "type": "Feature",
         "properties": {
-          "region": "MEA"
-        },
+          "region": "Middle East & N. Africa",
+          "regionAbrv": "MEA",
+          "color": "#F8EE88"          },
         "geometry": {
           "coordinates": [
             [
@@ -12981,7 +12989,9 @@
       {
         "type": "Feature",
         "properties": {
-          "region": "SEA"
+          "region": "South East Asia",
+          "regionAbrv": "SEA",
+          "color": "#DC4340"   
         },
         "geometry": {
           "coordinates": [
@@ -15172,7 +15182,9 @@
       {
         "type": "Feature",
         "properties": {
-          "region": "CHN"
+          "region": "Greater China",
+          "regionAbrv": "CHN",
+          "color": "#C06998"
         },
         "geometry": {
           "coordinates": [
@@ -16231,8 +16243,9 @@
       {
         "type": "Feature",
         "properties": {
-          "region": "NAM"
-        },
+          "region": "North America",
+          "regionAbrv": "NAM",
+          "color": "#9ED7F5"        },
         "geometry": {
           "coordinates": [
             [
@@ -20734,8 +20747,9 @@
       {
         "type": "Feature",
         "properties": {
-          "region": "OPA"
-        },
+          "region": "OECD Pacific",
+          "regionAbrv": "OPA",
+          "color": "#A86937"        },
         "geometry": {
           "coordinates": [
             [
