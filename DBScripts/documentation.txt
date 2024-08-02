@@ -1,0 +1,21 @@
+All current database tables:
+
+allocation_default_global
+    -Default allocation values for global tab; includes default values for 2024, bau, and all possible
+    altered options from 8.0 - 15.5 TW
+
+allocation_default_chn
+allocation_default_eur
+allocation_default_ind
+allocation_default_lam
+allocation_default_mea
+allocation_default_nam
+allocation_default_nee
+allocation_default_opa
+allocation_default_sea
+allocation_default_ssa
+    -Regional allocation values based on global TW value; essentially same structure as global table but with 
+    an additional column for regional total
+
+min_max_values
+    -Contains minimum and maximum values for each region and each technology

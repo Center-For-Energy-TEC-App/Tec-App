@@ -18,9 +18,9 @@ cursor = conn.cursor()
 
 def insert_global():
 
-    cursor.execute(f"CREATE TABLE allocation_defaults_global (category varchar(40), global_tw decimal, solar_gw integer, wind_gw integer, hydro_gw integer, geo_gw integer, bio_gw integer, nuclear_gw integer);")
+    cursor.execute(f"CREATE TABLE allocation_defaults_global (category varchar(10), global_tw decimal, solar_gw integer, wind_gw integer, hydro_gw integer, geo_gw integer, bio_gw integer, nuclear_gw integer);")
 
-    with open(f"DBScripts/Data/TEC_Allocations.Limits.xlsx - Global.csv", mode="r") as csvfile:
+    with open(f"DBScripts/Data/Global-Table 1.csv", mode="r") as csvfile:
         reader = csv.reader(csvfile)
         for i, line in enumerate(reader):
             print(line)
@@ -33,9 +33,9 @@ def insert_global():
 
 def insert_region(region):
 
-    cursor.execute(f"CREATE TABLE allocation_defaults_{region.lower()} (category varchar(40), global_tw decimal, regional_gw integer, solar_gw integer, wind_gw integer, hydro_gw integer, geo_gw integer, bio_gw integer, nuclear_gw integer);")
+    cursor.execute(f"CREATE TABLE allocation_defaults_{region.lower()} (category varchar(10), global_tw decimal, regional_gw integer, solar_gw integer, wind_gw integer, hydro_gw integer, geo_gw integer, bio_gw integer, nuclear_gw integer);")
 
-    with open(f"DBScripts/Data/TEC_Allocations.Limits.xlsx - {region}.csv", mode="r") as csvfile:
+    with open(f"DBScripts/Data/{region}-Table 1.csv", mode="r") as csvfile:
         reader = csv.reader(csvfile)
         for i, line in enumerate(reader):
             print(line)
@@ -46,20 +46,32 @@ def insert_region(region):
             if i>6:
                 cursor.execute(f"INSERT INTO allocation_defaults_{region.lower()} VALUES ('altered',{line[0]},{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
 
-def insert_max_vals():
-        cursor.execute(f"CREATE TABLE max_values (energy_type varchar(40), global integer, chn integer, ind integer, mea integer, nam integer, nee integer, sea integer, eur integer, lam integer, ssa integer, opa integer);")
-        with open(f"DBScripts/Data/TEC_Allocations.Limits.xlsx - Max Values.csv", mode="r") as csvfile:
-            reader = csv.reader(csvfile)
-            for line in reader:
-                cursor.execute(f"INSERT INTO max_values VALUES ('{line[0].lower()}',{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]},{line[9]},{line[9]},{line[10]},{line[11]},{line[12]})")
+def insert_min_max_vals():
+    cursor.execute(f"CREATE TABLE min_max_values (category varchar(3), energy_type varchar(10), global decimal, chn decimal, ind decimal, mea decimal, nam decimal, nee decimal, sea decimal, eur decimal, lam decimal, ssa decimal, opa decimal);")
+    with open(f"DBScripts/Data/Max.Min Values-Table 1.csv", mode="r") as csvfile:
+        reader = csv.reader(csvfile)
+        for line in reader:
+            if line[1]=="Max GW":
+                cursor.execute(f"INSERT INTO min_max_values VALUES ('max','{line[0].lower()}',{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]},{line[9]},{line[9]},{line[10]},{line[11]},{line[12]})")
+            else:
+                cursor.execute(f"INSERT INTO min_max_values VALUES ('min','{line[0].lower()}',{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]},{line[9]},{line[9]},{line[10]},{line[11]},{line[12]})")
 
+def insert():
+    insert_global()
 
-insert_global()
+    for i in regions[1:]:
+        insert_region(i)
 
-for i in regions[1:]:
-    insert_region(i)
+    insert_min_max_vals()
 
-insert_max_vals()
+def empty_database():
+    for i in regions:
+        cursor.execute(f"DROP TABLE allocation_defaults_{i.lower()}")
+    cursor.execute("DROP TABLE min_max_values")
+
+insert()
+
+# empty_database()
 
 conn.commit()
 cursor.close()
