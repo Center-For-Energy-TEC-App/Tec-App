@@ -1,8 +1,9 @@
 import React, { useMemo, useEffect, useRef, useState } from 'react'
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Text } from 'react-native'
 import BottomSheetTemplate from '@gorhom/bottom-sheet'
 import { RegionalDashboard } from './RegionalDashboard'
 import { GlobalDashboard } from './GlobalDashboard'
+import { getDefaultValues } from '../api/requests'
 
 export interface BottomSheetProps {
   selectedRegion: string
@@ -17,7 +18,15 @@ export const BottomSheet = ({
   const bottomSheetRef = useRef<BottomSheetTemplate>(null)
   const [currRegion, setCurrRegion] = useState(selectedRegion)
 
+  const [values, setValues] = useState();
+
   useEffect(() => {
+
+    getDefaultValues({category: 'altered', region: 'global', global_tw:"8"}).then(val=>{
+      setValues(val)
+    }).catch(console.error)
+
+
     if (selectedRegion === 'Global') {
       bottomSheetRef.current.snapToIndex(0)  // Snap to 12.5% for global dashboard
     } else {
@@ -36,6 +45,7 @@ export const BottomSheet = ({
         onSwipeDown()
       }}
     >
+      <Text>{values && values["category"]}</Text>
       <View style={styles.contentContainer}>
         {currRegion !== 'Global' ? (
           <RegionalDashboard currRegion={currRegion} />

@@ -27,7 +27,7 @@ app.use(cors({
     origin: "*"
 }))
 
-router.get('/defaults/:region/:category/:global_tw', getDefaultValues)
+router.get('/defaults', getDefaultValues)
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)

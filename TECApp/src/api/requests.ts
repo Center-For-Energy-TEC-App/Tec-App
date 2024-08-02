@@ -1,6 +1,16 @@
-const url = process.env.EXPO_PUBLIC_BACKEND_URL
+const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 
-export async function getAll() {
-  const response = await fetch(url, { method: 'GET' })
-  return await response.text()
+type DefaultValuesRequest = {
+  category: "2024" | "bau" | "altered"
+  region: string,
+  global_tw: string,
+}
+
+
+export async function getDefaultValues(request: DefaultValuesRequest) {
+  const params = new URLSearchParams(request)
+  const url = `/defaults?${params.toString()}`
+
+  const response = await fetch(BASE_URL+url, { method: 'GET' })
+  return await response.json()
 }
