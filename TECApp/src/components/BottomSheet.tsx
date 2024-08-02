@@ -19,7 +19,7 @@ export const BottomSheet = ({
 
   useEffect(() => {
     if (selectedRegion === 'Global') {
-      bottomSheetRef.current.snapToIndex(0) // Snap to 12.5% for global dashboard
+      bottomSheetRef.current.snapToIndex(0)  // Snap to 12.5% for global dashboard
     } else {
       bottomSheetRef.current?.snapToIndex(2) // Snap to 25% when a region is selected
     }

@@ -1,6 +1,6 @@
-import express from "express"
+import express, {Router} from "express"
 import "dotenv/config"
-import { getAll } from "./src/query"
+import { getDefaultValues } from "./src/query"
 import Pool from "pg"
 import cors from "cors"
 
@@ -19,19 +19,15 @@ export const pool = new newPool({
     }
 })
 
-app.use(express.json())
+const router = Router()
 
+app.use(router)
+app.use(express.json())
 app.use(cors({
     origin: "*"
 }))
 
-app.get('/', (req, res) => {
-    getAll().then(response=>{
-        res.status(200).send(response);
-    }).catch(error=>{
-        res.status(500).send(error);
-    })
-})
+router.get('/defaults/:region/:category/:global_tw', getDefaultValues)
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)
