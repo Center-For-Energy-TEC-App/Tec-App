@@ -27,7 +27,7 @@ def insert_global():
             if i==3:
                 cursor.execute(f"INSERT INTO allocation_defaults_global VALUES ('2024',{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
             if i==4:
-                cursor.execute(f"INSERT INTO allocation_defaults_global VALUES ('BAU',{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
+                cursor.execute(f"INSERT INTO allocation_defaults_global VALUES ('bau',{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
             if i>6:
                 cursor.execute(f"INSERT INTO allocation_defaults_global VALUES ('altered',{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
 
@@ -42,7 +42,7 @@ def insert_region(region):
             if i==3:
                 cursor.execute(f"INSERT INTO allocation_defaults_{region.lower()} VALUES ('2024',5,{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
             if i==4:
-                cursor.execute(f"INSERT INTO allocation_defaults_{region.lower()} VALUES ('BAU',8,{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
+                cursor.execute(f"INSERT INTO allocation_defaults_{region.lower()} VALUES ('bau',8,{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
             if i>6:
                 cursor.execute(f"INSERT INTO allocation_defaults_{region.lower()} VALUES ('altered',{line[0]},{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
 
