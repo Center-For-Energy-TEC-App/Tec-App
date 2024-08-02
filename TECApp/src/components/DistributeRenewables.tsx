@@ -15,8 +15,13 @@ import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon';
 import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon';
 import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon';
 import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon';
+import { DefaultValues } from './BottomSheet';
 
-const DistributeRenewables = () => {
+type DistributeRenewablesProps = {
+  defaultValues: DefaultValues
+}
+
+const DistributeRenewables = ({defaultValues}: DistributeRenewablesProps) => {
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null);
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
 

@@ -4,6 +4,7 @@ import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { Tracker } from './Tracker'
 import { ScrollView } from 'react-native-gesture-handler'
+import { DefaultValues } from './BottomSheet'
 
 export const GlobalDashboard = () => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
@@ -70,7 +71,8 @@ export const GlobalDashboard = () => {
       </View>
       <View style={styles.horizontalLine} />
       {activeTab === 'renewables' ? (
-        <DistributeRenewables />
+        // <DistributeRenewables defaultValues={null}/>
+        <></>
       ) : (
         <DataVisualizations region="Global" />
       )}

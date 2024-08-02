@@ -1,6 +1,6 @@
 import express, {Router} from "express"
 import "dotenv/config"
-import { getDefaultValues } from "./src/query"
+import { getAllDefaultValues, getMinMaxValues } from "./src/query"
 import Pool from "pg"
 import cors from "cors"
 
@@ -27,7 +27,9 @@ app.use(cors({
     origin: "*"
 }))
 
-router.get('/defaults', getDefaultValues)
+router.get('/defaults', getAllDefaultValues)
+
+router.get('/minmax', getMinMaxValues)
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)

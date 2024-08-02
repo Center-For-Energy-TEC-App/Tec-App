@@ -2,17 +2,22 @@ import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
+import { DefaultValues, MinMaxValues } from './BottomSheet'
+
 
 type RegionalDashboardProps = {
-  currRegion: string
+  currRegion: string,
+  defaultValues: DefaultValues,
+  minMaxValues: MinMaxValues[]
 }
 
-export const RegionalDashboard = ({ currRegion }: RegionalDashboardProps) => {
+export const RegionalDashboard = ({ currRegion, defaultValues, minMaxValues }: RegionalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
   )
 
   useEffect(() => {
+    console.log(minMaxValues)
     setActiveTab('renewables')
   }, [currRegion])
 
@@ -61,7 +66,7 @@ export const RegionalDashboard = ({ currRegion }: RegionalDashboardProps) => {
       </View>
       <View style={styles.horizontalLine} />
       {activeTab === 'renewables' ? (
-        <DistributeRenewables />
+        <DistributeRenewables defaultValues={defaultValues} />
       ) : (
         <DataVisualizations region={currRegion} />
       )}
