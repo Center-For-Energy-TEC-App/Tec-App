@@ -45,5 +45,5 @@ export const getMinMaxValues = async (req: Request, res: Response, next: NextFun
         res.status(200).json(transposedResults)
     }else{
         res.status(400)
-    }
+    } 
 }

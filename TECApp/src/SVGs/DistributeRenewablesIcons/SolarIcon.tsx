@@ -2,12 +2,7 @@ import React from 'react'
 import { Svg, G, Rect, Path } from 'react-native-svg'
 
 export const SolarIcon = () => (
-  <Svg
-    width="22"
-    height="22"
-    viewBox="0 0 22 22"
-    fill="none"
-  >
+  <Svg width="22" height="22" viewBox="0 0 22 22" fill="none">
     <G id="Frame 103">
       <Rect width="22" height="22" rx="11" fill="#F8CE46" />
       <Path

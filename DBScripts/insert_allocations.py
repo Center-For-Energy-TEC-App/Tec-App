@@ -25,7 +25,7 @@ def insert_global():
         for i, line in enumerate(reader):
             print(line)
             if i==3:
-                cursor.execute(f"INSERT INTO allocation_defaults_global VALUES ('2024',{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
+                cursor.execute(f"INSERT INTO allocation_defaults_global VALUES ('2023',{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
             if i==4:
                 cursor.execute(f"INSERT INTO allocation_defaults_global VALUES ('bau',{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
             if i>6:
@@ -40,9 +40,9 @@ def insert_region(region):
         for i, line in enumerate(reader):
             print(line)
             if i==3:
-                cursor.execute(f"INSERT INTO allocation_defaults_{region.lower()} VALUES ('2024',5,{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
+                cursor.execute(f"INSERT INTO allocation_defaults_{region.lower()} VALUES ('2023',4.1,{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
             if i==4:
-                cursor.execute(f"INSERT INTO allocation_defaults_{region.lower()} VALUES ('bau',8,{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
+                cursor.execute(f"INSERT INTO allocation_defaults_{region.lower()} VALUES ('bau',8.0,{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
             if i>6:
                 cursor.execute(f"INSERT INTO allocation_defaults_{region.lower()} VALUES ('altered',{line[0]},{line[1]},{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
 
@@ -52,9 +52,9 @@ def insert_min_max_vals():
         reader = csv.reader(csvfile)
         for line in reader:
             if line[1]=="Max GW":
-                cursor.execute(f"INSERT INTO min_max_values VALUES ('max','{line[0].lower()}',{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]},{line[9]},{line[9]},{line[10]},{line[11]},{line[12]})")
+                cursor.execute(f"INSERT INTO min_max_values VALUES ('max','{line[0].lower()}',{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]},{line[8]},{line[9]},{line[10]},{line[11]},{line[12]})")
             else:
-                cursor.execute(f"INSERT INTO min_max_values VALUES ('min','{line[0].lower()}',{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]},{line[9]},{line[9]},{line[10]},{line[11]},{line[12]})")
+                cursor.execute(f"INSERT INTO min_max_values VALUES ('min','{line[0].lower()}',{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]},{line[8]},{line[9]},{line[10]},{line[11]},{line[12]})")
 
 def insert():
     insert_global()
