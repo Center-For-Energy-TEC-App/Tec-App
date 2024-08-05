@@ -48,7 +48,7 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
               d={pathGenerator(feature)}
               key={index}
               stroke="#FFF"
-              strokeWidth={2.5}
+              strokeWidth={0}
               fill={feature.properties.color}
               onPress={() => {
                 onSelectCountry(feature.properties.region)
