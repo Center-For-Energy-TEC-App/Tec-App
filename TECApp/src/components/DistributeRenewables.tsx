@@ -170,7 +170,7 @@ const DistributeRenewables = ({
           maximumTrackTintColor="#B5B1AA"
           trackMarks={[
             values[0][energyMap[label.toLowerCase()]],
-            values[1][energyMap[label.toLowerCase()]],
+            values[1][energyMap[label.toLowerCase()]]-0.0275*(parseFloat(minMaxValues.max[label.toLowerCase()])-parseFloat(minMaxValues.min[label.toLowerCase()])),
           ]}
           renderTrackMarkComponent={(index) =>
             renderTrackMark(index, ['2024', 'BAU'][index])

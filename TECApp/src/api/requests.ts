@@ -1,13 +1,8 @@
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 
-type DefaultValuesRequest = {
-  global_tw?: string
-}
 
-export async function getDefaultValues(request: DefaultValuesRequest) {
-  const params = new URLSearchParams(request)
-  const url = `/defaults?${params.toString()}`
-
+export async function getDefaultValues() {
+  const url = `/defaults`
   const response = await fetch(BASE_URL + url, { method: 'GET' })
   return await response.json()
 }

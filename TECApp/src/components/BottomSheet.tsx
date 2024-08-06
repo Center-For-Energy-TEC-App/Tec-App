@@ -6,6 +6,7 @@ import { GlobalDashboard } from './GlobalDashboard'
 import { getDefaultValues, getMinMaxValues } from '../api/requests'
 
 export type DefaultValues = {
+  region: string
   category: string
   global_tw: string
   regional_gw?: number
@@ -26,6 +27,7 @@ export type RegionalValues = {
   mea: DefaultValues[]
   opa: DefaultValues[]
   eur: DefaultValues[]
+  ssa: DefaultValues[]
   nee: DefaultValues[]
 }
 
@@ -94,10 +96,11 @@ export const BottomSheet = ({
   const [minMaxValues, setMinMaxValues] = useState<RegionalMinMaxValues>()
 
   useEffect(() => {
-    getDefaultValues({ global_tw: '8' })
+    getDefaultValues()
       .then((val) => {
         setRegionalDefaultValues(val)
         setRegionalDynamicValues(val)
+        console.log(val)
       })
       .catch(console.error)
     getMinMaxValues()
