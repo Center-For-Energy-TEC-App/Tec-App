@@ -57,26 +57,33 @@ const DistributeRenewables = ({
 
   const [sliderValues, setSliderValues] = useState<DefaultValues>(values[2])
 
-  const [sliderProportions, setSliderProportions] = useState<SliderProportions>(undefined)
+  const [sliderProportions, setSliderProportions] =
+    useState<SliderProportions>(undefined)
 
   useEffect(() => {
     setSliderValues(values[2])
   }, [values])
 
-  useEffect(()=>{
-    if(proportionBarWidth){
-    const sliderTotal = sliderValues.wind_gw+sliderValues.solar_gw+sliderValues.hydro_gw+sliderValues.bio_gw+sliderValues.geo_gw+sliderValues.nuclear_gw
+  useEffect(() => {
+    if (proportionBarWidth) {
+      const sliderTotal =
+        sliderValues.wind_gw +
+        sliderValues.solar_gw +
+        sliderValues.hydro_gw +
+        sliderValues.bio_gw +
+        sliderValues.geo_gw +
+        sliderValues.nuclear_gw +
+        5
 
-    setSliderProportions({
-      wind: (sliderValues.wind_gw / sliderTotal) * proportionBarWidth,
-      solar: (sliderValues.solar_gw / sliderTotal) * proportionBarWidth,
-      hydropower: (sliderValues.hydro_gw / sliderTotal) * proportionBarWidth,
-      biomass: (sliderValues.bio_gw / sliderTotal) * proportionBarWidth,
-      geothermal: (sliderValues.geo_gw / sliderTotal) * proportionBarWidth,
-      nuclear: (sliderValues.nuclear_gw / sliderTotal) * proportionBarWidth
-  })
-  }
-
+      setSliderProportions({
+        wind: (sliderValues.wind_gw / sliderTotal) * proportionBarWidth,
+        solar: (sliderValues.solar_gw / sliderTotal) * proportionBarWidth,
+        hydropower: (sliderValues.hydro_gw / sliderTotal) * proportionBarWidth,
+        biomass: (sliderValues.bio_gw / sliderTotal) * proportionBarWidth,
+        geothermal: (sliderValues.geo_gw / sliderTotal) * proportionBarWidth,
+        nuclear: (sliderValues.nuclear_gw / sliderTotal) * proportionBarWidth,
+      })
+    }
   }, [sliderValues, proportionBarWidth])
 
   const renderTrackMark = (index: number, mark: string) => (
@@ -108,7 +115,6 @@ const DistributeRenewables = ({
         return '#B5B1AA'
     }
   }
-
 
   const toggleTooltip = (label: string) => {
     setVisibleTooltip(visibleTooltip === label ? null : label)
@@ -216,15 +222,7 @@ const DistributeRenewables = ({
               width={sliderProportions.wind}
               height={20}
               fill="#C66AAA"
-              rx={0}
             />
-            {/* <Rect
-              x={5}
-              y={0}
-              width={sliderProportions.wind-5}
-              height={20}
-              fill="#C66AAA"
-            /> */}
             <Rect
               x={sliderProportions.wind}
               y={0}
@@ -233,9 +231,7 @@ const DistributeRenewables = ({
               fill="#F8CE46"
             />
             <Rect
-              x={
-                sliderProportions.wind+sliderProportions.solar
-              }
+              x={sliderProportions.wind + sliderProportions.solar}
               y={0}
               width={sliderProportions.hydropower}
               height={20}
@@ -243,8 +239,9 @@ const DistributeRenewables = ({
             />
             <Rect
               x={
-                sliderProportions.wind+sliderProportions.solar
-+sliderProportions.hydropower
+                sliderProportions.wind +
+                sliderProportions.solar +
+                sliderProportions.hydropower
               }
               y={0}
               width={sliderProportions.biomass}
@@ -253,8 +250,10 @@ const DistributeRenewables = ({
             />
             <Rect
               x={
-                sliderProportions.wind+sliderProportions.solar
-+sliderProportions.hydropower+sliderProportions.biomass
+                sliderProportions.wind +
+                sliderProportions.solar +
+                sliderProportions.hydropower +
+                sliderProportions.biomass
               }
               y={0}
               width={sliderProportions.geothermal}
@@ -263,25 +262,31 @@ const DistributeRenewables = ({
             />
             <Rect
               x={
-                sliderProportions.wind+sliderProportions.solar
-                +sliderProportions.hydropower+sliderProportions.biomass+sliderProportions.geothermal
+                sliderProportions.wind +
+                sliderProportions.solar +
+                sliderProportions.hydropower +
+                sliderProportions.biomass +
+                sliderProportions.geothermal
+              }
+              y={0}
+              width={5}
+              height={20}
+              fill="white"
+            />
+            <Rect
+              x={
+                sliderProportions.wind +
+                sliderProportions.solar +
+                sliderProportions.hydropower +
+                sliderProportions.biomass +
+                sliderProportions.geothermal +
+                5
               }
               y={0}
               width={sliderProportions.nuclear}
               height={20}
               fill="#EE8E35"
-              rx={0}
             />
-            {/* <Rect
-              x={
-                sliderProportions.wind+sliderProportions.solar
-                +sliderProportions.hydropower+sliderProportions.biomass+sliderProportions.geothermal
-              }
-              y={0}
-              width={sliderProportions.nuclear-3}
-              height={20}
-              fill="#EE8E35"
-            /> */}
           </Svg>
         )}
         {/* <View style={styles.bar}></View> */}

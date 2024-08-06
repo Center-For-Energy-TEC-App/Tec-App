@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import DistributeRenewables, { SliderValues } from './DistributeRenewables'
+import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { DefaultValues, MinMaxValues } from './BottomSheet'
 

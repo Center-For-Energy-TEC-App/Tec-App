@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useRef, useState } from 'react'
-import { View, StyleSheet, Text } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import BottomSheetTemplate from '@gorhom/bottom-sheet'
 import { RegionalDashboard } from './RegionalDashboard'
 import { GlobalDashboard } from './GlobalDashboard'
@@ -94,7 +94,7 @@ export const BottomSheet = ({
   const [minMaxValues, setMinMaxValues] = useState<RegionalMinMaxValues>()
 
   useEffect(() => {
-    getDefaultValues({ global_tw: '10' })
+    getDefaultValues({ global_tw: '8' })
       .then((val) => {
         setRegionalDefaultValues(val)
         setRegionalDynamicValues(val)

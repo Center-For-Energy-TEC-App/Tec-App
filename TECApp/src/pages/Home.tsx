@@ -2,7 +2,7 @@ import { Dimensions, StyleSheet, View } from 'react-native'
 import { WorldMap } from '../components/WorldMap'
 import { BottomSheet } from '../components/BottomSheet'
 import { WelcomePopup } from '../components/WelcomePopup'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Tracker } from '../components/Tracker'
 

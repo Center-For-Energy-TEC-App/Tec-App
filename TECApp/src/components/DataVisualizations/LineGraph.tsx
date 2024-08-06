@@ -108,7 +108,7 @@ export const LineGraph = ({
           x={-(graphHeight - 30)}
           y={15}
         >
-          Renewable Capacity (TW)
+          Renewable Energy (TWh)
         </TextSvg>
         {horizontalAxis.map((e, key) => (
           <TextSvg

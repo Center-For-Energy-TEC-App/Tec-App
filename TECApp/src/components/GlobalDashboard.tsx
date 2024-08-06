@@ -1,10 +1,8 @@
 import React, { useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { Tracker } from './Tracker'
 import { ScrollView } from 'react-native-gesture-handler'
-import { DefaultValues } from './BottomSheet'
 
 export const GlobalDashboard = () => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(

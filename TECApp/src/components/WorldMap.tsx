@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import React from 'react'
-import { StyleSheet, Dimensions, Platform } from 'react-native'
+import { StyleSheet, Dimensions } from 'react-native'
 import data from '../../GeoChart.world.geo.json'
 import Svg, { Path, G, Rect } from 'react-native-svg'
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view'
