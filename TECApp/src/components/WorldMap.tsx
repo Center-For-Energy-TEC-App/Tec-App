@@ -10,14 +10,15 @@ export interface WorldMapProps {
 }
 
 export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
-  const width = Dimensions.get('window').width
-  const height = Dimensions.get('window').height
-  const widthScale = 3
+  const windowWidth = Dimensions.get('window').width
+  const windowHeight = Dimensions.get('window').height
+  // const aspectRatio = windowHeight / windowWidth;
+  const widthScale = 3 // aspectRatio > 1.6 ? 2 : 3
 
   const projection = d3
     .geoNaturalEarth1()
     //@ts-expect-error: weird property error with map
-    .fitSize([width * widthScale, height], data)
+    .fitSize([windowWidth * widthScale, windowHeight], data)
   const pathGenerator = d3.geoPath().projection(projection)
 
   return (
@@ -27,12 +28,12 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
       initialZoom={1.5}
       maxZoom={3}
       bindToBorders={true}
-      zoomStep={0}
-      contentHeight={-500}
-      contentWidth={1250}
+      zoomStep={0.5}
+      contentHeight={windowHeight}
+      contentWidth={windowWidth * widthScale}
       style={styles.container}
     >
-      <Svg style={styles.svg}>
+      <Svg style={styles.svg} width={windowWidth * widthScale} height={windowHeight}>
         <G>
           <Rect
             x={0}
@@ -44,7 +45,6 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
           />
           {data.features.map((feature, index) => (
             <Path
-              // @ts-expect-error: weird property error with map
               d={pathGenerator(feature)}
               key={index}
               stroke="#FFF"
@@ -63,18 +63,15 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    width: '300%',
-    height: '100%',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#1C2B47',
-    zIndex: -1,
-    // backgroundColor: "white"
   },
   svg: {
     height: '100%',
     width: '100%',
-    // marginBottom: "30%"
   },
 })
+
+export default WorldMap

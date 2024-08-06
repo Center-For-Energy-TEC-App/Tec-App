@@ -18,10 +18,12 @@
     "@miblanchard/react-native-slider": "^2.6.0",
     "@openspacelabs/react-native-zoomable-view": "^2.1.6",
     "@react-native-community/slider": "^4.5.2",
+    "@react-native-picker/picker": "^2.7.7",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
     "d3": "^7.9.0",
     "expo": "^51.0.18",
+    "expo-checkbox": "~3.0.0",
     "expo-font": "~12.0.7",
     "expo-router": "^3.5.17",
     "expo-splash-screen": "~0.27.5",
@@ -36,8 +38,7 @@
     "react-native-svg-pan-zoom": "^0.1.2",
     "react-native-web": "^0.19.11",
     "react-router-dom": "^6.22.3",
-    "typescript": "^5.4.5",
-    "expo-checkbox": "~3.0.0"
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "@babel/core": "^7.24.5",
