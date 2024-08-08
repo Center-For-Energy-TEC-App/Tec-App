@@ -3,7 +3,9 @@ import { View, StyleSheet } from 'react-native'
 import BottomSheetTemplate from '@gorhom/bottom-sheet'
 import { RegionalDashboard } from './RegionalDashboard'
 import { GlobalDashboard } from './GlobalDashboard'
-import { getDefaultValues, getMinMaxValues } from '../api/requests'
+import { getDefaultValues, getInitialGraphData, getMinMaxValues } from '../api/requests'
+import { DataPoint } from './DataVisualizations/BAUComparison'
+import { getAbbrv } from '../util/ValueDictionaries'
 
 export type DefaultValues = {
   region: string
@@ -62,17 +64,29 @@ export type RegionalMinMaxValues = {
   nee: MinMaxValues
 }
 
-const abbrvMap = {
-  'North America': 'nam',
-  'Latin America': 'lam',
-  Europe: 'eur',
-  'Sub-Saharan Africa': 'ssa',
-  'Middle East & N. Africa': 'mea',
-  'North East Eurasia': 'nee',
-  'Greater China': 'chn',
-  'Indian Subcontinent': 'ind',
-  'South East Asia': 'sea',
-  'OECD Pacific': 'opa',
+
+export type RegionData = {
+  solar: DataPoint[]
+  wind: DataPoint[]
+  hydropower: DataPoint[]
+  geothermal: DataPoint[]
+  biomass: DataPoint[]
+  nuclear: DataPoint[]
+  total: DataPoint[]
+}
+
+export type GraphData = {   
+  global: RegionData
+  chn: RegionData
+  nam: RegionData
+  lam: RegionData
+  ind: RegionData
+  sea: RegionData
+  mea: RegionData
+  opa: RegionData
+  eur: RegionData
+  ssa: RegionData
+  nee: RegionData
 }
 
 export interface BottomSheetProps {
@@ -92,8 +106,10 @@ export const BottomSheet = ({
     useState<RegionalValues>()
   const [regionalDynamicValues, setRegionalDynamicValues] =
     useState<RegionalValues>()
-
   const [minMaxValues, setMinMaxValues] = useState<RegionalMinMaxValues>()
+
+  const [initialGraphData, setInitialGraphData] = useState<GraphData>()
+  const [dynamicGraphData, setDynamicGraphData] = useState<GraphData>()
 
   useEffect(() => {
     getDefaultValues()
@@ -108,6 +124,10 @@ export const BottomSheet = ({
         setMinMaxValues(val)
       })
       .catch(console.error)
+    getInitialGraphData().then((val)=>{
+      setInitialGraphData(val)
+      setDynamicGraphData(val)
+    }).catch(console.error)
   }, [])
 
   useEffect(() => {
@@ -129,18 +149,19 @@ export const BottomSheet = ({
         onSwipeDown()
       }}
     >
+      {regionalDynamicValues &&
       <View style={styles.contentContainer}>
         {currRegion !== 'Global' ? (
           <RegionalDashboard
-            minMaxValues={minMaxValues[abbrvMap[currRegion]]}
-            sliderValues={regionalDynamicValues[abbrvMap[currRegion]]}
+            minMaxValues={minMaxValues[getAbbrv(currRegion)]}
+            sliderValues={regionalDynamicValues[getAbbrv(currRegion)]}
             currRegion={currRegion}
             onSliderChange={(val) =>
               setRegionalDynamicValues({
                 ...regionalDynamicValues,
-                [abbrvMap[currRegion]]: [
-                  regionalDynamicValues[abbrvMap[currRegion]][0],
-                  regionalDynamicValues[abbrvMap[currRegion]][1],
+                [getAbbrv(currRegion)]: [
+                  regionalDynamicValues[getAbbrv(currRegion)][0],
+                  regionalDynamicValues[getAbbrv(currRegion)][1],
                   val,
                 ],
               })
@@ -148,15 +169,18 @@ export const BottomSheet = ({
             onReset={() =>
               setRegionalDynamicValues({
                 ...regionalDynamicValues,
-                [abbrvMap[currRegion]]:
-                  regionalDefaultValues[abbrvMap[currRegion]],
+                [getAbbrv(currRegion)]:
+                  regionalDefaultValues[getAbbrv(currRegion)],
               })
             }
+            initialGraphData={initialGraphData}
+            dynamicGraphData={dynamicGraphData}
           />
         ) : (
-          <GlobalDashboard />
+          <GlobalDashboard initialGraphData={initialGraphData} dynamicGraphData={dynamicGraphData}/>
         )}
       </View>
+    }
     </BottomSheetTemplate>
   )
 }

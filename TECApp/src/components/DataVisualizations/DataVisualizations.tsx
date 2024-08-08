@@ -1,14 +1,19 @@
 import React, { useState } from 'react'
 import { Text, StyleSheet, View, ScrollView } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { BAUComparison } from './BAUComparison'
+import { BAUComparison, DataPoint } from './BAUComparison'
 import { RegionalComparison } from './RegionalComparison'
 import { CarbonBudget } from './CarbonBudget'
+import { GraphData } from '../BottomSheet'
+import { TechnologyComparison } from './TechnologyComparison'
+import { getAbbrv } from '../../util/ValueDictionaries'
 
 type DataVisualizationsProps = {
   region: string
+  initialData: GraphData,
+  dynamicData: GraphData
 }
-const DataVisualizations = ({ region }: DataVisualizationsProps) => {
+const DataVisualizations = ({ region, initialData, dynamicData }: DataVisualizationsProps) => {
   const [activeButton, setActiveButton] = useState('BAU Comparison')
 
   return (
@@ -75,14 +80,34 @@ const DataVisualizations = ({ region }: DataVisualizationsProps) => {
               </Text>
             </TouchableOpacity>
           )}
+          <TouchableOpacity
+              onPress={() => setActiveButton('Technology Comparison')}
+              style={
+                activeButton === 'Technology Comparison'
+                  ? styles.activeButton
+                  : styles.inactiveButton
+              }
+            >
+              <Text
+                style={
+                  activeButton === 'Technology Comparison'
+                    ? styles.activeButtonText
+                    : styles.inactiveButtonText
+                }
+              >
+                Technology Comparison
+              </Text>
+            </TouchableOpacity>
         </ScrollView>
       </View>
       {activeButton === 'BAU Comparison' ? (
-        <BAUComparison region={region} />
+        <BAUComparison region={region} BAUData={initialData[getAbbrv(region)]} dynamicData={dynamicData[getAbbrv(region)]} />
       ) : activeButton === 'Regional Comparison' ? (
-        <RegionalComparison region={region} />
-      ) : (
+        <RegionalComparison region={region} data={dynamicData} />
+      ) : activeButton === 'Carbon Budget' ?(
         <CarbonBudget />
+      ): (
+        <TechnologyComparison region={region} data={dynamicData[getAbbrv(region)]}/>
       )}
     </ScrollView>
   )
@@ -100,8 +125,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   buttonsWrapper: {
-    marginVertical: 28,
-    height: 36,
+    marginTop: 30,
+    marginBottom: 10,
+    height: 50,
   },
   activeButton: {
     display: 'flex',

@@ -11,3 +11,8 @@ export async function getMinMaxValues() {
   const response = await fetch(BASE_URL + '/minmax', { method: 'GET' })
   return await response.json()
 }
+
+export async function getInitialGraphData(){
+  const response = await fetch(BASE_URL + '/initgraph', {method: 'GET'})
+  return await response.json()
+}

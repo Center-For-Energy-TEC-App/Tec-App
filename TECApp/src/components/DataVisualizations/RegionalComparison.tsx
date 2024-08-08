@@ -11,6 +11,8 @@ import Checkbox from 'expo-checkbox'
 import { CurveObject, LineGraph } from './LineGraph'
 import * as d3 from 'd3'
 import { GraphKey } from './GraphKey'
+import { GraphData } from '../BottomSheet'
+import { getRegionColor } from '../../util/ValueDictionaries'
 
 type RegionObject = {
   region: string
@@ -25,6 +27,7 @@ type DataPoint = {
 
 type RegionalComparisonProps = {
   region: string
+  data: GraphData
 }
 
 const vw = Dimensions.get('window').width
@@ -32,135 +35,25 @@ const vw = Dimensions.get('window').width
 const graphHeight = 190
 
 const graphWidth = vw * 0.8
-const leftMargin = 60
+const leftMargin = 65
 
-const colorMap = {
-  'North America': '#9ED7F5',
-  'Latin America': '#78B85D',
-  Europe: '#0D5BA5',
-  'Sub-Saharan Africa': '#01ABE7',
-  'Middle East & N. Africa': '#F8EE88',
-  'North East Eurasia': '#E78C68',
-  'Greater China': '#C06998',
-  'Indian Subcontinent': '#978E86',
-  'South East Asia': '#DC4340',
-  'OECD Pacific': '#A86937',
-}
-
-const dummyNAM = [
-  { year: 2024, value: 4 },
-  { year: 2025, value: 6 },
-  { year: 2026, value: 5 },
-  { year: 2027, value: 4.8 },
-  { year: 2028, value: 6.2 },
-  { year: 2029, value: 5.8 },
-  { year: 2030, value: 5 },
-]
-const dummyLAM = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
-  { year: 2026, value: Math.random() * 12 + 4 },
-  { year: 2027, value: Math.random() * 12 + 4 },
-  { year: 2028, value: Math.random() * 12 + 4 },
-  { year: 2029, value: Math.random() * 12 + 4 },
-  { year: 2030, value: Math.random() * 12 + 4 },
-]
-
-const dummyEUR = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
-  { year: 2026, value: Math.random() * 12 + 4 },
-  { year: 2027, value: Math.random() * 12 + 4 },
-  { year: 2028, value: Math.random() * 12 + 4 },
-  { year: 2029, value: Math.random() * 12 + 4 },
-  { year: 2030, value: Math.random() * 12 + 4 },
-]
-
-const dummyMEA = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
-  { year: 2026, value: Math.random() * 12 + 4 },
-  { year: 2027, value: Math.random() * 12 + 4 },
-  { year: 2028, value: Math.random() * 12 + 4 },
-  { year: 2029, value: Math.random() * 12 + 4 },
-  { year: 2030, value: Math.random() * 12 + 4 },
-]
-
-const dummySSA = [
-  { year: 2024, value: 0.2 },
-  { year: 2025, value: 0.1 },
-  { year: 2026, value: 0.15 },
-  { year: 2027, value: 0.12 },
-  { year: 2028, value: 0.09 },
-  { year: 2029, value: 0.19 },
-  { year: 2030, value: 0.25 },
-]
-
-const dummyNEE = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
-  { year: 2026, value: Math.random() * 12 + 4 },
-  { year: 2027, value: Math.random() * 12 + 4 },
-  { year: 2028, value: Math.random() * 12 + 4 },
-  { year: 2029, value: Math.random() * 12 + 4 },
-  { year: 2030, value: Math.random() * 12 + 4 },
-]
-const dummyCHN = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
-  { year: 2026, value: Math.random() * 12 + 4 },
-  { year: 2027, value: Math.random() * 12 + 4 },
-  { year: 2028, value: Math.random() * 12 + 4 },
-  { year: 2029, value: Math.random() * 12 + 4 },
-  { year: 2030, value: Math.random() * 12 + 4 },
-]
-
-const dummyIND = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
-  { year: 2026, value: Math.random() * 12 + 4 },
-  { year: 2027, value: Math.random() * 12 + 4 },
-  { year: 2028, value: Math.random() * 12 + 4 },
-  { year: 2029, value: Math.random() * 12 + 4 },
-  { year: 2030, value: Math.random() * 12 + 4 },
-]
-
-const dummySEA = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
-  { year: 2026, value: Math.random() * 12 + 4 },
-  { year: 2027, value: Math.random() * 12 + 4 },
-  { year: 2028, value: Math.random() * 12 + 4 },
-  { year: 2029, value: Math.random() * 12 + 4 },
-  { year: 2030, value: Math.random() * 12 + 4 },
-]
-
-const dummyOPA = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
-  { year: 2026, value: Math.random() * 12 + 4 },
-  { year: 2027, value: Math.random() * 12 + 4 },
-  { year: 2028, value: Math.random() * 12 + 4 },
-  { year: 2029, value: Math.random() * 12 + 4 },
-  { year: 2030, value: Math.random() * 12 + 4 },
-]
 
 const xMin = 2024
 const xMax = 2030
 
-export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
+export const RegionalComparison = ({ region, data }: RegionalComparisonProps) => {
   const [dropdown, setDropdown] = useState<boolean>(false)
   const [dropdownOptions, setDropDownOptions] = useState<RegionObject[]>([
-    { region: 'North America', selected: false, data: dummyNAM },
-    { region: 'Latin America', selected: false, data: dummyLAM },
-    { region: 'Europe', selected: false, data: dummyEUR },
-    { region: 'Middle East & N. Africa', selected: false, data: dummyMEA },
-    { region: 'Sub-Saharan Africa', selected: false, data: dummySSA },
-    { region: 'North East Eurasia', selected: false, data: dummyNEE },
-    { region: 'South East Asia', selected: false, data: dummySEA },
-    { region: 'OECD Pacific', selected: false, data: dummyOPA },
-    { region: 'Greater China', selected: false, data: dummyCHN },
-    { region: 'Indian Subcontinent', selected: false, data: dummyIND },
+    { region: 'North America', selected: false, data: data.nam.total },
+    { region: 'Latin America', selected: false, data: data.lam.total },
+    { region: 'Europe', selected: false, data: data.eur.total },
+    { region: 'Middle East & N. Africa', selected: false, data: data.mea.total },
+    { region: 'Sub-Saharan Africa', selected: false, data: data.ssa.total },
+    { region: 'North East Eurasia', selected: false, data: data.nee.total },
+    { region: 'South East Asia', selected: false, data: data.sea.total },
+    { region: 'OECD Pacific', selected: false, data: data.opa.total },
+    { region: 'Greater China', selected: false, data: data.chn.total },
+    { region: 'Indian Subcontinent', selected: false, data: data.ind.total },
   ]) //keeps track of state of every checkbox
   const [numSelected, setNumSelected] = useState<number>(0) //easier way to keep track than parsing above state every time
 
@@ -215,7 +108,7 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
       .range([leftMargin, graphWidth])
 
     setCurrGradient({
-      color: colorMap[region],
+      color: getRegionColor(region),
       curve: d3
         .area<DataPoint>()
         .x((d) => x(d.year))
@@ -228,7 +121,7 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
     })
 
     setCurrGradientCurve({
-      color: colorMap[region],
+      color: getRegionColor(region),
       curve: d3
         .line<DataPoint>()
         .x((d) => x(d.year))
@@ -242,7 +135,7 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
     const lineCurves = []
     for (const i of selectedRegions) {
       const curve = {
-        color: colorMap[i.region],
+        color: getRegionColor(region),
         curve: d3
           .line<DataPoint>()
           .x((d) => x(d.year))
@@ -319,14 +212,14 @@ export const RegionalComparison = ({ region }: RegionalComparisonProps) => {
       {currGradientCurve && currLineCurves && (
         <View style={styles.graphContainer}>
           <View style={styles.graphInnerContainer}>
-            <GraphKey label={region.toUpperCase()} color={colorMap[region]} />
+            <GraphKey label={region.toUpperCase()} color={getRegionColor(region)} />
             {dropdownOptions
               .filter((item) => item.selected)
               .map((e, key) => (
                 <GraphKey
                   key={key}
                   label={e.region.toUpperCase()}
-                  color={colorMap[e.region]}
+                  color={getRegionColor(region)}
                 />
               ))}
             <LineGraph

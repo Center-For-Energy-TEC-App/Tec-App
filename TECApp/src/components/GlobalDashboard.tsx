@@ -3,8 +3,14 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { Tracker } from './Tracker'
 import { ScrollView } from 'react-native-gesture-handler'
+import { GraphData } from './BottomSheet'
 
-export const GlobalDashboard = () => {
+type GlobalDashboardProps = {
+  initialGraphData: GraphData
+  dynamicGraphData: GraphData
+}
+
+export const GlobalDashboard = ({initialGraphData, dynamicGraphData}: GlobalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
   )
@@ -72,7 +78,7 @@ export const GlobalDashboard = () => {
         // <DistributeRenewables defaultValues={null}/>
         <></>
       ) : (
-        <DataVisualizations region="Global" />
+        <DataVisualizations initialData={initialGraphData} dynamicData={dynamicGraphData} region="Global" />
       )}
     </ScrollView>
   )

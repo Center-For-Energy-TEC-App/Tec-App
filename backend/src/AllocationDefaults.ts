@@ -52,7 +52,6 @@ export const getAllDefaultValues = async (req: Request, res: Response, next: Nex
 
         }
     }
-    console.log(results)
     
     if(results!==null){
         res.status(200).json(results)
