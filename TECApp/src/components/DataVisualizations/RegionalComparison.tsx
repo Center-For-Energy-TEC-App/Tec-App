@@ -11,8 +11,8 @@ import Checkbox from 'expo-checkbox'
 import { CurveObject, LineGraph } from './LineGraph'
 import * as d3 from 'd3'
 import { GraphKey } from './GraphKey'
-import { GraphData } from '../BottomSheet'
 import { getRegionColor } from '../../util/ValueDictionaries'
+import { GraphData } from '../../api/requests'
 
 type RegionObject = {
   region: string
@@ -37,17 +37,23 @@ const graphHeight = 190
 const graphWidth = vw * 0.8
 const leftMargin = 65
 
-
 const xMin = 2024
 const xMax = 2030
 
-export const RegionalComparison = ({ region, data }: RegionalComparisonProps) => {
+export const RegionalComparison = ({
+  region,
+  data,
+}: RegionalComparisonProps) => {
   const [dropdown, setDropdown] = useState<boolean>(false)
   const [dropdownOptions, setDropDownOptions] = useState<RegionObject[]>([
     { region: 'North America', selected: false, data: data.nam.total },
     { region: 'Latin America', selected: false, data: data.lam.total },
     { region: 'Europe', selected: false, data: data.eur.total },
-    { region: 'Middle East & N. Africa', selected: false, data: data.mea.total },
+    {
+      region: 'Middle East & N. Africa',
+      selected: false,
+      data: data.mea.total,
+    },
     { region: 'Sub-Saharan Africa', selected: false, data: data.ssa.total },
     { region: 'North East Eurasia', selected: false, data: data.nee.total },
     { region: 'South East Asia', selected: false, data: data.sea.total },
@@ -135,7 +141,7 @@ export const RegionalComparison = ({ region, data }: RegionalComparisonProps) =>
     const lineCurves = []
     for (const i of selectedRegions) {
       const curve = {
-        color: getRegionColor(region),
+        color: getRegionColor(i.region),
         curve: d3
           .line<DataPoint>()
           .x((d) => x(d.year))
@@ -212,14 +218,17 @@ export const RegionalComparison = ({ region, data }: RegionalComparisonProps) =>
       {currGradientCurve && currLineCurves && (
         <View style={styles.graphContainer}>
           <View style={styles.graphInnerContainer}>
-            <GraphKey label={region.toUpperCase()} color={getRegionColor(region)} />
+            <GraphKey
+              label={region.toUpperCase()}
+              color={getRegionColor(region)}
+            />
             {dropdownOptions
               .filter((item) => item.selected)
               .map((e, key) => (
                 <GraphKey
                   key={key}
                   label={e.region.toUpperCase()}
-                  color={getRegionColor(region)}
+                  color={getRegionColor(e.region)}
                 />
               ))}
             <LineGraph

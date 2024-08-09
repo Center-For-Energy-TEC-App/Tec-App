@@ -2,8 +2,8 @@ import React, { Text, StyleSheet, Dimensions, View } from 'react-native'
 import * as d3 from 'd3'
 import { GraphKey } from './GraphKey'
 import { LineGraph } from './LineGraph'
-import { GraphData, RegionData } from '../BottomSheet'
-import { getAbbrv } from '../../util/ValueDictionaries'
+import { RegionData } from '../../api/requests'
+import { useEffect, useState } from 'react'
 
 const vw = Dimensions.get('window').width
 
@@ -26,7 +26,12 @@ type BAUComparisonProps = {
   dynamicData: RegionData
 }
 
-export const BAUComparison = ({ region, BAUData, dynamicData }: BAUComparisonProps) => {
+export const BAUComparison = ({
+  region,
+  BAUData,
+  dynamicData,
+}: BAUComparisonProps) => {
+
   const BAU_data = BAUData.total
   const altered_data = dynamicData.total
 

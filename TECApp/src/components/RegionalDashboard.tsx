@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
-import { DefaultValues, GraphData, MinMaxValues } from './BottomSheet'
+import { DefaultValues, GraphData, MinMaxValues } from '../api/requests'
 
 type RegionalDashboardProps = {
   currRegion: string
   sliderValues: DefaultValues
   minMaxValues: MinMaxValues
-  onSliderChange: (val: DefaultValues) => void
+  onSliderChange: (val: DefaultValues, technologyChanged: string) => void
   onReset: () => void
   initialGraphData: GraphData
   dynamicGraphData: GraphData
@@ -21,7 +21,7 @@ export const RegionalDashboard = ({
   onSliderChange,
   onReset,
   initialGraphData,
-  dynamicGraphData
+  dynamicGraphData,
 }: RegionalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
@@ -83,7 +83,11 @@ export const RegionalDashboard = ({
           onReset={onReset}
         />
       ) : (
-        <DataVisualizations initialData={initialGraphData} dynamicData={dynamicGraphData} region={currRegion} />
+        <DataVisualizations
+          initialData={initialGraphData}
+          dynamicData={dynamicGraphData}
+          region={currRegion}
+        />
       )}
     </View>
   )

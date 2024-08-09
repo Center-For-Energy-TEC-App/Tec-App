@@ -15,9 +15,9 @@ import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon'
 import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon'
 import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon'
 import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
-import { DefaultValues, MinMaxValues } from './BottomSheet'
 import Svg, { Rect } from 'react-native-svg'
 import { getEnergyAbbrv, getTechnologyColor } from '../util/ValueDictionaries'
+import { DefaultValues, MinMaxValues } from '../api/requests'
 
 export type SliderProportions = {
   solar: number
@@ -31,10 +31,9 @@ export type SliderProportions = {
 type DistributeRenewablesProps = {
   values: DefaultValues
   minMaxValues: MinMaxValues
-  onSliderChange: (val: DefaultValues) => void
+  onSliderChange: (val: DefaultValues, technologyChanged: string) => void
   onReset: () => void
 }
-
 
 const DistributeRenewables = ({
   values,
@@ -90,7 +89,6 @@ const DistributeRenewables = ({
     setSelectedSlider(label)
   }
 
-
   const toggleTooltip = (label: string) => {
     setVisibleTooltip(visibleTooltip === label ? null : label)
   }
@@ -144,11 +142,23 @@ const DistributeRenewables = ({
           minimumTrackTintColor={getTechnologyColor(label)}
           maximumTrackTintColor="#B5B1AA"
           trackMarks={[
-            values[0][getEnergyAbbrv(label.toLowerCase())]-0.0425*(parseFloat(minMaxValues.max[label.toLowerCase()])-parseFloat(minMaxValues.min[label.toLowerCase()])),
-            values[1][getEnergyAbbrv(label.toLowerCase())]-0.0275*(parseFloat(minMaxValues.max[label.toLowerCase()])-parseFloat(minMaxValues.min[label.toLowerCase()])),
+            values[0][getEnergyAbbrv(label.toLowerCase())] -
+              0.0425 *
+                (parseFloat(minMaxValues.max[label.toLowerCase()]) -
+                  parseFloat(minMaxValues.min[label.toLowerCase()])),
+            values[1][getEnergyAbbrv(label.toLowerCase())] -
+              0.0275 *
+                (parseFloat(minMaxValues.max[label.toLowerCase()]) -
+                  parseFloat(minMaxValues.min[label.toLowerCase()])),
           ]}
           renderTrackMarkComponent={(index) =>
-            renderTrackMark(index, values[0][getEnergyAbbrv(label.toLowerCase())]<values[1][getEnergyAbbrv(label.toLowerCase())]?['2024', 'BAU'][index]:['BAU', '2024'][index])
+            renderTrackMark(
+              index,
+              values[0][getEnergyAbbrv(label.toLowerCase())] <
+                values[1][getEnergyAbbrv(label.toLowerCase())]
+                ? ['2024', 'BAU'][index]
+                : ['BAU', '2024'][index],
+            )
           }
           onSlidingStart={() => handleSlidingStart(label)}
           onValueChange={(val) =>
@@ -158,15 +168,19 @@ const DistributeRenewables = ({
             })
           }
           onSlidingComplete={(val) =>
-            onSliderChange({
-              ...sliderValues,
-              [getEnergyAbbrv(label.toLowerCase())]: val[0],
-            })
+            onSliderChange(
+              {
+                ...sliderValues,
+                [getEnergyAbbrv(label.toLowerCase())]: val[0],
+              },
+              label.toLowerCase(),
+            )
           }
         />
         <View style={styles.sliderValueBox}>
           <Text style={styles.sliderValue}>
-            {Math.round(sliderValues[getEnergyAbbrv(label.toLowerCase())]) + ' GW'}
+            {Math.round(sliderValues[getEnergyAbbrv(label.toLowerCase())]) +
+              ' GW'}
           </Text>
         </View>
       </View>
