@@ -1,6 +1,7 @@
 import React, { StyleSheet, View, Text } from 'react-native'
 import { TemperatureIcon } from '../SVGs/TemperatureIcon'
 import { RenewableIcon } from '../SVGs/RenewableIcon'
+import { DistributeRenewables } from './DistributeRenewables';
 
 type TrackerProps = {
   type: 'temperature' | 'renewable'
