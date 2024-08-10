@@ -21,13 +21,9 @@ export type DataPoint = {
 }
 
 type TechnologyComparisonProps = {
-  region: string
   data: RegionData
 }
-export const TechnologyComparison = ({
-  region,
-  data,
-}: TechnologyComparisonProps) => {
+export const TechnologyComparison = ({ data }: TechnologyComparisonProps) => {
   const solar_data = data.solar
   const wind_data = data.wind
   const hydro_data = data.hydropower

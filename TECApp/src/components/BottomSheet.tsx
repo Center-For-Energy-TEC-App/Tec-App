@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useRef, useState } from 'react'
-import { View, StyleSheet, DrawerLayoutAndroidBase } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import BottomSheetTemplate from '@gorhom/bottom-sheet'
 import { RegionalDashboard } from './RegionalDashboard'
 import { GlobalDashboard } from './GlobalDashboard'
@@ -27,7 +27,6 @@ export const BottomSheet = ({
 }: BottomSheetProps) => {
   const snapPoints = useMemo(() => ['12.5%', '25%', '50%', '80%'], [])
   const bottomSheetRef = useRef<BottomSheetTemplate>(null)
-  const [currRegion, setCurrRegion] = useState(selectedRegion)
 
   const [regionalDefaultValues, setRegionalDefaultValues] =
     useState<RegionalValues>()
@@ -62,7 +61,7 @@ export const BottomSheet = ({
   }, [])
 
   useEffect(() => {
-    getRegionCalculationData(getAbbrv(currRegion))
+    getRegionCalculationData(getAbbrv(selectedRegion))
       .then((val) => {
         setCalculationData(val)
       })
@@ -73,7 +72,6 @@ export const BottomSheet = ({
     } else {
       bottomSheetRef.current?.snapToIndex(2) // Snap to 25% when a region is selected
     }
-    setCurrRegion(selectedRegion)
   }, [selectedRegion])
 
   return (
@@ -88,38 +86,49 @@ export const BottomSheet = ({
     >
       {regionalDynamicValues && (
         <View style={styles.contentContainer}>
-          {currRegion !== 'Global' ? (
+          {selectedRegion !== 'Global' ? (
             <RegionalDashboard
-              minMaxValues={minMaxValues[getAbbrv(currRegion)]}
-              sliderValues={regionalDynamicValues[getAbbrv(currRegion)]}
-              currRegion={currRegion}
+              minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
+              sliderValues={regionalDynamicValues[getAbbrv(selectedRegion)]}
+              currRegion={selectedRegion}
               onSliderChange={(val, technologyChanged) => {
                 setRegionalDynamicValues({
                   ...regionalDynamicValues,
-                  [getAbbrv(currRegion)]: [
-                    regionalDynamicValues[getAbbrv(currRegion)][0],
-                    regionalDynamicValues[getAbbrv(currRegion)][1],
+                  [getAbbrv(selectedRegion)]: [
+                    regionalDynamicValues[getAbbrv(selectedRegion)][0],
+                    regionalDynamicValues[getAbbrv(selectedRegion)][1],
                     val,
                   ],
                 })
                 setDynamicGraphData({
                   ...dynamicGraphData,
-                  [getAbbrv(currRegion)]: calculateCurve(
-                    {technology: technologyChanged, value: val[getEnergyAbbrv(technologyChanged)]},
-                    dynamicGraphData[getAbbrv(currRegion)],
+                  [getAbbrv(selectedRegion)]: calculateCurve(
+                    {
+                      technology: technologyChanged,
+                      value: val[getEnergyAbbrv(technologyChanged)],
+                    },
+                    dynamicGraphData[getAbbrv(selectedRegion)],
                     calculationData,
                   ),
                 })
               }}
-              onReset={() =>
+              onReset={() => {
                 setRegionalDynamicValues({
                   ...regionalDynamicValues,
-                  [getAbbrv(currRegion)]:
-                    regionalDefaultValues[getAbbrv(currRegion)],
+                  [getAbbrv(selectedRegion)]:
+                    regionalDefaultValues[getAbbrv(selectedRegion)],
                 })
-              }
+                setDynamicGraphData({
+                  ...dynamicGraphData,
+                  [getAbbrv(selectedRegion)]:
+                    initialGraphData[getAbbrv(selectedRegion)],
+                })
+              }}
               initialGraphData={initialGraphData}
               dynamicGraphData={dynamicGraphData}
+              sliderDisabled={
+                calculationData.region !== getAbbrv(selectedRegion)
+              }
             />
           ) : (
             <GlobalDashboard

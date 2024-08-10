@@ -1,4 +1,4 @@
-import { DataPoint } from "../components/DataVisualizations/BAUComparison"
+import { DataPoint } from '../components/DataVisualizations/BAUComparison'
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 
@@ -31,7 +31,7 @@ export type RegionalValues = {
 export async function getDefaultValues() {
   const url = `/defaults`
   const response = await fetch(BASE_URL + url, { method: 'GET' })
-  return await response.json() as RegionalValues
+  return (await response.json()) as RegionalValues
 }
 
 export type MinMaxValues = {
@@ -65,10 +65,9 @@ export type RegionalMinMaxValues = {
   nee: MinMaxValues
 }
 
-
 export async function getMinMaxValues() {
   const response = await fetch(BASE_URL + '/minmax', { method: 'GET' })
-  return await response.json() as RegionalMinMaxValues
+  return (await response.json()) as RegionalMinMaxValues
 }
 
 export type RegionData = {
@@ -97,7 +96,7 @@ export type GraphData = {
 
 export async function getInitialGraphData() {
   const response = await fetch(BASE_URL + '/initgraph', { method: 'GET' })
-  return await response.json() as GraphData
+  return (await response.json()) as GraphData
 }
 
 type YearRange = {
@@ -125,6 +124,7 @@ export type RenewableEnergyCalculationData = {
   forecast_cagr: RawData
   forecast_growth_rate: RawData
   capacity_factor: RawData
+  region: string
 }
 
 export async function getRegionCalculationData(region: string) {

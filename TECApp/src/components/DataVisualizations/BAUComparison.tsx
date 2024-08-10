@@ -3,7 +3,6 @@ import * as d3 from 'd3'
 import { GraphKey } from './GraphKey'
 import { LineGraph } from './LineGraph'
 import { RegionData } from '../../api/requests'
-import { useEffect, useState } from 'react'
 
 const vw = Dimensions.get('window').width
 
@@ -31,7 +30,6 @@ export const BAUComparison = ({
   BAUData,
   dynamicData,
 }: BAUComparisonProps) => {
-
   const BAU_data = BAUData.total
   const altered_data = dynamicData.total
 

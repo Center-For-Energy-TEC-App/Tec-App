@@ -33,6 +33,7 @@ type DistributeRenewablesProps = {
   minMaxValues: MinMaxValues
   onSliderChange: (val: DefaultValues, technologyChanged: string) => void
   onReset: () => void
+  disabled: boolean
 }
 
 const DistributeRenewables = ({
@@ -40,6 +41,7 @@ const DistributeRenewables = ({
   minMaxValues,
   onSliderChange,
   onReset,
+  disabled,
 }: DistributeRenewablesProps) => {
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
@@ -127,6 +129,7 @@ const DistributeRenewables = ({
       {renderTooltip(label, tooltip)}
       <View style={styles.sliderWrapper}>
         <Slider
+          disabled={disabled}
           containerStyle={styles.slider}
           minimumValue={Math.round(
             parseFloat(minMaxValues.min[label.toLowerCase()]),

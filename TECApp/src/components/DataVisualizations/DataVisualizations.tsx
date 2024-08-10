@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Text, StyleSheet, View, ScrollView } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { BAUComparison, DataPoint } from './BAUComparison'
+import { BAUComparison } from './BAUComparison'
 import { RegionalComparison } from './RegionalComparison'
 import { CarbonBudget } from './CarbonBudget'
 import { TechnologyComparison } from './TechnologyComparison'
@@ -26,7 +26,7 @@ const DataVisualizations = ({
       contentContainerStyle={{ display: 'flex', alignItems: 'flex-start' }}
     >
       <View style={styles.buttonsWrapper}>
-        <ScrollView horizontal={true}>
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
           <TouchableOpacity
             onPress={() => setActiveButton('BAU Comparison')}
             style={
@@ -115,10 +115,7 @@ const DataVisualizations = ({
       ) : activeButton === 'Carbon Budget' ? (
         <CarbonBudget />
       ) : (
-        <TechnologyComparison
-          region={region}
-          data={dynamicData[getAbbrv(region)]}
-        />
+        <TechnologyComparison data={dynamicData[getAbbrv(region)]} />
       )}
     </ScrollView>
   )

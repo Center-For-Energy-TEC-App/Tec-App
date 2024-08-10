@@ -41,8 +41,8 @@ def insert_secondary_calculations():
     cursor.execute(f"CREATE TABLE secondary_calculations_forecast_cagr (energy_type varchar(20), region varchar(10), value decimal);")
     cursor.execute(f"CREATE TABLE secondary_calculations_forecast_growth_rate (energy_type varchar(20), year integer, region varchar(10), value decimal);")
 
-    with open(f"DBScripts/Data/GraphData/Secondary Calculations-Table 1.csv", mode="r") as csvfile:
-        reader = csv.reader(csvfile)
+    with open(f"DBScripts/Data/GraphData/Secondary Calculations-Table 1.tsv", mode="r") as csvfile:
+        reader = csv.reader(csvfile, delimiter='\t')
         for i, line in enumerate(reader):
             print(line)
             if i>1 and i<86 and line[0]=="Capacity Factor":
@@ -121,10 +121,10 @@ def insert_initial_graph_data():
             print(line)
             cursor.execute(f"INSERT INTO initial_graph_data VALUES ('{parse_energy_type(line[1])}', {line[3]}, {parse_large_num(line[4])},{parse_large_num(line[5])},{parse_large_num(line[6])},{parse_large_num(line[7])},{parse_large_num(line[8])},{parse_large_num(line[9])},{parse_large_num(line[10])},{parse_large_num(line[11])},{parse_large_num(line[12])},{parse_large_num(line[13])},{parse_large_num(line[14])});")
 
-# insert_secondary_calculations()
+insert_secondary_calculations()
 # insert_data_aggregation()
 # insert_transpose()
-insert_initial_graph_data()
+# insert_initial_graph_data()
 
 
 conn.commit()   # commit changes (otherwise changes will not be reflected in remote database)

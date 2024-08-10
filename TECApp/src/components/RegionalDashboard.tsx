@@ -12,6 +12,7 @@ type RegionalDashboardProps = {
   onReset: () => void
   initialGraphData: GraphData
   dynamicGraphData: GraphData
+  sliderDisabled: boolean
 }
 
 export const RegionalDashboard = ({
@@ -22,6 +23,7 @@ export const RegionalDashboard = ({
   onReset,
   initialGraphData,
   dynamicGraphData,
+  sliderDisabled,
 }: RegionalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
@@ -81,6 +83,7 @@ export const RegionalDashboard = ({
           minMaxValues={minMaxValues}
           onSliderChange={onSliderChange}
           onReset={onReset}
+          disabled={sliderDisabled}
         />
       ) : (
         <DataVisualizations

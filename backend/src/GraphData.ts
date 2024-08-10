@@ -99,24 +99,28 @@ type RenewableEnergyCalculationData = {
     forecast_cagr: RawData
     forecast_growth_rate: RawData
     capacity_factor: RawData
+    region: string
 }
 
-const technologies = ["solar", "wind", "hydropower", "geothermal", "biomass", "nuclear"]
-
 export const getRegionCalculationData = async (req: Request, res: Response, next: NextFunction) =>{
+    let technologies = ["solar", "wind", "biomass", "geothermal", "hydropower" , "nuclear"]
+
     const region = req.params.region
     
-    const results = {installed_capacity: {}, forecast_cagr: {}, forecast_growth_rate: {}, capacity_factor: {}} as RenewableEnergyCalculationData
+    const results = {installed_capacity: {}, forecast_cagr: {}, forecast_growth_rate: {}, capacity_factor: {}, region:region} as RenewableEnergyCalculationData
 
     //installed capacity
     const data_aggregation_installed_capacity_query = await pool.query("SELECT * FROM data_aggregation_installed_capacity WHERE region=$1 AND year=2024 AND (energy_type='Solar' OR energy_type='Wind');", [region])
     const transpose_installed_capacity_query = await pool.query("SELECT * FROM transpose_installed_capacity WHERE region=$1 AND year=2024 AND (energy_type='hydropower' OR energy_type='geothermal' OR energy_type='biomass_fired' OR energy_type='nuclear');", [region])
     const installed_capacity_rows = data_aggregation_installed_capacity_query.rows.concat(transpose_installed_capacity_query.rows)
+    console.log(installed_capacity_rows)
     for(let i=0; i<installed_capacity_rows.length; i++){
         const techKey = technologies[i] as keyof typeof results.installed_capacity
         results.installed_capacity[techKey] = {"2024": installed_capacity_rows[i].value}
     }
-
+    console.log(results)
+    
+    technologies = ["solar", "wind","hydropower", "geothermal", "biomass",  "nuclear"]  //query order is different from here on
     //forecast cagr
     const forecast_cagr_query = await pool.query("SELECT * FROM secondary_calculations_forecast_cagr WHERE region=$1", [region])
     for(let i = 0; i<forecast_cagr_query.rows.length; i++){
