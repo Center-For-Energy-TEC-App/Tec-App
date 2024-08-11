@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -6,53 +6,64 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
-} from 'react-native';
-import { Slider } from '@miblanchard/react-native-slider';
-import { WindIcon } from '../SVGs/DistributeRenewablesIcons/WindIcon';
-import { SolarIcon } from '../SVGs/DistributeRenewablesIcons/SolarIcon';
-import { HydroIcon } from '../SVGs/DistributeRenewablesIcons/HydroIcon';
-import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon';
-import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon';
-import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon';
-import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon';
+  Platform,
+  Dimensions,
+} from 'react-native'
+import { Slider } from '@miblanchard/react-native-slider'
+import { WindIcon } from '../SVGs/DistributeRenewablesIcons/WindIcon'
+import { SolarIcon } from '../SVGs/DistributeRenewablesIcons/SolarIcon'
+import { HydroIcon } from '../SVGs/DistributeRenewablesIcons/HydroIcon'
+import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon'
+import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon'
+import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon'
+import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
 
 const DistributeRenewables = () => {
-  const [selectedSlider, setSelectedSlider] = useState<string | null>(null);
-  const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
+  const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
+  const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
+
+  const deviceType = () => {
+    const { width, height } = Dimensions.get('window')
+    return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
+      ? 'ipad'
+      : 'iphone'
+  }
+
+  const isIpad = deviceType() === 'ipad'
 
   const renderTrackMark = (index: number, mark: string) => (
     <View style={styles.trackMarkContainer} key={index}>
       <View style={styles.trackMark} />
       <Text style={styles.trackMarkLabel}>{mark}</Text>
     </View>
-  );
+  )
 
   const handleSlidingStart = (label: string) => {
-    setSelectedSlider(label);
-  };
+    setSelectedSlider(label)
+  }
 
   const getSourceColor = (label: string) => {
     switch (label) {
       case 'Wind':
-        return '#C66AAA';
+        return '#C66AAA'
       case 'Solar':
-        return '#F8CE46';
+        return '#F8CE46'
       case 'Hydropower':
-        return '#58C4D4';
+        return '#58C4D4'
       case 'Biomass':
-        return '#779448';
+        return '#779448'
       case 'Geothermal':
-        return '#BF9336';
+        return '#BF9336'
       case 'Nuclear*':
-        return '#EE8E35';
+        return '#EE8E35'
       default:
-        return '#B5B1AA';
+        return '#B5B1AA'
     }
-  };
+  }
 
   const toggleTooltip = (label: string) => {
-    setVisibleTooltip(visibleTooltip === label ? null : label);
-  };
+    setVisibleTooltip(visibleTooltip === label ? null : label)
+  }
 
   const renderTooltip = (label: string, text: string) => (
     <Modal
@@ -72,7 +83,7 @@ const DistributeRenewables = () => {
         </View>
       </View>
     </Modal>
-  );
+  )
 
   const renderSlider = (label, IconComponent, tooltip) => (
     <View style={styles.sliderContainer} key={label}>
@@ -90,11 +101,15 @@ const DistributeRenewables = () => {
           minimumValue={2024}
           maximumValue={2035}
           value={0.1}
-          thumbTintColor={selectedSlider === label ? getSourceColor(label) : '#B5B1AA'}
+          thumbTintColor={
+            selectedSlider === label ? getSourceColor(label) : '#B5B1AA'
+          }
           minimumTrackTintColor={getSourceColor(label)}
           maximumTrackTintColor="#B5B1AA"
           trackMarks={[2024, 2027.5, 2030]}
-          renderTrackMarkComponent={(index) => renderTrackMark(index, ['2024', 'BAU', 'GV'][index])}
+          renderTrackMarkComponent={(index) =>
+            renderTrackMark(index, ['2024', 'BAU', 'GV'][index])
+          }
           onSlidingStart={() => handleSlidingStart(label)}
         />
         <View style={styles.sliderValueBox}>
@@ -102,27 +117,54 @@ const DistributeRenewables = () => {
         </View>
       </View>
     </View>
-  );
+  )
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.description}>
+      <Text style={[styles.description, isIpad && styles.iPadText]}>
         Using the sliders below, make region specific changes for each renewable
         energy source to reach 12 TW of renewable capacity. This will override
         default values set in the global dashboard.
       </Text>
       <View style={styles.capacityProportionContainer}>
-        <Text style={styles.capacityProportionText}>Renewable Capacity Proportions</Text>
+        <Text style={styles.capacityProportionText}>
+          Renewable Capacity Proportions
+        </Text>
         <View style={styles.bar}></View>
       </View>
-      {renderSlider('Wind', WindIcon, 'Wind power involves using wind turbines to convert moving air in the form of kinetic energy into electrical energy. Wind power is captured through wind turbines that rotate when wind passes through them.')}
-      {renderSlider('Solar', SolarIcon, 'Solar power converts sunlight into electrical energy through photovoltaic panels. This energy can be used to generate electricity or can be stored in batteries.')}
-      {renderSlider('Hydropower', HydroIcon, 'Hydropower generates electricity using the energy of water. This is harnessed by using turbines and generators to convert the natural kinetic energy of water into electricity.')}
-      {renderSlider('Biomass', BiomassIcon, 'Most biomass power systems are generated by the direct combustion of organic materials such as crops and waste products, which are burned and produce steam that drives a generator. ')}
-      {renderSlider('Geothermal', GeothermalIcon, 'Geothermal power is generated from heat within the Earth’s core. Geothermal wells and heat exchangers are used to tap into reservoirs of steam and hot water.')}
-      {renderSlider('Nuclear*', NuclearIcon, 'Nuclear power is generated through nuclear reactions, typically involving the splitting of atoms to release energy. This is then harnessed to generate electricity.')}
+      {renderSlider(
+        'Wind',
+        WindIcon,
+        'Wind power involves using wind turbines to convert moving air in the form of kinetic energy into electrical energy. Wind power is captured through wind turbines that rotate when wind passes through them.',
+      )}
+      {renderSlider(
+        'Solar',
+        SolarIcon,
+        'Solar power converts sunlight into electrical energy through photovoltaic panels. This energy can be used to generate electricity or can be stored in batteries.',
+      )}
+      {renderSlider(
+        'Hydropower',
+        HydroIcon,
+        'Hydropower generates electricity using the energy of water. This is harnessed by using turbines and generators to convert the natural kinetic energy of water into electricity.',
+      )}
+      {renderSlider(
+        'Biomass',
+        BiomassIcon,
+        'Most biomass power systems are generated by the direct combustion of organic materials such as crops and waste products, which are burned and produce steam that drives a generator. ',
+      )}
+      {renderSlider(
+        'Geothermal',
+        GeothermalIcon,
+        'Geothermal power is generated from heat within the Earth’s core. Geothermal wells and heat exchangers are used to tap into reservoirs of steam and hot water.',
+      )}
+      {renderSlider(
+        'Nuclear*',
+        NuclearIcon,
+        'Nuclear power is generated through nuclear reactions, typically involving the splitting of atoms to release energy. This is then harnessed to generate electricity.',
+      )}
 
-      <Text style={styles.nuclearNote}>
+      <Text style={[styles.nuclearNote, isIpad && styles.iPadText]}>
+        {' '}
         *Not a renewable energy source, but supports carbon reduction goals by
         reducing reliance on fossil fuels.
       </Text>
@@ -130,9 +172,7 @@ const DistributeRenewables = () => {
       <TouchableOpacity style={styles.resetButton}>
         <Text style={styles.resetButtonText}>Reset to Global Values</Text>
       </TouchableOpacity>
-      <View style={styles.spacer}>
-
-      </View>
+      <View style={styles.spacer}></View>
     </ScrollView>
   )
 }
@@ -148,6 +188,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 16,
   },
+  iPadText: {
+    fontSize: 18,
+  },
   capacityProportionContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -162,7 +205,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.25,
     shadowRadius: 6.1,
-    elevation: 3 
+    elevation: 3,
   },
   capacityProportionText: {
     color: '#000',
@@ -261,7 +304,7 @@ const styles = StyleSheet.create({
   trackMarkContainer: {
     paddingTop: 20,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   trackMark: {
     width: 1,
@@ -270,8 +313,8 @@ const styles = StyleSheet.create({
   },
   trackMarkLabel: {
     color: '#B5B1AA',
-    fontSize: 17
+    fontSize: 17,
   },
-});
+})
 
-export default DistributeRenewables;
+export default DistributeRenewables

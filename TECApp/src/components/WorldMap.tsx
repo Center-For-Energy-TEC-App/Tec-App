@@ -12,8 +12,7 @@ export interface WorldMapProps {
 export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
   const windowWidth = Dimensions.get('window').width
   const windowHeight = Dimensions.get('window').height
-  // const aspectRatio = windowHeight / windowWidth;
-  const widthScale = 3 // aspectRatio > 1.6 ? 2 : 3
+  const widthScale = 3 
 
   const projection = d3
     .geoNaturalEarth1()
@@ -29,8 +28,8 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
       maxZoom={3}
       bindToBorders={true}
       zoomStep={0.5}
-      contentHeight={windowHeight}
-      contentWidth={windowWidth * widthScale}
+      contentHeight={windowHeight} // These lines break browser version 
+      contentWidth={windowWidth * widthScale} // These lines break browser version 
       style={styles.container}
     >
       <Svg style={styles.svg} width={windowWidth * widthScale} height={windowHeight}>
