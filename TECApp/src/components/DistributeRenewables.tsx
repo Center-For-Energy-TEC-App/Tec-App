@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+
 import {
   View,
   Text,
@@ -17,11 +18,43 @@ import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon'
 import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon'
 import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon'
 import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
+import { DefaultValues, MinMaxValues } from './BottomSheet'
+import Svg, { Rect } from 'react-native-svg'
 
-const DistributeRenewables = () => {
+export type SliderProportions = {
+  solar: number
+  wind: number
+  hydropower: number
+  biomass: number
+  geothermal: number
+  nuclear: number
+}
+
+type DistributeRenewablesProps = {
+  values: DefaultValues
+  minMaxValues: MinMaxValues
+  onSliderChange: (val: DefaultValues) => void
+  onReset: () => void
+}
+
+const energyMap = {
+  solar: 'solar_gw',
+  wind: 'wind_gw',
+  hydropower: 'hydro_gw',
+  biomass: 'bio_gw',
+  geothermal: 'geo_gw',
+  nuclear: 'nuclear_gw',
+}
+
+const DistributeRenewables = ({
+  values,
+  minMaxValues,
+  onSliderChange,
+  onReset,
+}: DistributeRenewablesProps) => {
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
-
+  
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
     return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
@@ -30,6 +63,40 @@ const DistributeRenewables = () => {
   }
 
   const isIpad = deviceType() === 'ipad'
+  
+  const [proportionBarWidth, setProportionBarWidth] =
+    useState<number>(undefined)
+
+  const [sliderValues, setSliderValues] = useState<DefaultValues>(values[2])
+
+  const [sliderProportions, setSliderProportions] =
+    useState<SliderProportions>(undefined)
+
+  useEffect(() => {
+    setSliderValues(values[2])
+  }, [values])
+
+  useEffect(() => {
+    if (proportionBarWidth) {
+      const sliderTotal =
+        sliderValues.wind_gw +
+        sliderValues.solar_gw +
+        sliderValues.hydro_gw +
+        sliderValues.bio_gw +
+        sliderValues.geo_gw +
+        sliderValues.nuclear_gw +
+        5
+
+      setSliderProportions({
+        wind: (sliderValues.wind_gw / sliderTotal) * proportionBarWidth,
+        solar: (sliderValues.solar_gw / sliderTotal) * proportionBarWidth,
+        hydropower: (sliderValues.hydro_gw / sliderTotal) * proportionBarWidth,
+        biomass: (sliderValues.bio_gw / sliderTotal) * proportionBarWidth,
+        geothermal: (sliderValues.geo_gw / sliderTotal) * proportionBarWidth,
+        nuclear: (sliderValues.nuclear_gw / sliderTotal) * proportionBarWidth,
+      })
+    }
+  }, [sliderValues, proportionBarWidth])
 
   const renderTrackMark = (index: number, mark: string) => (
     <View style={styles.trackMarkContainer} key={index}>
@@ -54,7 +121,7 @@ const DistributeRenewables = () => {
         return '#779448'
       case 'Geothermal':
         return '#BF9336'
-      case 'Nuclear*':
+      case 'Nuclear':
         return '#EE8E35'
       default:
         return '#B5B1AA'
@@ -89,7 +156,9 @@ const DistributeRenewables = () => {
     <View style={styles.sliderContainer} key={label}>
       <View style={styles.labelContainer}>
         <IconComponent width={22} height={22} />
-        <Text style={styles.label}>{label}</Text>
+        <Text style={styles.label}>
+          {label === 'Nuclear' ? 'Nuclear*' : label}
+        </Text>
         <TouchableOpacity onPress={() => toggleTooltip(label)}>
           <ToolTipIcon />
         </TouchableOpacity>
@@ -98,22 +167,44 @@ const DistributeRenewables = () => {
       <View style={styles.sliderWrapper}>
         <Slider
           containerStyle={styles.slider}
-          minimumValue={2024}
-          maximumValue={2035}
-          value={0.1}
+          minimumValue={Math.round(
+            parseFloat(minMaxValues.min[label.toLowerCase()]),
+          )}
+          maximumValue={Math.round(
+            parseFloat(minMaxValues.max[label.toLowerCase()]),
+          )}
+          value={sliderValues[energyMap[label.toLowerCase()]]}
+          step={1.0}
           thumbTintColor={
             selectedSlider === label ? getSourceColor(label) : '#B5B1AA'
           }
           minimumTrackTintColor={getSourceColor(label)}
           maximumTrackTintColor="#B5B1AA"
-          trackMarks={[2024, 2027.5, 2030]}
+          trackMarks={[
+            values[0][energyMap[label.toLowerCase()]],
+            values[1][energyMap[label.toLowerCase()]]-0.0275*(parseFloat(minMaxValues.max[label.toLowerCase()])-parseFloat(minMaxValues.min[label.toLowerCase()])),
+          ]}
           renderTrackMarkComponent={(index) =>
-            renderTrackMark(index, ['2024', 'BAU', 'GV'][index])
+            renderTrackMark(index, ['2024', 'BAU'][index])
           }
           onSlidingStart={() => handleSlidingStart(label)}
+          onValueChange={(val) =>
+            setSliderValues({
+              ...sliderValues,
+              [energyMap[label.toLowerCase()]]: val[0],
+            })
+          }
+          onSlidingComplete={(val) =>
+            onSliderChange({
+              ...sliderValues,
+              [energyMap[label.toLowerCase()]]: val[0],
+            })
+          }
         />
         <View style={styles.sliderValueBox}>
-          <Text style={styles.sliderValue}>000 GW</Text>
+          <Text style={styles.sliderValue}>
+            {Math.round(sliderValues[energyMap[label.toLowerCase()]]) + ' GW'}
+          </Text>
         </View>
       </View>
     </View>
@@ -126,11 +217,91 @@ const DistributeRenewables = () => {
         energy source to reach 12 TW of renewable capacity. This will override
         default values set in the global dashboard.
       </Text>
-      <View style={styles.capacityProportionContainer}>
+      <View
+        style={styles.capacityProportionContainer}
+        onLayout={(event) => {
+          setProportionBarWidth(event.nativeEvent.layout.width - 20)
+        }}
+      >
         <Text style={styles.capacityProportionText}>
           Renewable Capacity Proportions
         </Text>
-        <View style={styles.bar}></View>
+        {proportionBarWidth && sliderProportions && (
+          <Svg height={20}>
+            <Rect
+              x={0}
+              y={0}
+              width={sliderProportions.wind}
+              height={20}
+              fill="#C66AAA"
+            />
+            <Rect
+              x={sliderProportions.wind}
+              y={0}
+              width={sliderProportions.solar}
+              height={20}
+              fill="#F8CE46"
+            />
+            <Rect
+              x={sliderProportions.wind + sliderProportions.solar}
+              y={0}
+              width={sliderProportions.hydropower}
+              height={20}
+              fill="#58C4D4"
+            />
+            <Rect
+              x={
+                sliderProportions.wind +
+                sliderProportions.solar +
+                sliderProportions.hydropower
+              }
+              y={0}
+              width={sliderProportions.biomass}
+              height={20}
+              fill="#779448"
+            />
+            <Rect
+              x={
+                sliderProportions.wind +
+                sliderProportions.solar +
+                sliderProportions.hydropower +
+                sliderProportions.biomass
+              }
+              y={0}
+              width={sliderProportions.geothermal}
+              height={20}
+              fill="#BF9336"
+            />
+            <Rect
+              x={
+                sliderProportions.wind +
+                sliderProportions.solar +
+                sliderProportions.hydropower +
+                sliderProportions.biomass +
+                sliderProportions.geothermal
+              }
+              y={0}
+              width={5}
+              height={20}
+              fill="white"
+            />
+            <Rect
+              x={
+                sliderProportions.wind +
+                sliderProportions.solar +
+                sliderProportions.hydropower +
+                sliderProportions.biomass +
+                sliderProportions.geothermal +
+                5
+              }
+              y={0}
+              width={sliderProportions.nuclear}
+              height={20}
+              fill="#EE8E35"
+            />
+          </Svg>
+        )}
+        {/* <View style={styles.bar}></View> */}
       </View>
       {renderSlider(
         'Wind',
@@ -158,7 +329,7 @@ const DistributeRenewables = () => {
         'Geothermal power is generated from heat within the Earth’s core. Geothermal wells and heat exchangers are used to tap into reservoirs of steam and hot water.',
       )}
       {renderSlider(
-        'Nuclear*',
+        'Nuclear',
         NuclearIcon,
         'Nuclear power is generated through nuclear reactions, typically involving the splitting of atoms to release energy. This is then harnessed to generate electricity.',
       )}
@@ -169,7 +340,7 @@ const DistributeRenewables = () => {
         reducing reliance on fossil fuels.
       </Text>
 
-      <TouchableOpacity style={styles.resetButton}>
+      <TouchableOpacity onPress={onReset} style={styles.resetButton}>
         <Text style={styles.resetButtonText}>Reset to Global Values</Text>
       </TouchableOpacity>
       <View style={styles.spacer}></View>
@@ -271,6 +442,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#000',
     borderRadius: 4,
+    width: 75,
+    display: 'flex',
+    alignItems: 'center',
   },
   sliderValue: {
     color: '#000',

@@ -78,7 +78,8 @@ export const GlobalDashboard = () => {
       </View>
       <View style={styles.horizontalLine} />
       {activeTab === 'renewables' ? (
-        <DistributeRenewables />
+        // <DistributeRenewables defaultValues={null}/>
+        <></>
       ) : (
         <DataVisualizations region="Global" />
       )}
