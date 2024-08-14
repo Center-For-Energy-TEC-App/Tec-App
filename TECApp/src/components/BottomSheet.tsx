@@ -14,7 +14,7 @@ import {
   getRegionCalculationData,
 } from '../api/requests'
 import { getAbbrv, getEnergyAbbrv } from '../util/ValueDictionaries'
-import { calculateCurve } from '../util/Calculations'
+import { calculateCurve, calculateNewGlobalOnReset } from '../util/Calculations'
 
 export interface BottomSheetProps {
   selectedRegion: string
@@ -100,16 +100,19 @@ export const BottomSheet = ({
                     val,
                   ],
                 })
+                const { regional, global } = calculateCurve(
+                  {
+                    technology: technologyChanged,
+                    value: val[getEnergyAbbrv(technologyChanged)],
+                  },
+                  dynamicGraphData[getAbbrv(selectedRegion)],
+                  dynamicGraphData.global,
+                  calculationData,
+                )
                 setDynamicGraphData({
                   ...dynamicGraphData,
-                  [getAbbrv(selectedRegion)]: calculateCurve(
-                    {
-                      technology: technologyChanged,
-                      value: val[getEnergyAbbrv(technologyChanged)],
-                    },
-                    dynamicGraphData[getAbbrv(selectedRegion)],
-                    calculationData,
-                  ),
+                  [getAbbrv(selectedRegion)]: regional,
+                  global: global,
                 })
               }}
               onReset={() => {
@@ -122,6 +125,11 @@ export const BottomSheet = ({
                   ...dynamicGraphData,
                   [getAbbrv(selectedRegion)]:
                     initialGraphData[getAbbrv(selectedRegion)],
+                  global: calculateNewGlobalOnReset(
+                    initialGraphData[getAbbrv(selectedRegion)],
+                    dynamicGraphData[getAbbrv(selectedRegion)],
+                    dynamicGraphData.global,
+                  ),
                 })
               }}
               initialGraphData={initialGraphData}

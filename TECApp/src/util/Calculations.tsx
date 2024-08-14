@@ -7,7 +7,8 @@ type ValuePair = {
 
 export const calculateCurve = (
   newVal: ValuePair,
-  graphData: RegionData,
+  regionGraphData: RegionData,
+  globalGraphData: RegionData,
   calculationData: RenewableEnergyCalculationData,
 ) => {
   const installed_capacity =
@@ -28,38 +29,85 @@ export const calculateCurve = (
       parseFloat(forecast_growth_rate[i]) + climate_path_minus_forecast
   }
 
-  const climate_path_installed_capacty = {}
-  let currValue = installed_capacity
+  const newRegionTechnology = []
+  const newRegionTotal = []
+  const newGlobalTechnology = []
+  const newGlobalTotal = []
+  let climate_path_installed_capacty = installed_capacity
   for (let i = 2024; i <= 2030; i++) {
-    climate_path_installed_capacty[i] = currValue
-    currValue = currValue * (1 + climate_path_growth_rate[i + 1])
-  }
+    const electricity_generation =
+      climate_path_installed_capacty * 8760 * capacity_factor[i] * 0.001
+    climate_path_installed_capacty =
+      climate_path_installed_capacty * (1 + climate_path_growth_rate[i + 1])
 
-  const electricity_generation = {}
-  for (let i = 2024; i <= 2030; i++) {
-    electricity_generation[i] =
-      climate_path_installed_capacty[i] * 8760 * capacity_factor[i] * 0.001
-  }
+    const valueChange =
+      electricity_generation -
+      regionGraphData[newVal.technology][i - 2024].value
 
-  const newCurve = [
-    { year: 2024, value: electricity_generation[2024] },
-    { year: 2025, value: electricity_generation[2025] },
-    { year: 2026, value: electricity_generation[2026] },
-    { year: 2027, value: electricity_generation[2027] },
-    { year: 2028, value: electricity_generation[2028] },
-    { year: 2029, value: electricity_generation[2029] },
-    { year: 2030, value: electricity_generation[2030] },
-  ]
+    newRegionTechnology.push({ year: i, value: electricity_generation })
 
-  const newTotal = []
-  for (let i = 0; i <= 6; i++) {
-    newTotal.push({
-      year: 2024 + i,
-      value:
-        graphData.total[i].value +
-        (newCurve[i].value - graphData[newVal.technology][i].value),
+    newRegionTotal.push({
+      year: i,
+      value: regionGraphData.total[i - 2024].value + valueChange,
+    })
+    newGlobalTechnology.push({
+      year: i,
+      value: globalGraphData[newVal.technology][i - 2024].value + valueChange,
+    })
+    newGlobalTotal.push({
+      year: i,
+      value: globalGraphData.total[i - 2024].value + valueChange,
     })
   }
 
-  return { ...graphData, [newVal.technology]: newCurve, total: newTotal }
+  return {
+    regional: {
+      ...regionGraphData,
+      [newVal.technology]: newRegionTechnology,
+      total: newRegionTotal,
+    },
+    global: {
+      ...globalGraphData,
+      [newVal.technology]: newGlobalTechnology,
+      total: newGlobalTotal,
+    },
+  }
+}
+
+let technologies = [
+  'solar',
+  'wind',
+  'biomass',
+  'geothermal',
+  'hydropower',
+  'nuclear',
+  'total',
+]
+
+export const calculateNewGlobalOnReset = (
+  BAURegionData: RegionData,
+  oldRegionData: RegionData,
+  oldGlobalData: RegionData,
+) => {
+  const newGlobal: RegionData = {
+    solar: [],
+    wind: [],
+    hydropower: [],
+    biomass: [],
+    geothermal: [],
+    nuclear: [],
+    total: [],
+  }
+  for (let i = 2024; i <= 2030; i++) {
+    for (const technology of technologies) {
+      newGlobal[technology].push({
+        year: i,
+        value:
+          oldGlobalData[technology][i - 2024].value +
+          (BAURegionData[technology][i - 2024].value -
+            oldRegionData[technology][i - 2024].value),
+      })
+    }
+  }
+  return newGlobal
 }
