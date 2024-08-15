@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+
 import {
   View,
   Text,
@@ -6,6 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
+  Platform,
+  Dimensions,
 } from 'react-native'
 import { Slider } from '@miblanchard/react-native-slider'
 import { WindIcon } from '../SVGs/DistributeRenewablesIcons/WindIcon'
@@ -51,7 +54,16 @@ const DistributeRenewables = ({
 }: DistributeRenewablesProps) => {
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
+  
+  const deviceType = () => {
+    const { width, height } = Dimensions.get('window')
+    return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
+      ? 'ipad'
+      : 'iphone'
+  }
 
+  const isIpad = deviceType() === 'ipad'
+  
   const [proportionBarWidth, setProportionBarWidth] =
     useState<number>(undefined)
 
@@ -200,7 +212,7 @@ const DistributeRenewables = ({
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.description}>
+      <Text style={[styles.description, isIpad && styles.iPadText]}>
         Using the sliders below, make region specific changes for each renewable
         energy source to reach 12 TW of renewable capacity. This will override
         default values set in the global dashboard.
@@ -322,7 +334,8 @@ const DistributeRenewables = ({
         'Nuclear power is generated through nuclear reactions, typically involving the splitting of atoms to release energy. This is then harnessed to generate electricity.',
       )}
 
-      <Text style={styles.nuclearNote}>
+      <Text style={[styles.nuclearNote, isIpad && styles.iPadText]}>
+        {' '}
         *Not a renewable energy source, but supports carbon reduction goals by
         reducing reliance on fossil fuels.
       </Text>
@@ -345,6 +358,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
     fontSize: 14,
     marginBottom: 16,
+  },
+  iPadText: {
+    fontSize: 18,
   },
   capacityProportionContainer: {
     display: 'flex',
