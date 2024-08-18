@@ -41,8 +41,8 @@ def insert_secondary_calculations():
     cursor.execute(f"CREATE TABLE secondary_calculations_forecast_cagr (energy_type varchar(20), region varchar(10), value decimal);")
     cursor.execute(f"CREATE TABLE secondary_calculations_forecast_growth_rate (energy_type varchar(20), year integer, region varchar(10), value decimal);")
 
-    with open(f"DBScripts/Data/GraphData/Secondary Calculations-Table 1.csv", mode="r") as csvfile:
-        reader = csv.reader(csvfile)
+    with open(f"DBScripts/Data/GraphData/Secondary Calculations-Table 1.tsv", mode="r") as csvfile:
+        reader = csv.reader(csvfile, delimiter='\t')
         for i, line in enumerate(reader):
             print(line)
             if i>1 and i<86 and line[0]=="Capacity Factor":
@@ -64,9 +64,9 @@ def insert_secondary_calculations():
                     regionIndex+=1
 
 def insert_data_aggregation():
- cursor.execute(f"CREATE TABLE data_aggregation_installed_capacity (energy_type varchar(20), year integer, region varchar(10), value decimal);")
- cursor.execute(f"CREATE TABLE data_aggregation_electricity_generation (energy_type varchar(20), year integer, region varchar(10), value decimal);")
- with open(f"DBScripts/Data/GraphData/Data Aggregation-Table 1.tsv", mode="r") as csvfile:
+    cursor.execute(f"CREATE TABLE data_aggregation_installed_capacity (energy_type varchar(20), year integer, region varchar(10), value decimal);")
+    cursor.execute(f"CREATE TABLE data_aggregation_electricity_generation (energy_type varchar(20), year integer, region varchar(10), value decimal);")
+    with open(f"DBScripts/Data/GraphData/Data Aggregation-Table 1.tsv", mode="r") as csvfile:
         reader = csv.reader(csvfile, delimiter="\t")
         for i, line in enumerate(reader):
             print(line)
@@ -88,33 +88,43 @@ def insert_transpose():
     cursor.execute(f"CREATE TABLE transpose_co2_emissions (energy_type varchar(30), year integer, region varchar(10), value decimal);")
 
     with open(f"DBScripts/Data/GraphData/Transpose-Table 1.tsv", mode="r") as csvfile:
-            reader = csv.reader(csvfile, delimiter="\t")
-            for i, line in enumerate(reader):
-                print(line)
-                if  i<168:
-                    regionIndex = 0
-                    for entry in line[4:15]:
-                        cursor.execute(f"INSERT INTO transpose_electricity_generation VALUES('{parse_energy_type(line[1])}', {line[3]}, '{regions[regionIndex].lower()}', {parse_large_num(entry) if entry else 0})")
-                        regionIndex+=1
-                if i>167 and i<336:
-                    regionIndex = 0
-                    for entry in line[4:15]:
-                        cursor.execute(f"INSERT INTO transpose_installed_capacity VALUES('{parse_energy_type(line[1])}', {line[3]}, '{regions[regionIndex].lower()}', {parse_large_num(entry) if entry else 0})")
-                        regionIndex+=1
-                if i>335 and i<378:
-                    regionIndex = 0
-                    for entry in line[4:15]:
-                        cursor.execute(f"INSERT INTO transpose_energy_consumption VALUES('{parse_energy_type(line[1])}', {line[3]}, '{regions[regionIndex].lower()}', {parse_large_num(entry) if entry else 0})")
-                        regionIndex+=1
-                if i>377:
-                    regionIndex = 0
-                    for entry in line[4:15]:
-                        cursor.execute(f"INSERT INTO transpose_co2_emissions VALUES('{parse_energy_type(line[1])}', {line[3]}, '{regions[regionIndex].lower()}', {parse_large_num(entry) if entry else 0})")
-                        regionIndex+=1
+        reader = csv.reader(csvfile, delimiter="\t")
+        for i, line in enumerate(reader):
+            print(line)
+            if  i<168:
+                regionIndex = 0
+                for entry in line[4:15]:
+                    cursor.execute(f"INSERT INTO transpose_electricity_generation VALUES('{parse_energy_type(line[1])}', {line[3]}, '{regions[regionIndex].lower()}', {parse_large_num(entry) if entry else 0})")
+                    regionIndex+=1
+            if i>167 and i<336:
+                regionIndex = 0
+                for entry in line[4:15]:
+                    cursor.execute(f"INSERT INTO transpose_installed_capacity VALUES('{parse_energy_type(line[1])}', {line[3]}, '{regions[regionIndex].lower()}', {parse_large_num(entry) if entry else 0})")
+                    regionIndex+=1
+            if i>335 and i<378:
+                regionIndex = 0
+                for entry in line[4:15]:
+                    cursor.execute(f"INSERT INTO transpose_energy_consumption VALUES('{parse_energy_type(line[1])}', {line[3]}, '{regions[regionIndex].lower()}', {parse_large_num(entry) if entry else 0})")
+                    regionIndex+=1
+            if i>377:
+                regionIndex = 0
+                for entry in line[4:15]:
+                    cursor.execute(f"INSERT INTO transpose_co2_emissions VALUES('{parse_energy_type(line[1])}', {line[3]}, '{regions[regionIndex].lower()}', {parse_large_num(entry) if entry else 0})")
+                    regionIndex+=1
+            
+
+def insert_initial_graph_data():
+    cursor.execute(f"CREATE TABLE initial_graph_data (energy_type varchar(10), year integer, global decimal, chn decimal, ind decimal, mea decimal, nam decimal, nee decimal, sea decimal, eur decimal, lam decimal, ssa decimal, opa decimal);")
+    with open(f"DBScripts/Data/GraphData/InitialData.tsv", mode="r") as csvfile:
+        reader = csv.reader(csvfile, delimiter="\t")
+        for i, line in enumerate(reader):
+            print(line)
+            cursor.execute(f"INSERT INTO initial_graph_data VALUES ('{parse_energy_type(line[1])}', {line[3]}, {parse_large_num(line[4])},{parse_large_num(line[5])},{parse_large_num(line[6])},{parse_large_num(line[7])},{parse_large_num(line[8])},{parse_large_num(line[9])},{parse_large_num(line[10])},{parse_large_num(line[11])},{parse_large_num(line[12])},{parse_large_num(line[13])},{parse_large_num(line[14])});")
 
 insert_secondary_calculations()
-insert_data_aggregation()
-insert_transpose()
+# insert_data_aggregation()
+# insert_transpose()
+# insert_initial_graph_data()
 
 
 conn.commit()   # commit changes (otherwise changes will not be reflected in remote database)

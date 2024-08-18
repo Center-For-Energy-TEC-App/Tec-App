@@ -2,55 +2,27 @@ import React, { Text, StyleSheet, Dimensions, View, Platform } from 'react-nativ
 import * as d3 from 'd3'
 import { GraphKey } from './GraphKey'
 import { LineGraph } from './LineGraph'
+import { RegionData } from '../../api/requests'
 
 const vw = Dimensions.get('window').width
 
 const graphHeight = 190
 
 const graphWidth = vw * 0.8
-const leftMargin = 60
-
-const dummyBAU = [
-  { year: 2024, value: 10 },
-  { year: 2025, value: 12 },
-  { year: 2026, value: 14 },
-  { year: 2027, value: 9 },
-  { year: 2028, value: 11.5 },
-  { year: 2029, value: 13 },
-  { year: 2030, value: 15 },
-]
-const dummyAltered = [
-  { year: 2024, value: Math.random() * 12 + 4 },
-  { year: 2025, value: Math.random() * 12 + 4 },
-  { year: 2026, value: Math.random() * 12 + 4 },
-  { year: 2027, value: Math.random() * 12 + 4 },
-  { year: 2028, value: Math.random() * 12 + 4 },
-  { year: 2029, value: Math.random() * 12 + 4 },
-  { year: 2030, value: Math.random() * 12 + 4 },
-]
-
-//min of both datasets
-const yMin = Math.min(
-  Math.min(...dummyBAU.map((val) => val.value)),
-  Math.min(...dummyAltered.map((val) => val.value)),
-)
-
-//max of both datasets
-const yMax = Math.max(
-  Math.max(...dummyBAU.map((val) => val.value)),
-  Math.max(...dummyAltered.map((val) => val.value)),
-)
+const leftMargin = 65
 
 const xMin = 2024
 const xMax = 2030
 
-type DataPoint = {
+export type DataPoint = {
   year: number
   value: number
 }
 
 type BAUComparisonProps = {
   region: string
+  BAUData: RegionData
+  dynamicData: RegionData
 }
 
 const deviceType = () => {
@@ -60,7 +32,26 @@ const deviceType = () => {
 
 const isIpad = deviceType() === 'ipad'
 
-export const BAUComparison = ({ region }: BAUComparisonProps) => {
+export const BAUComparison = ({
+  region,
+  BAUData,
+  dynamicData,
+}: BAUComparisonProps) => {
+  const BAU_data = BAUData.total
+  const altered_data = dynamicData.total
+
+  //min of both datasets
+  const yMin = Math.min(
+    Math.min(...BAU_data.map((val) => val.value)),
+    Math.min(...altered_data.map((val) => val.value)),
+  )
+
+  //max of both datasets
+  const yMax = Math.max(
+    Math.max(...BAU_data.map((val) => val.value)),
+    Math.max(...altered_data.map((val) => val.value)),
+  )
+
   //define y-axis scale
   const y = d3.scaleLinear().domain([yMin, yMax]).range([graphHeight, 0])
   //define x-axis scale
@@ -75,21 +66,21 @@ export const BAUComparison = ({ region }: BAUComparisonProps) => {
     .x((d) => x(d.year))
     .y1((d) => y(d.value))
     .y0(graphHeight)
-    .curve(d3.curveMonotoneX)(dummyBAU)
+    .curve(d3.curveMonotoneX)(BAU_data)
 
   //define BAU line curve
   const BAU_curve = d3
     .line<DataPoint>()
     .x((d) => x(d.year))
     .y((d) => y(d.value))
-    .curve(d3.curveMonotoneX)(dummyBAU)
+    .curve(d3.curveMonotoneX)(BAU_data)
 
   //define altered renewables line curve
   const altered_curve = d3
     .line<DataPoint>()
     .x((d) => x(d.year))
     .y((d) => y(d.value))
-    .curve(d3.curveMonotoneX)(dummyAltered)
+    .curve(d3.curveMonotoneX)(altered_data)
 
   return (
     <View style={{ width: '100%' }}>

@@ -1,8 +1,9 @@
 import express, {Router} from "express"
 import "dotenv/config"
-import { getAllDefaultValues, getMinMaxValues } from "./src/query"
+import { getAllDefaultValues, getMinMaxValues } from "./src/AllocationDefaults"
 import Pool from "pg"
 import cors from "cors"
+import { getInitialGraphData, getRegionCalculationData } from "./src/GraphData"
 
 const app = express()
 const port = process.env.LOCAL_PORT
@@ -30,6 +31,10 @@ app.use(cors({
 router.get('/defaults', getAllDefaultValues)
 
 router.get('/minmax', getMinMaxValues)
+
+router.get('/initgraph', getInitialGraphData)
+
+router.get('/calc/:region', getRegionCalculationData)
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)

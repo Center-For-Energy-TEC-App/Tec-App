@@ -16,7 +16,7 @@ const graphHeight = 190 //height of graph graph
 const offset = 20 //graph starts this amount from the top of the svg container (allows for axes label to peek out above strict graph limits)
 
 const graphWidth = vw * 0.8
-const leftMargin = 60
+const leftMargin = 65
 
 export type CurveObject = {
   color: string
@@ -29,9 +29,9 @@ export type CurveObject = {
  * forces borders on all sides when we only want the stroked curve on the top of the gradient
  */
 type LineGraphProps = {
-  gradient: CurveObject //area curve for gradient
-  gradientCurve: CurveObject //line curve for gradient border
-  lineCurves: CurveObject[] //generic line curves
+  gradient?: CurveObject //area curve for gradient
+  gradientCurve?: CurveObject //line curve for gradient border
+  lineCurves?: CurveObject[] //generic line curves
   yMin: number //minimum y-axis value of data
   yMax: number //maximum y-axis value of data
 }
@@ -65,12 +65,18 @@ export const LineGraph = ({
   return (
     <Svg width={graphWidth} height={svgHeight}>
       {/* Gradient definitions*/}
-      <Defs>
-        <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0" stopColor={gradientCurve.color} stopOpacity={0.9} />
-          <Stop offset="1" stopColor="#FFF" stopOpacity={0.01} />
-        </LinearGradient>
-      </Defs>
+      {gradientCurve && (
+        <Defs>
+          <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+            <Stop
+              offset="0"
+              stopColor={gradientCurve.color}
+              stopOpacity={0.9}
+            />
+            <Stop offset="1" stopColor="#FFF" stopOpacity={0.01} />
+          </LinearGradient>
+        </Defs>
+      )}
 
       {/* Graph frame */}
       <G y={offset}>
@@ -88,7 +94,13 @@ export const LineGraph = ({
             <TextSvg
               strokeWidth={0.1}
               y={calculateY(e) + 3.5}
-              x={e >= 10 ? leftMargin - 25 : leftMargin - 20} //double digits take up more space
+              x={
+                e >= 10000
+                  ? leftMargin - 42
+                  : e >= 1000
+                    ? leftMargin - 37
+                    : leftMargin - 35
+              } //double digits take up more space
               fontSize={10}
               fill="#9E9FA7"
               stroke="#9E9FA7"
@@ -106,14 +118,14 @@ export const LineGraph = ({
           fontFamily="Roboto"
           fontSize={14}
           x={-(graphHeight - 30)}
-          y={15}
+          y={10}
         >
-          Renewable Energy (TWh)
+          Renewable Energy(TWh)
         </TextSvg>
         {horizontalAxis.map((e, key) => (
           <TextSvg
             key={key}
-            x={graphWidth * (-(2024 - e) / 8.3) + leftMargin}
+            x={graphWidth * (-(2024 - e) / 8.6) + leftMargin}
             y={graphHeight + 25}
             strokeWidth={0.1}
             fontWeight={700}
@@ -139,18 +151,22 @@ export const LineGraph = ({
       </G>
       {/* Graph Curves */}
       <G y={offset}>
-        <Path
-          d={gradient.curve}
-          strokeWidth={0}
-          stroke={gradient.color}
-          fill="url(#grad)"
-        />
-        <Path
-          d={gradientCurve.curve}
-          strokeWidth={2}
-          stroke={gradientCurve.color}
-          fill="none"
-        />
+        {gradient && gradientCurve && (
+          <>
+            <Path
+              d={gradient.curve}
+              strokeWidth={0}
+              stroke={gradient.color}
+              fill="url(#grad)"
+            />
+            <Path
+              d={gradientCurve.curve}
+              strokeWidth={2}
+              stroke={gradientCurve.color}
+              fill="none"
+            />
+          </>
+        )}
         {lineCurves.map((curveObject, key) => (
           <Path
             key={key}
