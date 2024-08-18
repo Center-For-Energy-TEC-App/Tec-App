@@ -1,4 +1,4 @@
-import React, { Text, StyleSheet, Dimensions, View } from 'react-native'
+import React, { Text, StyleSheet, Dimensions, View, Platform } from 'react-native'
 import * as d3 from 'd3'
 import { GraphKey } from './GraphKey'
 import { LineGraph } from './LineGraph'
@@ -24,6 +24,13 @@ type BAUComparisonProps = {
   BAUData: RegionData
   dynamicData: RegionData
 }
+
+const deviceType = () => {
+  const { width, height } = Dimensions.get('window')
+  return Platform.OS === 'ios' && (width >= 1024 || height >= 1366) ? 'ipad' : 'iphone'
+}
+
+const isIpad = deviceType() === 'ipad'
 
 export const BAUComparison = ({
   region,
@@ -78,7 +85,7 @@ export const BAUComparison = ({
   return (
     <View style={{ width: '100%' }}>
       <Text style={styles.header}>B.A.U. Comparison</Text>
-      <Text style={styles.body}>
+      <Text style={[styles.body, isIpad&&styles.iPadText]}>
         See how your manipulated data compares to the business-as-usual (BAU)
         data. The BAU data represents the projected renewable capacity levels
         from now to 2030 without any interventions.
@@ -139,4 +146,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: 4,
   },
+  iPadText: {
+    fontSize: 18
+  }
 })
