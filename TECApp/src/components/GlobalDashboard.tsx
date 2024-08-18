@@ -4,15 +4,19 @@ import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { Tracker } from './Tracker'
 import { ScrollView } from 'react-native-gesture-handler'
 import { GraphData } from '../api/requests'
+import { DataPoint } from './DataVisualizations/BAUComparison'
+import { FossilReductionData } from './BottomSheet'
 
 type GlobalDashboardProps = {
   initialGraphData: GraphData
   dynamicGraphData: GraphData
+  fossilData: DataPoint[]
 }
 
 export const GlobalDashboard = ({
   initialGraphData,
   dynamicGraphData,
+  fossilData,
 }: GlobalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
@@ -84,6 +88,7 @@ export const GlobalDashboard = ({
         <DataVisualizations
           initialData={initialGraphData}
           dynamicData={dynamicGraphData}
+          fossilData={fossilData}
           region="Global"
         />
       )}

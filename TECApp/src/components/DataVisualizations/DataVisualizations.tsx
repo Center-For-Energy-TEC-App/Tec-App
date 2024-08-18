@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Text, StyleSheet, View, ScrollView } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { BAUComparison } from './BAUComparison'
+import { BAUComparison, DataPoint } from './BAUComparison'
 import { RegionalComparison } from './RegionalComparison'
 import { CarbonBudget } from './CarbonBudget'
 import { TechnologyComparison } from './TechnologyComparison'
@@ -12,11 +12,13 @@ type DataVisualizationsProps = {
   region: string
   initialData: GraphData
   dynamicData: GraphData
+  fossilData: DataPoint[]
 }
 const DataVisualizations = ({
   region,
   initialData,
   dynamicData,
+  fossilData,
 }: DataVisualizationsProps) => {
   const [activeButton, setActiveButton] = useState('BAU Comparison')
 
@@ -113,7 +115,7 @@ const DataVisualizations = ({
       ) : activeButton === 'Regional Comparison' ? (
         <RegionalComparison region={region} data={dynamicData} />
       ) : activeButton === 'Carbon Budget' ? (
-        <CarbonBudget />
+        <CarbonBudget data={fossilData} />
       ) : (
         <TechnologyComparison data={dynamicData[getAbbrv(region)]} />
       )}

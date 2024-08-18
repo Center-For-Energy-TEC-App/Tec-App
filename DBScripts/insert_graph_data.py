@@ -121,11 +121,29 @@ def insert_initial_graph_data():
             print(line)
             cursor.execute(f"INSERT INTO initial_graph_data VALUES ('{parse_energy_type(line[1])}', {line[3]}, {parse_large_num(line[4])},{parse_large_num(line[5])},{parse_large_num(line[6])},{parse_large_num(line[7])},{parse_large_num(line[8])},{parse_large_num(line[9])},{parse_large_num(line[10])},{parse_large_num(line[11])},{parse_large_num(line[12])},{parse_large_num(line[13])},{parse_large_num(line[14])});")
 
-insert_secondary_calculations()
-# insert_data_aggregation()
-# insert_transpose()
-# insert_initial_graph_data()
+def insert_fossil_emissions_data():
+    cursor.execute(f"CREATE TABLE fossil_emissions_data (year integer, region varchar(10), value decimal)")
+    with open("DBScripts/Data/GraphData/Fossil Emissions.tsv", mode="r") as csvfile:
+        reader = csv.reader(csvfile, delimiter="\t")
+        for line in reader:
+            print(line)
+            regionIndex = 0
+            for entry in line[4:15]:
+                cursor.execute(f"INSERT INTO fossil_emissions_data VALUES({line[3]}, '{regions[regionIndex].lower()}', {parse_large_num(entry) if entry else 0})")
+                regionIndex+=1
+    
+def drop_all_tables():
+    cursor.execute("DROP TABLE IF EXISTS secondary_calculations_capacity_factor,secondary_calculations_forecast_cagr, secondary_calculations_forecast_growth_rate,data_aggregation_installed_capacity,data_aggregation_electricity_generation,transpose_electricity_generation,transpose_installed_capacity,transpose_energy_consumption,transpose_co2_emissions")
 
+insert_secondary_calculations()
+insert_data_aggregation()
+insert_transpose()
+
+# insert_initial_graph_data()
+# insert_fossil_emissions_data()
+
+
+# drop_all_tables()
 
 conn.commit()   # commit changes (otherwise changes will not be reflected in remote database)
 cursor.close()  # close cursor & connection

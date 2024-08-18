@@ -9,17 +9,38 @@ import {
   RegionalValues,
   RenewableEnergyCalculationData,
   getDefaultValues,
+  getInitialFossilData,
   getInitialGraphData,
   getMinMaxValues,
   getRegionCalculationData,
 } from '../api/requests'
 import { getAbbrv, getEnergyAbbrv } from '../util/ValueDictionaries'
-import { calculateCurve, calculateNewGlobalOnReset } from '../util/Calculations'
+import {
+  calculateCarbonReductions,
+  calculateEnergyCurve,
+  calculateNewGlobalOnReset,
+} from '../util/Calculations'
+import { DataPoint } from './DataVisualizations/BAUComparison'
 
 export interface BottomSheetProps {
   selectedRegion: string
   onSwipeDown: () => void
 }
+
+export type FossilReductionData = {
+  chn: DataPoint[]
+  nam: DataPoint[]
+  lam: DataPoint[]
+  ind: DataPoint[]
+  sea: DataPoint[]
+  mea: DataPoint[]
+  opa: DataPoint[]
+  eur: DataPoint[]
+  ssa: DataPoint[]
+  nee: DataPoint[]
+}
+
+const regions = ["chn", "nam", "lam", "ind", "sea", "mea", "opa", "eur", "ssa", "nee"]
 
 export const BottomSheet = ({
   selectedRegion,
@@ -36,6 +57,10 @@ export const BottomSheet = ({
 
   const [initialGraphData, setInitialGraphData] = useState<GraphData>()
   const [dynamicGraphData, setDynamicGraphData] = useState<GraphData>()
+
+  const [fossilData, setFossilData] = useState<DataPoint[]>()
+  const [fossilReductionData, setFossilReductionData] =
+    useState<FossilReductionData>()
 
   const [calculationData, setCalculationData] =
     useState<RenewableEnergyCalculationData>()
@@ -58,6 +83,22 @@ export const BottomSheet = ({
         setDynamicGraphData(val)
       })
       .catch(console.error)
+    getInitialFossilData().then((val) => {
+      setFossilData(val)
+    })
+
+    let initialFossilReductionData = {} as FossilReductionData
+    for(const region of regions){
+      initialFossilReductionData[region] = [
+        {year: 2025, value: 0},
+        {year: 2026, value: 0},
+        {year: 2027, value: 0},
+        {year: 2028, value: 0},
+        {year: 2029, value: 0},
+        {year: 2030, value: 0},
+      ]
+    }
+    setFossilReductionData(initialFossilReductionData)
   }, [])
 
   useEffect(() => {
@@ -100,7 +141,7 @@ export const BottomSheet = ({
                     val,
                   ],
                 })
-                const { regional, global } = calculateCurve(
+                const { regional, global } = calculateEnergyCurve(
                   {
                     technology: technologyChanged,
                     value: val[getEnergyAbbrv(technologyChanged)],
@@ -113,6 +154,25 @@ export const BottomSheet = ({
                   ...dynamicGraphData,
                   [getAbbrv(selectedRegion)]: regional,
                   global: global,
+                })
+
+                const newRegionFossilReductionData = calculateCarbonReductions(
+                  getAbbrv(selectedRegion),
+                  calculationData,
+                  regional,
+                )
+
+                let newFossilData = fossilData
+                for (let i = 1; i < fossilData.length; i++) {
+                  newFossilData[i].value -= (newRegionFossilReductionData[i-1].value -
+                    fossilReductionData[getAbbrv(selectedRegion)][i-1].value)
+                }
+
+                setFossilData(newFossilData)
+
+                setFossilReductionData({
+                  ...fossilReductionData,
+                  [getAbbrv(selectedRegion)]: newRegionFossilReductionData,
                 })
               }}
               onReset={() => {
@@ -131,6 +191,26 @@ export const BottomSheet = ({
                     dynamicGraphData.global,
                   ),
                 })
+              
+                let newFossilData = fossilData
+                for (let i = 1; i < fossilData.length; i++) {
+                  newFossilData[i].value +=
+                    fossilReductionData[getAbbrv(selectedRegion)][i-1].value
+                }
+
+                setFossilData(newFossilData)
+
+                setFossilReductionData({
+                  ...fossilReductionData,
+                  [getAbbrv(selectedRegion)]: [
+                    {year: 2025, value:0},
+                    {year: 2026, value:0},
+                    {year: 2027, value:0},
+                    {year: 2028, value:0},
+                    {year: 2029, value:0},
+                    {year: 2030, value:0}
+                  ],
+                })
               }}
               initialGraphData={initialGraphData}
               dynamicGraphData={dynamicGraphData}
@@ -142,6 +222,7 @@ export const BottomSheet = ({
             <GlobalDashboard
               initialGraphData={initialGraphData}
               dynamicGraphData={dynamicGraphData}
+              fossilData={fossilData}
             />
           )}
         </View>

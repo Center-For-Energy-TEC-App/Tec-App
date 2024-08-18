@@ -22,21 +22,8 @@ const offset = 20
 const graphWidth = vw * 0.8
 const leftMargin = 60
 
-const dummyData = [
-  { year: 2024, value: 4 },
-  { year: 2025, value: 4.4 },
-  { year: 2026, value: 4.9 },
-  { year: 2027, value: 5.4 },
-  { year: 2028, value: 5.8 },
-  { year: 2029, value: 6.2 },
-  { year: 2030, value: 6.3 },
-]
-
-const dummy1Point5Limit = 10
-const dummy2Point0Limit = 20
-
-const yMin = Math.min(...dummyData.map((val) => val.value))
-const yMax = Math.max(...dummyData.map((val) => val.value))
+const dummy1Point5Limit = 100
+const dummy2Point0Limit = 148
 
 const xMin = 2024
 const xMax = 2030
@@ -46,12 +33,19 @@ type DataPoint = {
   value: number
 }
 
-export const CarbonBudget = () => {
+type CarbonBudgetProps = {
+  data: DataPoint[]
+}
+
+export const CarbonBudget = ({ data }: CarbonBudgetProps) => {
+  const yMin = Math.min(...data.map((val) => val.value))
+  const yMax = Math.max(...data.map((val) => val.value))
+
   let sum = 0
   let dummy1Point5Year: number
   let dummy2Point0Year: number
   //calculating x-axis position of each temperature limit
-  for (const i of dummyData) {
+  for (const i of data) {
     sum += i.value
     if (!dummy1Point5Year && sum > dummy1Point5Limit) {
       dummy1Point5Year = i.year
@@ -62,8 +56,8 @@ export const CarbonBudget = () => {
   }
 
   //separate data based on 2 degree limit
-  const dummyData1 = dummyData.filter((val) => val.year <= dummy2Point0Year)
-  const dummyData2 = dummyData.filter((val) => val.year >= dummy2Point0Year)
+  const data1 = data.filter((val) => val.year <= dummy2Point0Year)
+  const data2 = data.filter((val) => val.year >= dummy2Point0Year)
 
   const y = d3.scaleLinear().domain([yMin, yMax]).range([graphHeight, 0])
   const x = d3
@@ -76,26 +70,26 @@ export const CarbonBudget = () => {
     .x((d) => x(d.year))
     .y1((d) => y(d.value))
     .y0(graphHeight)
-    .curve(d3.curveMonotoneX)(dummyData1)
+    .curve(d3.curveMonotoneX)(data1)
 
   const carbon_gradient2 = d3
     .area<DataPoint>()
     .x((d) => x(d.year))
     .y1((d) => y(d.value))
     .y0(graphHeight)
-    .curve(d3.curveMonotoneX)(dummyData2)
+    .curve(d3.curveMonotoneX)(data2)
 
   const carbon_curve1 = d3
     .line<DataPoint>()
     .x((d) => x(d.year))
     .y((d) => y(d.value))
-    .curve(d3.curveMonotoneX)(dummyData1)
+    .curve(d3.curveMonotoneX)(data1)
 
   const carbon_curve2 = d3
     .line<DataPoint>()
     .x((d) => x(d.year))
     .y((d) => y(d.value))
-    .curve(d3.curveMonotoneX)(dummyData2)
+    .curve(d3.curveMonotoneX)(data2)
 
   const yRange = yMax - yMin
 
@@ -221,7 +215,7 @@ export const CarbonBudget = () => {
               />
               <Rect
                 x={leftMargin}
-                y={calculateY(dummyData1[dummyData1.length - 1].value) - 25}
+                y={calculateY(data1[data1.length - 1].value) - 25}
                 width={62}
                 height={20}
                 rx={4}
@@ -238,7 +232,7 @@ export const CarbonBudget = () => {
                 letterSpacing={0.787}
                 fontSize={8}
                 x={leftMargin + 3}
-                y={calculateY(dummyData1[dummyData1.length - 1].value) - 12}
+                y={calculateY(data1[data1.length - 1].value) - 12}
               >
                 2.0°C LIMIT
               </TextSvg>
@@ -246,8 +240,8 @@ export const CarbonBudget = () => {
                 strokeDasharray="6"
                 x1={leftMargin}
                 x2={graphWidth}
-                y1={calculateY(dummyData1[dummyData1.length - 1].value)}
-                y2={calculateY(dummyData1[dummyData1.length - 1].value)}
+                y1={calculateY(data1[data1.length - 1].value)}
+                y2={calculateY(data1[data1.length - 1].value)}
                 stroke="#58C4D4"
                 strokeWidth={1}
               />
@@ -256,7 +250,7 @@ export const CarbonBudget = () => {
                 x={leftMargin}
                 y={
                   calculateY(
-                    dummyData.find((val) => val.year == dummy1Point5Year).value,
+                    data.find((val) => val.year == dummy1Point5Year).value,
                   ) - 25
                 }
                 width={62}
@@ -278,7 +272,7 @@ export const CarbonBudget = () => {
                 x={leftMargin + 3}
                 y={
                   calculateY(
-                    dummyData.find((val) => val.year == dummy1Point5Year).value,
+                    data.find((val) => val.year == dummy1Point5Year).value,
                   ) - 12
                 }
               >
@@ -290,10 +284,10 @@ export const CarbonBudget = () => {
                 x1={leftMargin}
                 x2={graphWidth}
                 y1={calculateY(
-                  dummyData.find((val) => val.year == dummy1Point5Year).value,
+                  data.find((val) => val.year == dummy1Point5Year).value,
                 )}
                 y2={calculateY(
-                  dummyData.find((val) => val.year == dummy1Point5Year).value,
+                  data.find((val) => val.year == dummy1Point5Year).value,
                 )}
                 stroke="#58C4D4"
                 strokeWidth={1}
