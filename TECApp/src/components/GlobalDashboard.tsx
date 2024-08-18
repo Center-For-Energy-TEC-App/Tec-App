@@ -5,7 +5,6 @@ import { Tracker } from './Tracker'
 import { ScrollView } from 'react-native-gesture-handler'
 import { GraphData } from '../api/requests'
 import { DataPoint } from './DataVisualizations/BAUComparison'
-import { FossilReductionData } from './BottomSheet'
 
 type GlobalDashboardProps = {
   initialGraphData: GraphData

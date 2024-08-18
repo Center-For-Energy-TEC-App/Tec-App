@@ -87,7 +87,7 @@ export const getEnergyAbbrv = (energy: string) => {
 }
 
 export const getElectricityGenerationCoal = (region: string) => {
-  switch(region){
+  switch (region) {
     case 'chn':
       return 0.87
     case 'ind':
@@ -95,7 +95,7 @@ export const getElectricityGenerationCoal = (region: string) => {
     case 'mea':
       return 0.06
     case 'nam':
-      return 0.20
+      return 0.2
     case 'nee':
       return 0.23
     case 'sea':
@@ -107,6 +107,6 @@ export const getElectricityGenerationCoal = (region: string) => {
     case 'ssa':
       return 0.82
     case 'opa':
-      return 0.70
+      return 0.7
   }
 }

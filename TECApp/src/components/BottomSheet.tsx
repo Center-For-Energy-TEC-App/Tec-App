@@ -40,7 +40,18 @@ export type FossilReductionData = {
   nee: DataPoint[]
 }
 
-const regions = ["chn", "nam", "lam", "ind", "sea", "mea", "opa", "eur", "ssa", "nee"]
+const regions = [
+  'chn',
+  'nam',
+  'lam',
+  'ind',
+  'sea',
+  'mea',
+  'opa',
+  'eur',
+  'ssa',
+  'nee',
+]
 
 export const BottomSheet = ({
   selectedRegion,
@@ -87,15 +98,15 @@ export const BottomSheet = ({
       setFossilData(val)
     })
 
-    let initialFossilReductionData = {} as FossilReductionData
-    for(const region of regions){
+    const initialFossilReductionData = {} as FossilReductionData
+    for (const region of regions) {
       initialFossilReductionData[region] = [
-        {year: 2025, value: 0},
-        {year: 2026, value: 0},
-        {year: 2027, value: 0},
-        {year: 2028, value: 0},
-        {year: 2029, value: 0},
-        {year: 2030, value: 0},
+        { year: 2025, value: 0 },
+        { year: 2026, value: 0 },
+        { year: 2027, value: 0 },
+        { year: 2028, value: 0 },
+        { year: 2029, value: 0 },
+        { year: 2030, value: 0 },
       ]
     }
     setFossilReductionData(initialFossilReductionData)
@@ -162,10 +173,11 @@ export const BottomSheet = ({
                   regional,
                 )
 
-                let newFossilData = fossilData
+                const newFossilData = fossilData
                 for (let i = 1; i < fossilData.length; i++) {
-                  newFossilData[i].value -= (newRegionFossilReductionData[i-1].value -
-                    fossilReductionData[getAbbrv(selectedRegion)][i-1].value)
+                  newFossilData[i].value -=
+                    newRegionFossilReductionData[i - 1].value -
+                    fossilReductionData[getAbbrv(selectedRegion)][i - 1].value
                 }
 
                 setFossilData(newFossilData)
@@ -191,11 +203,11 @@ export const BottomSheet = ({
                     dynamicGraphData.global,
                   ),
                 })
-              
-                let newFossilData = fossilData
+
+                const newFossilData = fossilData
                 for (let i = 1; i < fossilData.length; i++) {
                   newFossilData[i].value +=
-                    fossilReductionData[getAbbrv(selectedRegion)][i-1].value
+                    fossilReductionData[getAbbrv(selectedRegion)][i - 1].value
                 }
 
                 setFossilData(newFossilData)
@@ -203,12 +215,12 @@ export const BottomSheet = ({
                 setFossilReductionData({
                   ...fossilReductionData,
                   [getAbbrv(selectedRegion)]: [
-                    {year: 2025, value:0},
-                    {year: 2026, value:0},
-                    {year: 2027, value:0},
-                    {year: 2028, value:0},
-                    {year: 2029, value:0},
-                    {year: 2030, value:0}
+                    { year: 2025, value: 0 },
+                    { year: 2026, value: 0 },
+                    { year: 2027, value: 0 },
+                    { year: 2028, value: 0 },
+                    { year: 2029, value: 0 },
+                    { year: 2030, value: 0 },
                   ],
                 })
               }}
