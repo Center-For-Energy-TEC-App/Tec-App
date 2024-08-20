@@ -10,13 +10,15 @@ import { DataPoint } from './DataVisualizations/BAUComparison'
 type GlobalDashboardProps = {
   initialGraphData: GraphData
   dynamicGraphData: GraphData
-  fossilData: DataPoint[]
+  initialFossilData: DataPoint[]
+  dynamicFossilData: DataPoint[]
 }
 
 export const GlobalDashboard = ({
   initialGraphData,
   dynamicGraphData,
-  fossilData,
+  initialFossilData,
+  dynamicFossilData,
 }: GlobalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
@@ -96,7 +98,8 @@ export const GlobalDashboard = ({
         <DataVisualizations
           initialData={initialGraphData}
           dynamicData={dynamicGraphData}
-          fossilData={fossilData}
+          initialFossilData={initialFossilData}
+          dynamicFossilData={dynamicFossilData}
           region="Global"
         />
       )}

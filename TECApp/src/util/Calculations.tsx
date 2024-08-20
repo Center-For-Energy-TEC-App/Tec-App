@@ -126,6 +126,10 @@ export const calculateCarbonReductions = (
         reduction_fossil_energy_gas,
     })
   }
+  reduction_fossil_energy.push({year: 2040, value: reduction_fossil_energy[5].value})
+  reduction_fossil_energy.push({year: 2050, value: reduction_fossil_energy[5].value})
+  reduction_fossil_energy.push({year: 2060, value: reduction_fossil_energy[5].value})
+
   return reduction_fossil_energy
 }
 

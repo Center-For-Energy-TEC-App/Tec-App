@@ -44,6 +44,7 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
           />
           {data.features.map((feature, index) => (
             <Path
+              //@ts-expect-error
               d={pathGenerator(feature)}
               key={index}
               stroke="#FFF"

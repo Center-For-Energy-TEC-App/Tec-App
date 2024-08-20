@@ -12,13 +12,15 @@ type DataVisualizationsProps = {
   region: string
   initialData: GraphData
   dynamicData: GraphData
-  fossilData: DataPoint[]
+  initialFossilData?: DataPoint[]
+  dynamicFossilData?: DataPoint[]
 }
 const DataVisualizations = ({
   region,
   initialData,
   dynamicData,
-  fossilData,
+  initialFossilData,
+  dynamicFossilData
 }: DataVisualizationsProps) => {
   const [activeButton, setActiveButton] = useState('BAU Comparison')
 
@@ -115,7 +117,7 @@ const DataVisualizations = ({
       ) : activeButton === 'Regional Comparison' ? (
         <RegionalComparison region={region} data={dynamicData} />
       ) : activeButton === 'Carbon Budget' ? (
-        <CarbonBudget data={fossilData} />
+        <CarbonBudget BAUData={initialFossilData} dynamicData={dynamicFossilData} />
       ) : (
         <TechnologyComparison data={dynamicData[getAbbrv(region)]} />
       )}

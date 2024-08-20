@@ -69,7 +69,8 @@ export const BottomSheet = ({
   const [initialGraphData, setInitialGraphData] = useState<GraphData>()
   const [dynamicGraphData, setDynamicGraphData] = useState<GraphData>()
 
-  const [fossilData, setFossilData] = useState<DataPoint[]>()
+  const [initialFossilData, setInitialFossilData] = useState<DataPoint[]>()
+  const [dynamicFossilData, setDynamicFossilData] = useState<DataPoint[]>()
   const [fossilReductionData, setFossilReductionData] =
     useState<FossilReductionData>()
 
@@ -95,7 +96,9 @@ export const BottomSheet = ({
       })
       .catch(console.error)
     getInitialFossilData().then((val) => {
-      setFossilData(val)
+      setInitialFossilData(val)
+      setDynamicFossilData(val)
+      console.log(val)
     })
 
     const initialFossilReductionData = {} as FossilReductionData
@@ -107,6 +110,10 @@ export const BottomSheet = ({
         { year: 2028, value: 0 },
         { year: 2029, value: 0 },
         { year: 2030, value: 0 },
+        { year: 2040, value: 0 },
+        { year: 2050, value: 0 },
+        { year: 2060, value: 0 },
+
       ]
     }
     setFossilReductionData(initialFossilReductionData)
@@ -126,6 +133,7 @@ export const BottomSheet = ({
     }
   }, [selectedRegion])
 
+  
   return (
     <BottomSheetTemplate
       ref={bottomSheetRef}
@@ -173,14 +181,14 @@ export const BottomSheet = ({
                   regional,
                 )
 
-                const newFossilData = fossilData
-                for (let i = 1; i < fossilData.length; i++) {
+                const newFossilData = JSON.parse(JSON.stringify(dynamicFossilData))
+                for (let i = 1; i < dynamicFossilData.length; i++) {
                   newFossilData[i].value -=
                     newRegionFossilReductionData[i - 1].value -
                     fossilReductionData[getAbbrv(selectedRegion)][i - 1].value
                 }
-
-                setFossilData(newFossilData)
+             
+                setDynamicFossilData(newFossilData)
 
                 setFossilReductionData({
                   ...fossilReductionData,
@@ -204,13 +212,13 @@ export const BottomSheet = ({
                   ),
                 })
 
-                const newFossilData = fossilData
-                for (let i = 1; i < fossilData.length; i++) {
+                const newFossilData = JSON.parse(JSON.stringify(dynamicFossilData))
+                for (let i = 1; i < dynamicFossilData.length; i++) {
                   newFossilData[i].value +=
                     fossilReductionData[getAbbrv(selectedRegion)][i - 1].value
                 }
 
-                setFossilData(newFossilData)
+                setDynamicFossilData(newFossilData)
 
                 setFossilReductionData({
                   ...fossilReductionData,
@@ -221,6 +229,10 @@ export const BottomSheet = ({
                     { year: 2028, value: 0 },
                     { year: 2029, value: 0 },
                     { year: 2030, value: 0 },
+                    { year: 2040, value: 0 },
+                    { year: 2050, value: 0 },
+                    { year: 2060, value: 0 },
+
                   ],
                 })
               }}
@@ -234,7 +246,8 @@ export const BottomSheet = ({
             <GlobalDashboard
               initialGraphData={initialGraphData}
               dynamicGraphData={dynamicGraphData}
-              fossilData={fossilData}
+              dynamicFossilData={dynamicFossilData}
+              initialFossilData={initialFossilData}
             />
           )}
         </View>

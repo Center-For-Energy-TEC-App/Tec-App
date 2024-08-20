@@ -26,7 +26,7 @@ const dummy1Point5Limit = 100
 const dummy2Point0Limit = 148
 
 const xMin = 2024
-const xMax = 2030
+const xMax = 2060
 
 type DataPoint = {
   year: number
@@ -34,18 +34,19 @@ type DataPoint = {
 }
 
 type CarbonBudgetProps = {
-  data: DataPoint[]
+  BAUData: DataPoint[]
+  dynamicData: DataPoint[]
 }
 
-export const CarbonBudget = ({ data }: CarbonBudgetProps) => {
-  const yMin = Math.min(...data.map((val) => val.value))
-  const yMax = Math.max(...data.map((val) => val.value))
+export const CarbonBudget = ({ BAUData, dynamicData }: CarbonBudgetProps) => {
+  const yMin = 0
+  const yMax = Math.max(Math.max(...dynamicData.map((val) => val.value)),Math.max(...BAUData.map((val) => val.value)))
 
   let sum = 0
   let dummy1Point5Year: number
   let dummy2Point0Year: number
   //calculating x-axis position of each temperature limit
-  for (const i of data) {
+  for (const i of dynamicData) {
     sum += i.value
     if (!dummy1Point5Year && sum > dummy1Point5Limit) {
       dummy1Point5Year = i.year
@@ -56,10 +57,10 @@ export const CarbonBudget = ({ data }: CarbonBudgetProps) => {
   }
 
   //separate data based on 2 degree limit
-  const data1 = data.filter((val) => val.year <= dummy2Point0Year)
-  const data2 = data.filter((val) => val.year >= dummy2Point0Year)
+  const data1 = dynamicData.filter((val) => val.year <= dummy2Point0Year)
+  const data2 = dynamicData.filter((val) => val.year >= dummy2Point0Year)
 
-  const y = d3.scaleLinear().domain([yMin, yMax]).range([graphHeight, 0])
+  const y = d3.scaleLinear().domain([0, yMax]).range([graphHeight, 0])
   const x = d3
     .scaleLinear()
     .domain([xMin, xMax])
@@ -91,6 +92,12 @@ export const CarbonBudget = ({ data }: CarbonBudgetProps) => {
     .y((d) => y(d.value))
     .curve(d3.curveMonotoneX)(data2)
 
+  const BAU_curve = d3
+    .line<DataPoint>()
+    .x((d) => x(d.year))
+    .y((d) => y(d.value))
+    .curve(d3.curveMonotoneX)(BAUData)
+
   const yRange = yMax - yMin
 
   const verticalAxis = [
@@ -101,7 +108,7 @@ export const CarbonBudget = ({ data }: CarbonBudgetProps) => {
     yMin + yRange * 0.8,
     yMax,
   ]
-  const horizontalAxis = [2024, 2026, 2028, 2030]
+  const horizontalAxis = [2030, 2040, 2050, 2060]
 
   //helper method for calculating y coordinate based on graph value
   //calculated as proportion of graph height from the top
@@ -120,7 +127,9 @@ export const CarbonBudget = ({ data }: CarbonBudgetProps) => {
       </Text>
       <View style={styles.graphContainer}>
         <View style={styles.graphInnerContainer}>
-          <GraphKey label="CUMULATIVE CARBON EMISSIONS" color="#266297" />
+          <GraphKey label="BAU CARBON EMISSIONS" color="#266297" />
+          <GraphKey label="ALTERED CARBON EMISSIONS" color="#58C4D4" />
+
           <Svg width={graphWidth} height={svgHeight}>
             <Defs>
               <LinearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
@@ -170,10 +179,21 @@ export const CarbonBudget = ({ data }: CarbonBudgetProps) => {
               >
                 Emissions (GT)
               </TextSvg>
+              <TextSvg
+                  x={leftMargin-5}
+                  y={graphHeight + 25}
+                  strokeWidth={0.1}
+                  fontWeight={700}
+                  fontSize={10}
+                  fill="#9E9FA7"
+                  stroke="#9E9FA7"
+                >
+                  2024
+                </TextSvg>
               {horizontalAxis.map((e, key) => (
                 <TextSvg
                   key={key}
-                  x={graphWidth * (-(2024 - e) / 8.3) + leftMargin}
+                  x={graphWidth * ((e-2030) / 50) + leftMargin + 35}
                   y={graphHeight + 25}
                   strokeWidth={0.1}
                   fontWeight={700}
@@ -204,11 +224,17 @@ export const CarbonBudget = ({ data }: CarbonBudgetProps) => {
               <Path
                 d={carbon_curve1}
                 strokeWidth={2}
-                stroke="#266297"
+                stroke="#58C4D4"
                 fill="none"
               />
               <Path
                 d={carbon_curve2}
+                strokeWidth={2}
+                stroke="#58C4D4"
+                fill="none"
+              />
+              <Path
+                d={BAU_curve}
                 strokeWidth={2}
                 stroke="#266297"
                 fill="none"
@@ -250,7 +276,7 @@ export const CarbonBudget = ({ data }: CarbonBudgetProps) => {
                 x={leftMargin}
                 y={
                   calculateY(
-                    data.find((val) => val.year == dummy1Point5Year).value,
+                    dynamicData.find((val) => val.year == dummy1Point5Year).value,
                   ) - 25
                 }
                 width={62}
@@ -272,7 +298,7 @@ export const CarbonBudget = ({ data }: CarbonBudgetProps) => {
                 x={leftMargin + 3}
                 y={
                   calculateY(
-                    data.find((val) => val.year == dummy1Point5Year).value,
+                    dynamicData.find((val) => val.year == dummy1Point5Year).value,
                   ) - 12
                 }
               >
@@ -284,10 +310,10 @@ export const CarbonBudget = ({ data }: CarbonBudgetProps) => {
                 x1={leftMargin}
                 x2={graphWidth}
                 y1={calculateY(
-                  data.find((val) => val.year == dummy1Point5Year).value,
+                  dynamicData.find((val) => val.year == dummy1Point5Year).value,
                 )}
                 y2={calculateY(
-                  data.find((val) => val.year == dummy1Point5Year).value,
+                  dynamicData.find((val) => val.year == dummy1Point5Year).value,
                 )}
                 stroke="#58C4D4"
                 strokeWidth={1}
