@@ -1,14 +1,14 @@
 import React, { StyleSheet, View, Text } from 'react-native'
 import { TemperatureIcon } from '../SVGs/TemperatureIcon'
 import { RenewableIcon } from '../SVGs/RenewableIcon'
-import { DistributeRenewables } from './DistributeRenewables';
 
 type TrackerProps = {
   type: 'temperature' | 'renewable'
   dashboard?: boolean
+  totalGlobalEnergy?:number
 }
 
-export const Tracker = ({ type, dashboard }: TrackerProps) => {
+export const Tracker = ({ type, dashboard, totalGlobalEnergy}: TrackerProps) => {
   return (
     <>
       {type === 'temperature' ? (
@@ -44,7 +44,7 @@ export const Tracker = ({ type, dashboard }: TrackerProps) => {
                 dashboard ? mobileStyles.dashboardHeader : mobileStyles.header
               }
             >
-              8/12
+              {(totalGlobalEnergy / 1000).toFixed(1)}/15.5
             </Text>
             <Text
               style={

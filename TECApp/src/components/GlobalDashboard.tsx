@@ -4,7 +4,11 @@ import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { Tracker } from './Tracker'
 import { ScrollView } from 'react-native-gesture-handler'
 
-export const GlobalDashboard = () => {
+type GlobalDashboardProps = {
+  totalGlobalEnergy: number
+}
+
+export const GlobalDashboard = ({ totalGlobalEnergy } : GlobalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
   )
@@ -25,7 +29,7 @@ export const GlobalDashboard = () => {
       </Text>
       <View style={styles.trackersWrapper}>
         <Tracker type="temperature" dashboard />
-        <Tracker type="renewable" dashboard />
+        <Tracker type="renewable" dashboard totalGlobalEnergy={totalGlobalEnergy}/>
       </View>
       <View style={styles.tabContainer}>
         <TouchableOpacity onPress={() => setActiveTab('renewables')}>

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
+
 import {
   View,
   Text,
@@ -6,34 +7,35 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
-} from 'react-native';
-import { Slider } from '@miblanchard/react-native-slider';
-import { WindIcon } from '../SVGs/DistributeRenewablesIcons/WindIcon';
-import { SolarIcon } from '../SVGs/DistributeRenewablesIcons/SolarIcon';
-import { HydroIcon } from '../SVGs/DistributeRenewablesIcons/HydroIcon';
-import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon';
-import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon';
-import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon';
-import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon';
-import { DefaultValues, MinMaxValues } from './BottomSheet';
-import Svg, { Rect } from 'react-native-svg';
+  Platform,
+  Dimensions,
+} from 'react-native'
+import { Slider } from '@miblanchard/react-native-slider'
+import { WindIcon } from '../SVGs/DistributeRenewablesIcons/WindIcon'
+import { SolarIcon } from '../SVGs/DistributeRenewablesIcons/SolarIcon'
+import { HydroIcon } from '../SVGs/DistributeRenewablesIcons/HydroIcon'
+import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon'
+import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon'
+import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon'
+import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
+import { DefaultValues, MinMaxValues } from './BottomSheet'
+import Svg, { Rect } from 'react-native-svg'
 
 export type SliderProportions = {
-  solar: number;
-  wind: number;
-  hydropower: number;
-  biomass: number;
-  geothermal: number;
-  nuclear: number;
-};
+  solar: number
+  wind: number
+  hydropower: number
+  biomass: number
+  geothermal: number
+  nuclear: number
+}
 
 type DistributeRenewablesProps = {
-  values: DefaultValues;
-  minMaxValues: MinMaxValues;
-  onSliderChange: (val: DefaultValues) => void;
-  onReset: () => void;
-  onTotalChange: (total: number) => void; // New callback prop for total change
-};
+  values: DefaultValues
+  minMaxValues: MinMaxValues
+  onSliderChange: (val: DefaultValues) => void
+  onReset: () => void
+}
 
 const energyMap = {
   solar: 'solar_gw',
@@ -42,38 +44,49 @@ const energyMap = {
   biomass: 'bio_gw',
   geothermal: 'geo_gw',
   nuclear: 'nuclear_gw',
-};
+}
 
 const DistributeRenewables = ({
   values,
   minMaxValues,
   onSliderChange,
   onReset,
-  onTotalChange,
 }: DistributeRenewablesProps) => {
-  const [selectedSlider, setSelectedSlider] = useState<string | null>(null);
-  const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null);
+  const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
+  const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
+  
+  const deviceType = () => {
+    const { width, height } = Dimensions.get('window')
+    return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
+      ? 'ipad'
+      : 'iphone'
+  }
 
-  const [proportionBarWidth, setProportionBarWidth] = useState<number>(undefined);
-  const [sliderValues, setSliderValues] = useState<DefaultValues>(values[2]);
-  const [sliderProportions, setSliderProportions] = useState<SliderProportions>(undefined);
+  const isIpad = deviceType() === 'ipad'
+  
+  const [proportionBarWidth, setProportionBarWidth] =
+    useState<number>(undefined)
 
-  // Update slider values and total energy when component mounts or values change
+  const [sliderValues, setSliderValues] = useState<DefaultValues>(values[2])
+
+  const [sliderProportions, setSliderProportions] =
+    useState<SliderProportions>(undefined)
+
   useEffect(() => {
-    setSliderValues(values[2]);
+    setSliderValues(values[2])
+  }, [values])
 
-    // Calculate initial total energy and update it
-    const initialTotal = values[2].wind_gw + values[2].solar_gw + values[2].hydro_gw + values[2].bio_gw + values[2].geo_gw + values[2].nuclear_gw;
-    onTotalChange(initialTotal);
-
-  }, [values]);
-
-  // Recalculate total energy and slider proportions whenever slider values change
   useEffect(() => {
-    const sliderTotal = sliderValues.wind_gw + sliderValues.solar_gw + sliderValues.hydro_gw + sliderValues.bio_gw + sliderValues.geo_gw + sliderValues.nuclear_gw;
-    onTotalChange(sliderTotal); // Update total when slider values change
-
     if (proportionBarWidth) {
+      const sliderTotal =
+        sliderValues.wind_gw +
+        sliderValues.solar_gw +
+        sliderValues.hydro_gw +
+        sliderValues.bio_gw +
+        sliderValues.geo_gw +
+        sliderValues.nuclear_gw +
+        5
+
       setSliderProportions({
         wind: (sliderValues.wind_gw / sliderTotal) * proportionBarWidth,
         solar: (sliderValues.solar_gw / sliderTotal) * proportionBarWidth,
@@ -81,43 +94,43 @@ const DistributeRenewables = ({
         biomass: (sliderValues.bio_gw / sliderTotal) * proportionBarWidth,
         geothermal: (sliderValues.geo_gw / sliderTotal) * proportionBarWidth,
         nuclear: (sliderValues.nuclear_gw / sliderTotal) * proportionBarWidth,
-      });
+      })
     }
-  }, [sliderValues, proportionBarWidth]);
+  }, [sliderValues, proportionBarWidth])
 
   const renderTrackMark = (index: number, mark: string) => (
     <View style={styles.trackMarkContainer} key={index}>
       <View style={styles.trackMark} />
       <Text style={styles.trackMarkLabel}>{mark}</Text>
     </View>
-  );
+  )
 
   const handleSlidingStart = (label: string) => {
-    setSelectedSlider(label);
-  };
+    setSelectedSlider(label)
+  }
 
   const getSourceColor = (label: string) => {
     switch (label) {
       case 'Wind':
-        return '#C66AAA';
+        return '#C66AAA'
       case 'Solar':
-        return '#F8CE46';
+        return '#F8CE46'
       case 'Hydropower':
-        return '#58C4D4';
+        return '#58C4D4'
       case 'Biomass':
-        return '#779448';
+        return '#779448'
       case 'Geothermal':
-        return '#BF9336';
+        return '#BF9336'
       case 'Nuclear':
-        return '#EE8E35';
+        return '#EE8E35'
       default:
-        return '#B5B1AA';
+        return '#B5B1AA'
     }
-  };
+  }
 
   const toggleTooltip = (label: string) => {
-    setVisibleTooltip(visibleTooltip === label ? null : label);
-  };
+    setVisibleTooltip(visibleTooltip === label ? null : label)
+  }
 
   const renderTooltip = (label: string, text: string) => (
     <Modal
@@ -137,7 +150,7 @@ const DistributeRenewables = ({
         </View>
       </View>
     </Modal>
-  );
+  )
 
   const renderSlider = (label, IconComponent, tooltip) => (
     <View style={styles.sliderContainer} key={label}>
@@ -169,10 +182,7 @@ const DistributeRenewables = ({
           maximumTrackTintColor="#B5B1AA"
           trackMarks={[
             values[0][energyMap[label.toLowerCase()]],
-            values[1][energyMap[label.toLowerCase()]] -
-              0.0275 *
-                (parseFloat(minMaxValues.max[label.toLowerCase()]) -
-                  parseFloat(minMaxValues.min[label.toLowerCase()])),
+            values[1][energyMap[label.toLowerCase()]]-0.0275*(parseFloat(minMaxValues.max[label.toLowerCase()])-parseFloat(minMaxValues.min[label.toLowerCase()])),
           ]}
           renderTrackMarkComponent={(index) =>
             renderTrackMark(index, ['2024', 'BAU'][index])
@@ -198,11 +208,11 @@ const DistributeRenewables = ({
         </View>
       </View>
     </View>
-  );
+  )
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.description}>
+      <Text style={[styles.description, isIpad && styles.iPadText]}>
         Using the sliders below, make region specific changes for each renewable
         energy source to reach 12 TW of renewable capacity. This will override
         default values set in the global dashboard.
@@ -210,7 +220,7 @@ const DistributeRenewables = ({
       <View
         style={styles.capacityProportionContainer}
         onLayout={(event) => {
-          setProportionBarWidth(event.nativeEvent.layout.width - 20);
+          setProportionBarWidth(event.nativeEvent.layout.width - 20)
         }}
       >
         <Text style={styles.capacityProportionText}>
@@ -291,6 +301,7 @@ const DistributeRenewables = ({
             />
           </Svg>
         )}
+        {/* <View style={styles.bar}></View> */}
       </View>
       {renderSlider(
         'Wind',
@@ -310,7 +321,7 @@ const DistributeRenewables = ({
       {renderSlider(
         'Biomass',
         BiomassIcon,
-        'Most biomass power systems are generated by the direct combustion of organic materials such as crops and waste products, which are burned and produce steam that drives a generator.',
+        'Most biomass power systems are generated by the direct combustion of organic materials such as crops and waste products, which are burned and produce steam that drives a generator. ',
       )}
       {renderSlider(
         'Geothermal',
@@ -323,7 +334,8 @@ const DistributeRenewables = ({
         'Nuclear power is generated through nuclear reactions, typically involving the splitting of atoms to release energy. This is then harnessed to generate electricity.',
       )}
 
-      <Text style={styles.nuclearNote}>
+      <Text style={[styles.nuclearNote, isIpad && styles.iPadText]}>
+        {' '}
         *Not a renewable energy source, but supports carbon reduction goals by
         reducing reliance on fossil fuels.
       </Text>
@@ -333,8 +345,8 @@ const DistributeRenewables = ({
       </TouchableOpacity>
       <View style={styles.spacer}></View>
     </ScrollView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -346,6 +358,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
     fontSize: 14,
     marginBottom: 16,
+  },
+  iPadText: {
+    fontSize: 18,
   },
   capacityProportionContainer: {
     display: 'flex',
@@ -474,6 +489,6 @@ const styles = StyleSheet.create({
     color: '#B5B1AA',
     fontSize: 17,
   },
-});
+})
 
-export default DistributeRenewables;
+export default DistributeRenewables
