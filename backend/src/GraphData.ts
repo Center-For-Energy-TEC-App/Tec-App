@@ -191,9 +191,9 @@ export const getInitialFossilData = async (req: Request, res: Response, next: Ne
         results.push({year: yearCount, value: parseFloat(row.value)})
         yearCount++
     }
-    results.push({year: 2040, value: results[6].value*0.9})
-    results.push({year: 2050, value: results[6].value*0.8})
-    results.push({year: 2060, value: results[6].value*0.7})
+    results.push({year: 2040, value: results[6].value>30?results[6].value*0.82:results[6].value>=25?results[6].value*0.71:results[6].value*0.6})
+    results.push({year: 2050, value: results[6].value>30?results[7].value*0.71:results[6].value>=25?results[7].value*0.58:results[7].value*0.5})
+    results.push({year: 2060, value: results[6].value>30?results[8].value*0.542:results[6].value>=25?results[8].value*0.436:results[8].value*0.33})
 
     if(results!==null){
         res.status(200).json(results)

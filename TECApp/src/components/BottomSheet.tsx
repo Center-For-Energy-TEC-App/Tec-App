@@ -80,6 +80,7 @@ export const BottomSheet = ({
   useEffect(() => {
     getDefaultValues()
       .then((val) => {
+        console.log('finished')
         setRegionalDefaultValues(val)
         setRegionalDynamicValues(val)
       })
@@ -98,7 +99,6 @@ export const BottomSheet = ({
     getInitialFossilData().then((val) => {
       setInitialFossilData(val)
       setDynamicFossilData(val)
-      console.log(val)
     })
 
     const initialFossilReductionData = {} as FossilReductionData
@@ -110,10 +110,6 @@ export const BottomSheet = ({
         { year: 2028, value: 0 },
         { year: 2029, value: 0 },
         { year: 2030, value: 0 },
-        { year: 2040, value: 0 },
-        { year: 2050, value: 0 },
-        { year: 2060, value: 0 },
-
       ]
     }
     setFossilReductionData(initialFossilReductionData)
@@ -182,12 +178,15 @@ export const BottomSheet = ({
                 )
 
                 const newFossilData = JSON.parse(JSON.stringify(dynamicFossilData))
-                for (let i = 1; i < dynamicFossilData.length; i++) {
-                  newFossilData[i].value -=
-                    newRegionFossilReductionData[i - 1].value -
-                    fossilReductionData[getAbbrv(selectedRegion)][i - 1].value
+                for (let i =0; i < newRegionFossilReductionData.length; i++) {
+                  newFossilData[i+1].value -=
+                    newRegionFossilReductionData[i].value -
+                    fossilReductionData[getAbbrv(selectedRegion)][i].value
                 }
-             
+                newFossilData[7].value = newFossilData[6].value>30?newFossilData[6].value*0.82:newFossilData[6].value>=25?newFossilData[6].value*0.71:newFossilData[6].value*0.6
+                newFossilData[8].value = newFossilData[6].value>30?newFossilData[7].value*0.71:newFossilData[6].value>=25?newFossilData[7].value*0.58:newFossilData[7].value*0.5
+                newFossilData[9].value = newFossilData[6].value>30?newFossilData[8].value*0.542:newFossilData[6].value>=25?newFossilData[8].value*0.436:newFossilData[8].value*0.33
+
                 setDynamicFossilData(newFossilData)
 
                 setFossilReductionData({
@@ -213,10 +212,14 @@ export const BottomSheet = ({
                 })
 
                 const newFossilData = JSON.parse(JSON.stringify(dynamicFossilData))
-                for (let i = 1; i < dynamicFossilData.length; i++) {
-                  newFossilData[i].value +=
-                    fossilReductionData[getAbbrv(selectedRegion)][i - 1].value
+                for (let i = 0; i < 6; i++) {
+                  newFossilData[i+1].value +=
+                    fossilReductionData[getAbbrv(selectedRegion)][i].value
                 }
+
+                newFossilData[7].value = newFossilData[6].value>30?newFossilData[6].value*0.82:newFossilData[6].value>=25?newFossilData[6].value*0.71:newFossilData[6].value*0.6
+                newFossilData[8].value = newFossilData[6].value>30?newFossilData[7].value*0.71:newFossilData[6].value>=25?newFossilData[7].value*0.58:newFossilData[7].value*0.5
+                newFossilData[9].value = newFossilData[6].value>30?newFossilData[8].value*0.542:newFossilData[6].value>=25?newFossilData[8].value*0.436:newFossilData[7].value*0.33
 
                 setDynamicFossilData(newFossilData)
 
@@ -229,10 +232,6 @@ export const BottomSheet = ({
                     { year: 2028, value: 0 },
                     { year: 2029, value: 0 },
                     { year: 2030, value: 0 },
-                    { year: 2040, value: 0 },
-                    { year: 2050, value: 0 },
-                    { year: 2060, value: 0 },
-
                   ],
                 })
               }}
