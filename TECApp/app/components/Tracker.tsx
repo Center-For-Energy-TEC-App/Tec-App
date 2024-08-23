@@ -101,34 +101,34 @@ const mobileStyles = StyleSheet.create({
   },
 
   header: {
-    fontFamily: 'Brix Sans',
+    // fontFamily: 'Brix Sans',
     fontSize: 24,
   },
 
   dashboardHeader: {
-    fontFamily: 'Brix Sans',
+    // fontFamily: 'Brix Sans',
     fontSize: 32,
   },
 
   smallHeader: {
-    fontFamily: 'Brix Sans',
+    // fontFamily: 'Brix Sans',
     fontSize: 16,
     paddingBottom: 2,
   },
 
   dashboardSmallHeader: {
-    fontFamily: 'Brix Sans',
+    // fontFamily: 'Brix Sans',
     fontSize: 20,
     paddingBottom: 2,
   },
 
   label: {
-    fontFamily: 'Brix Sans',
+    // fontFamily: 'Brix Sans',
     fontSize: 11,
   },
 
   dashboardLabel: {
-    fontFamily: 'Brix Sans',
+    // fontFamily: 'Brix Sans',
     fontSize: 15.5,
   },
 })

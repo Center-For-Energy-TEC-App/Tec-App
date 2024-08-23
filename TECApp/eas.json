@@ -8,7 +8,13 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios":{
+        "simulator": true
+      },
+      "env": {
+        "EXPO_PUBLIC_BACKEND_URL":"http://192.168.7.192:3001"
+      }
     },
     "production": {}
   },
