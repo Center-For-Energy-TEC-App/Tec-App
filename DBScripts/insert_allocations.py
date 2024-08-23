@@ -22,7 +22,7 @@ cursor = conn.cursor()  #initialize database cursor
 #     cursor.execute(f"CREATE TABLE allocation_defaults_global (category varchar(10), global_tw decimal, solar_gw integer, wind_gw integer, hydro_gw integer, geo_gw integer, bio_gw integer, nuclear_gw integer);")
 
 #     #csv reader
-#     with open(f"DBScripts/Data/Global-Table 1.csv", mode="r") as csvfile:
+#     with open(f"DBScripts/Data/DefaultAllocations/Global-Table 1.csv", mode="r") as csvfile:
 #         reader = csv.reader(csvfile)
 #         for i, line in enumerate(reader):
 #             print(line)
@@ -38,7 +38,7 @@ cursor = conn.cursor()  #initialize database cursor
 #     # create regional table
 #     cursor.execute(f"CREATE TABLE allocation_defaults_{region.lower()} (category varchar(10), global_tw decimal, regional_gw integer, solar_gw integer, wind_gw integer, hydro_gw integer, geo_gw integer, bio_gw integer, nuclear_gw integer);")
 
-#     with open(f"DBScripts/Data/{region}-Table 1.csv", mode="r") as csvfile:
+#     with open(f"DBScripts/Data/DefaultAllocations/{region}-Table 1.csv", mode="r") as csvfile:
 #         reader = csv.reader(csvfile)
 #         for i, line in enumerate(reader):
 #             print(line)
@@ -51,7 +51,7 @@ cursor = conn.cursor()  #initialize database cursor
 
 def insert_defaults():
     cursor.execute(f"CREATE TABLE allocation_defaults (region varchar(10), category varchar(10), global_tw decimal, regional_gw integer, solar_gw integer, wind_gw integer, hydro_gw integer, geo_gw integer, bio_gw integer, nuclear_gw integer);")
-    with open(f"DBScripts/Data/Global-Table 1.csv", mode="r") as csvfile:
+    with open(f"DBScripts/Data/DefaultAllocations/Global-Table 1.csv", mode="r") as csvfile:
         reader = csv.reader(csvfile)
         for i, line in enumerate(reader):
             print(line)
@@ -60,7 +60,7 @@ def insert_defaults():
             if i==4:    # row for BAU values
                  cursor.execute(f"INSERT INTO allocation_defaults VALUES ('global', 'bau',{line[1]}, '0', {line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]})")
     for region in regions[1:]:
-        with open(f"DBScripts/Data/{region}-Table 1.csv", mode="r") as csvfile:
+        with open(f"DBScripts/Data/DefaultAllocations/{region}-Table 1.csv", mode="r") as csvfile:
             reader = csv.reader(csvfile)
             for i, line in enumerate(reader):
                 print(line)
@@ -73,7 +73,7 @@ def insert_defaults():
 def insert_min_max_vals():
     # create min max table
     cursor.execute(f"CREATE TABLE min_max_values (category varchar(3), energy_type varchar(10), global decimal, chn decimal, ind decimal, mea decimal, nam decimal, nee decimal, sea decimal, eur decimal, lam decimal, ssa decimal, opa decimal);")
-    with open(f"DBScripts/Data/Max.Min Values-Table 1.csv", mode="r") as csvfile:
+    with open(f"DBScripts/Data/DefaultAllocations/Max.Min Values-Table 1.csv", mode="r") as csvfile:
         reader = csv.reader(csvfile)
         for line in reader:
             if line[1]=="Max GW":   # inserting max values

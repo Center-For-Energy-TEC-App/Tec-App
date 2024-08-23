@@ -1,29 +1,44 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions } from 'react-native'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { Tracker } from './Tracker'
 import { ScrollView } from 'react-native-gesture-handler'
+import { GraphData } from '../api/requests'
 
 type GlobalDashboardProps = {
   totalGlobalEnergy: number
+  initialGraphData: GraphData
+  dynamicGraphData: GraphData
 }
 
-export const GlobalDashboard = ({ totalGlobalEnergy } : GlobalDashboardProps) => {
+export const GlobalDashboard = ({
+  totalGlobalEnergy,
+  initialGraphData,
+  dynamicGraphData,
+}: GlobalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
   )
+  const deviceType = () => {
+    const { width, height } = Dimensions.get('window')
+    return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
+      ? 'ipad'
+      : 'iphone'
+  }
+
+  const isIpad = deviceType() === 'ipad'
   return (
     <ScrollView
       style={styles.regionInfoContainer}
       contentContainerStyle={{ alignItems: 'flex-start' }}
     >
       <Text style={styles.regionName}>Global Climate Dashboard</Text>
-      <Text style={styles.body}>
+      <Text style={[styles.body, isIpad&&styles.iPadText]}>
         Set default global renewable values and keep track of your progress
         towards meeting 2030 climate goals.{' '}
       </Text>
       <Text style={styles.header}>2030 Climate Goals</Text>
-      <Text style={styles.body}>
+      <Text style={[styles.body, isIpad&&styles.iPadText]}>
         The world aims to keep global warming below 2°C by 2030. We can do this
         through increasing our current renewable capacity from 8 to 12 TW.{' '}
       </Text>
@@ -43,8 +58,8 @@ export const GlobalDashboard = ({ totalGlobalEnergy } : GlobalDashboardProps) =>
             <Text
               style={
                 activeTab === 'renewables'
-                  ? styles.activeTab
-                  : styles.inactiveTab
+                ? [styles.activeTab, isIpad && styles.iPadText]
+                : [styles.inactiveTab, isIpad && styles.iPadText]
               }
             >
               Distribute Renewables
@@ -62,8 +77,8 @@ export const GlobalDashboard = ({ totalGlobalEnergy } : GlobalDashboardProps) =>
             <Text
               style={
                 activeTab === 'visualizations'
-                  ? styles.activeTab
-                  : styles.inactiveTab
+                ? [styles.activeTab, isIpad && styles.iPadText]
+                : [styles.inactiveTab, isIpad && styles.iPadText]
               }
             >
               Data Visualizations
@@ -76,7 +91,11 @@ export const GlobalDashboard = ({ totalGlobalEnergy } : GlobalDashboardProps) =>
         // <DistributeRenewables defaultValues={null}/>
         <></>
       ) : (
-        <DataVisualizations region="Global" />
+        <DataVisualizations
+          initialData={initialGraphData}
+          dynamicData={dynamicGraphData}
+          region="Global"
+        />
       )}
     </ScrollView>
   )
@@ -142,5 +161,8 @@ const styles = StyleSheet.create({
   },
   inactiveTabWrapper: {
     borderBottomWidth: 0,
+  },
+  iPadText: {
+    fontSize: 18
   },
 })

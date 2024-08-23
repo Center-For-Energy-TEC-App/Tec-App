@@ -1,15 +1,18 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity } from 'react-native'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
-import { DefaultValues, MinMaxValues } from './BottomSheet'
+import { DefaultValues, GraphData, MinMaxValues } from '../api/requests'
 
 type RegionalDashboardProps = {
   currRegion: string
   sliderValues: DefaultValues
   minMaxValues: MinMaxValues
-  onSliderChange: (val: DefaultValues) => void
+  onSliderChange: (val: DefaultValues, technologyChanged: string) => void
   onReset: () => void
+  initialGraphData: GraphData
+  dynamicGraphData: GraphData
+  sliderDisabled: boolean
 }
 
 export const RegionalDashboard = ({
@@ -17,7 +20,10 @@ export const RegionalDashboard = ({
   sliderValues,
   minMaxValues,
   onSliderChange,
-  onReset
+  onReset,
+  initialGraphData,
+  dynamicGraphData,
+  sliderDisabled,
 }: RegionalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
@@ -29,7 +35,6 @@ export const RegionalDashboard = ({
   }
 
   const isIpad = deviceType() === 'ipad'
-
 
 
   return (
@@ -82,9 +87,14 @@ export const RegionalDashboard = ({
           minMaxValues={minMaxValues}
           onSliderChange={onSliderChange}
           onReset={onReset}
+          disabled={sliderDisabled}
         />
       ) : (
-        <DataVisualizations region={currRegion} />
+        <DataVisualizations
+          initialData={initialGraphData}
+          dynamicData={dynamicGraphData}
+          region={currRegion}
+        />
       )}
     </View>
   )

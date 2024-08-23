@@ -18,8 +18,9 @@ import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon'
 import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon'
 import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon'
 import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
-import { DefaultValues, MinMaxValues } from './BottomSheet'
 import Svg, { Rect } from 'react-native-svg'
+import { getEnergyAbbrv, getTechnologyColor } from '../util/ValueDictionaries'
+import { DefaultValues, MinMaxValues } from '../api/requests'
 
 export type SliderProportions = {
   solar: number
@@ -33,17 +34,9 @@ export type SliderProportions = {
 type DistributeRenewablesProps = {
   values: DefaultValues
   minMaxValues: MinMaxValues
-  onSliderChange: (val: DefaultValues) => void
+  onSliderChange: (val: DefaultValues, technologyChanged: string) => void
   onReset: () => void
-}
-
-const energyMap = {
-  solar: 'solar_gw',
-  wind: 'wind_gw',
-  hydropower: 'hydro_gw',
-  biomass: 'bio_gw',
-  geothermal: 'geo_gw',
-  nuclear: 'nuclear_gw',
+  disabled: boolean
 }
 
 const DistributeRenewables = ({
@@ -51,6 +44,7 @@ const DistributeRenewables = ({
   minMaxValues,
   onSliderChange,
   onReset,
+  disabled,
 }: DistributeRenewablesProps) => {
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
@@ -109,25 +103,6 @@ const DistributeRenewables = ({
     setSelectedSlider(label)
   }
 
-  const getSourceColor = (label: string) => {
-    switch (label) {
-      case 'Wind':
-        return '#C66AAA'
-      case 'Solar':
-        return '#F8CE46'
-      case 'Hydropower':
-        return '#58C4D4'
-      case 'Biomass':
-        return '#779448'
-      case 'Geothermal':
-        return '#BF9336'
-      case 'Nuclear':
-        return '#EE8E35'
-      default:
-        return '#B5B1AA'
-    }
-  }
-
   const toggleTooltip = (label: string) => {
     setVisibleTooltip(visibleTooltip === label ? null : label)
   }
@@ -166,6 +141,7 @@ const DistributeRenewables = ({
       {renderTooltip(label, tooltip)}
       <View style={styles.sliderWrapper}>
         <Slider
+          disabled={disabled}
           containerStyle={styles.slider}
           minimumValue={Math.round(
             parseFloat(minMaxValues.min[label.toLowerCase()]),
@@ -173,37 +149,53 @@ const DistributeRenewables = ({
           maximumValue={Math.round(
             parseFloat(minMaxValues.max[label.toLowerCase()]),
           )}
-          value={sliderValues[energyMap[label.toLowerCase()]]}
+          value={sliderValues[getEnergyAbbrv(label.toLowerCase())]}
           step={1.0}
           thumbTintColor={
-            selectedSlider === label ? getSourceColor(label) : '#B5B1AA'
+            selectedSlider === label ? getTechnologyColor(label) : '#B5B1AA'
           }
-          minimumTrackTintColor={getSourceColor(label)}
+          minimumTrackTintColor={getTechnologyColor(label)}
           maximumTrackTintColor="#B5B1AA"
           trackMarks={[
-            values[0][energyMap[label.toLowerCase()]],
-            values[1][energyMap[label.toLowerCase()]]-0.0275*(parseFloat(minMaxValues.max[label.toLowerCase()])-parseFloat(minMaxValues.min[label.toLowerCase()])),
+            values[0][getEnergyAbbrv(label.toLowerCase())] -
+              0.0425 *
+                (parseFloat(minMaxValues.max[label.toLowerCase()]) -
+                  parseFloat(minMaxValues.min[label.toLowerCase()])),
+            values[1][getEnergyAbbrv(label.toLowerCase())] -
+              0.0275 *
+                (parseFloat(minMaxValues.max[label.toLowerCase()]) -
+                  parseFloat(minMaxValues.min[label.toLowerCase()])),
           ]}
           renderTrackMarkComponent={(index) =>
-            renderTrackMark(index, ['2024', 'BAU'][index])
+            renderTrackMark(
+              index,
+              values[0][getEnergyAbbrv(label.toLowerCase())] <
+                values[1][getEnergyAbbrv(label.toLowerCase())]
+                ? ['2024', 'BAU'][index]
+                : ['BAU', '2024'][index],
+            )
           }
           onSlidingStart={() => handleSlidingStart(label)}
           onValueChange={(val) =>
             setSliderValues({
               ...sliderValues,
-              [energyMap[label.toLowerCase()]]: val[0],
+              [getEnergyAbbrv(label.toLowerCase())]: val[0],
             })
           }
           onSlidingComplete={(val) =>
-            onSliderChange({
-              ...sliderValues,
-              [energyMap[label.toLowerCase()]]: val[0],
-            })
+            onSliderChange(
+              {
+                ...sliderValues,
+                [getEnergyAbbrv(label.toLowerCase())]: val[0],
+              },
+              label.toLowerCase(),
+            )
           }
         />
         <View style={styles.sliderValueBox}>
           <Text style={styles.sliderValue}>
-            {Math.round(sliderValues[energyMap[label.toLowerCase()]]) + ' GW'}
+            {Math.round(sliderValues[getEnergyAbbrv(label.toLowerCase())]) +
+              ' GW'}
           </Text>
         </View>
       </View>

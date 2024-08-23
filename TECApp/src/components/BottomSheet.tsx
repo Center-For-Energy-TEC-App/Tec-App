@@ -3,77 +3,18 @@ import { View, StyleSheet } from 'react-native'
 import BottomSheetTemplate from '@gorhom/bottom-sheet'
 import { RegionalDashboard } from './RegionalDashboard'
 import { GlobalDashboard } from './GlobalDashboard'
-import { getDefaultValues, getMinMaxValues } from '../api/requests'
-
-export type DefaultValues = {
-  region: string
-  category: string
-  global_tw: string
-  regional_gw?: number
-  solar_gw: number
-  wind_gw: number
-  hydro_gw: number
-  geo_gw: number
-  bio_gw: number
-  nuclear_gw: number
-}
-
-export type RegionalValues = {
-  chn: DefaultValues[]
-  nam: DefaultValues[]
-  lam: DefaultValues[]
-  ind: DefaultValues[]
-  sea: DefaultValues[]
-  mea: DefaultValues[]
-  opa: DefaultValues[]
-  eur: DefaultValues[]
-  ssa: DefaultValues[]
-  nee: DefaultValues[]
-}
-
-export type MinMaxValues = {
-  min: {
-    solar: string
-    wind: string
-    hydropower: string
-    geothermal: string
-    biomass: string
-    nuclear: string
-  }
-  max: {
-    solar: string
-    wind: string
-    hydropower: string
-    geothermal: string
-    biomass: string
-    nuclear: string
-  }
-}
-
-export type RegionalMinMaxValues = {
-  chn: MinMaxValues
-  nam: MinMaxValues
-  lam: MinMaxValues
-  ind: MinMaxValues
-  sea: MinMaxValues
-  mea: MinMaxValues
-  opa: MinMaxValues
-  eur: MinMaxValues
-  nee: MinMaxValues
-}
-
-const abbrvMap = {
-  'North America': 'nam',
-  'Latin America': 'lam',
-  Europe: 'eur',
-  'Sub-Saharan Africa': 'ssa',
-  'Middle East & N. Africa': 'mea',
-  'North East Eurasia': 'nee',
-  'Greater China': 'chn',
-  'Indian Subcontinent': 'ind',
-  'South East Asia': 'sea',
-  'OECD Pacific': 'opa',
-}
+import {
+  GraphData,
+  RegionalMinMaxValues,
+  RegionalValues,
+  RenewableEnergyCalculationData,
+  getDefaultValues,
+  getInitialGraphData,
+  getMinMaxValues,
+  getRegionCalculationData,
+} from '../api/requests'
+import { getAbbrv, getEnergyAbbrv } from '../util/ValueDictionaries'
+import { calculateCurve } from '../util/Calculations'
 
 export interface BottomSheetProps {
   selectedRegion: string
@@ -88,13 +29,11 @@ export const BottomSheet = ({
 }: BottomSheetProps) => {
   const snapPoints = useMemo(() => ['12.5%', '25%', '50%', '80%'], [])
   const bottomSheetRef = useRef<BottomSheetTemplate>(null)
-  const [currRegion, setCurrRegion] = useState(selectedRegion)
 
   const [regionalDefaultValues, setRegionalDefaultValues] =
     useState<RegionalValues>()
   const [regionalDynamicValues, setRegionalDynamicValues] =
     useState<RegionalValues>()
-
   const [minMaxValues, setMinMaxValues] = useState<RegionalMinMaxValues>()
 
   const [totalGlobalEnergy, setTotalGlobalEnergy] = useState<number>(0)
@@ -121,6 +60,12 @@ export const BottomSheet = ({
     setTotalGlobalEnergy(totalEnergy) // Update total global energy
     return totalEnergy
   }
+
+  const [initialGraphData, setInitialGraphData] = useState<GraphData>()
+  const [dynamicGraphData, setDynamicGraphData] = useState<GraphData>()
+
+  const [calculationData, setCalculationData] =
+    useState<RenewableEnergyCalculationData>()
 
   useEffect(() => {
     getDefaultValues()
@@ -150,7 +95,6 @@ export const BottomSheet = ({
             defaultValues[regionKey as keyof RegionalValues] = [regionArray[1]] // Adjust index based on use case
           }
         })
-
         const initialGlobalEnergy = calculateTotalGlobalEnergy(defaultValues)
         setTotalGlobalEnergy(initialGlobalEnergy)
       })
@@ -162,18 +106,27 @@ export const BottomSheet = ({
       .then((val) => {
         setMinMaxValues(val)
       })
-      .catch((error) => {
-        console.error('Error fetching min/max values:', error)
+      .catch(console.error)
+    getInitialGraphData()
+      .then((val) => {
+        setInitialGraphData(val)
+        setDynamicGraphData(val)
       })
+      .catch(console.error)
   }, [])
 
   useEffect(() => {
+    getRegionCalculationData(getAbbrv(selectedRegion))
+      .then((val) => {
+        setCalculationData(val)
+      })
+      .catch(console.error)
+
     if (selectedRegion === 'Global') {
       bottomSheetRef.current?.snapToIndex(0) // Snap to 12.5% for global dashboard
     } else {
       bottomSheetRef.current?.snapToIndex(2) // Snap to 25% when a region is selected
     }
-    setCurrRegion(selectedRegion)
   }, [selectedRegion])
 
   return (
@@ -186,53 +139,92 @@ export const BottomSheet = ({
         onSwipeDown()
       }}
     >
-      <View style={styles.contentContainer}>
-        {currRegion !== 'Global' ? (
-          <RegionalDashboard
-            minMaxValues={minMaxValues && minMaxValues[abbrvMap[currRegion]]}
-            sliderValues={regionalDynamicValues && regionalDynamicValues[abbrvMap[currRegion]]}
-            currRegion={currRegion}
-            onSliderChange={(val) => {
-              setRegionalDynamicValues({
-                ...regionalDynamicValues,
-                [abbrvMap[currRegion]]: [
-                  regionalDynamicValues[abbrvMap[currRegion]][0],
-                  regionalDynamicValues[abbrvMap[currRegion]][1],
-                  val,
-                ],
-              })
-              
+      {regionalDynamicValues && (
+        <View style={styles.contentContainer}>
+          {selectedRegion !== 'Global' ? (
+            <RegionalDashboard
+              minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
+              sliderValues={regionalDynamicValues[getAbbrv(selectedRegion)]}
+              currRegion={selectedRegion}
+              onSliderChange={(val, technologyChanged) => {
+                setRegionalDynamicValues({
+                  ...regionalDynamicValues,
+                  [getAbbrv(selectedRegion)]: [
+                    regionalDynamicValues[getAbbrv(selectedRegion)][0],
+                    regionalDynamicValues[getAbbrv(selectedRegion)][1],
+                    val,
+                  ],
+                })
+                setDynamicGraphData({
+                  ...dynamicGraphData,
+                  [getAbbrv(selectedRegion)]: calculateCurve(
+                    {
+                      technology: technologyChanged,
+                      value: val[getEnergyAbbrv(technologyChanged)],
+                    },
+                    dynamicGraphData[getAbbrv(selectedRegion)],
+                    calculationData,
+                  ),
+                })       
+              //   const updatedGlobalEnergy = calculateTotalGlobalEnergy({
+              //     ...regionalDynamicValues,
+              //     [abbrvMap[currRegion]]: [
+              //       regionalDynamicValues[abbrvMap[currRegion]][0],
+              //       regionalDynamicValues[abbrvMap[currRegion]][1],
+              //       val,
+              //     ],
+              //   })
+              //   passGlobalToHome(updatedGlobalEnergy)
+              //   setTotalGlobalEnergy(updatedGlobalEnergy)
+              // }}
               const updatedGlobalEnergy = calculateTotalGlobalEnergy({
                 ...regionalDynamicValues,
-                [abbrvMap[currRegion]]: [
-                  regionalDynamicValues[abbrvMap[currRegion]][0],
-                  regionalDynamicValues[abbrvMap[currRegion]][1],
+                [getAbbrv(selectedRegion)]: [
+                  regionalDynamicValues[getAbbrv(selectedRegion)][0],
+                  regionalDynamicValues[getAbbrv(selectedRegion)][1],
                   val,
                 ],
-              })
-              passGlobalToHome(updatedGlobalEnergy)
-              setTotalGlobalEnergy(updatedGlobalEnergy)
+              });
+              passGlobalToHome(updatedGlobalEnergy);
+              setTotalGlobalEnergy(updatedGlobalEnergy);
             }}
-            onReset={() => {
-              setRegionalDynamicValues({
-                ...regionalDynamicValues,
-                [abbrvMap[currRegion]]:
-                  regionalDefaultValues[abbrvMap[currRegion]],
-              })
 
-              const updatedGlobalEnergy = calculateTotalGlobalEnergy({
-                ...regionalDynamicValues,
-                [abbrvMap[currRegion]]:
-                  regionalDefaultValues[abbrvMap[currRegion]],
-              })
-              passGlobalToHome(updatedGlobalEnergy)
-              setTotalGlobalEnergy(updatedGlobalEnergy)
-            }}
-          />
-        ) : (
-          <GlobalDashboard totalGlobalEnergy={totalGlobalEnergy} />
-        )}
-      </View>
+
+
+              onReset={() => {
+                setRegionalDynamicValues({
+                  ...regionalDynamicValues,
+                  [getAbbrv(selectedRegion)]:
+                    regionalDefaultValues[getAbbrv(selectedRegion)],
+                })
+                setDynamicGraphData({
+                  ...dynamicGraphData,
+                  [getAbbrv(selectedRegion)]:
+                    initialGraphData[getAbbrv(selectedRegion)],
+                })
+                const updatedGlobalEnergy = calculateTotalGlobalEnergy({
+                  ...regionalDynamicValues,
+                  [getAbbrv(selectedRegion)]: regionalDefaultValues[getAbbrv(selectedRegion)],
+                });
+                passGlobalToHome(updatedGlobalEnergy);
+                setTotalGlobalEnergy(updatedGlobalEnergy);
+
+              }}
+              initialGraphData={initialGraphData}
+              dynamicGraphData={dynamicGraphData}
+              sliderDisabled={
+                calculationData.region !== getAbbrv(selectedRegion)
+              }
+            />
+          ) : (
+            <GlobalDashboard
+              initialGraphData={initialGraphData}
+              dynamicGraphData={dynamicGraphData}
+              totalGlobalEnergy={totalGlobalEnergy}
+            />
+          )}
+        </View>
+      )}
     </BottomSheetTemplate>
   )
 }
