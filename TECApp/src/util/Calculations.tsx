@@ -1,27 +1,22 @@
 import { RegionData, RenewableEnergyCalculationData } from '../api/requests'
 import { getElectricityGenerationCoal } from './ValueDictionaries'
 
-type ValuePair = {
-  technology: string
-  value: number
-}
-
 export const calculateEnergyCurve = (
-  newVal: ValuePair,
+  newVal: number,
+  technologyChanged: string,
   regionGraphData: RegionData,
   globalGraphData: RegionData,
   calculationData: RenewableEnergyCalculationData,
 ) => {
   const installed_capacity =
-    calculationData.installed_capacity[newVal.technology]['2024']
+    calculationData.installed_capacity[technologyChanged]['2024']
   const forecast_cagr =
-    calculationData.forecast_cagr[newVal.technology]['2024-2030']
+    calculationData.forecast_cagr[technologyChanged]['2024-2030']
   const forecast_growth_rate =
-    calculationData.forecast_growth_rate[newVal.technology]
-  const capacity_factor = calculationData.capacity_factor[newVal.technology]
+    calculationData.forecast_growth_rate[technologyChanged]
+  const capacity_factor = calculationData.capacity_factor[technologyChanged]
 
-  const climate_path_cagr =
-    Math.pow(newVal.value / installed_capacity, 1 / 6) - 1
+  const climate_path_cagr = Math.pow(newVal / installed_capacity, 1 / 6) - 1
   const climate_path_minus_forecast = climate_path_cagr - forecast_cagr
 
   const climate_path_growth_rate = {}
@@ -43,7 +38,7 @@ export const calculateEnergyCurve = (
 
     const valueChange =
       electricity_generation -
-      regionGraphData[newVal.technology][i - 2024].value
+      regionGraphData[technologyChanged][i - 2024].value
 
     newRegionTechnology.push({ year: i, value: electricity_generation })
 
@@ -53,7 +48,7 @@ export const calculateEnergyCurve = (
     })
     newGlobalTechnology.push({
       year: i,
-      value: globalGraphData[newVal.technology][i - 2024].value + valueChange,
+      value: globalGraphData[technologyChanged][i - 2024].value + valueChange,
     })
     newGlobalTotal.push({
       year: i,
@@ -61,14 +56,14 @@ export const calculateEnergyCurve = (
     })
   }
   return {
-    regional: {
+    regionalGraphData: {
       ...regionGraphData,
-      [newVal.technology]: newRegionTechnology,
+      [technologyChanged]: newRegionTechnology,
       total: newRegionTotal,
     },
-    global: {
+    globalGraphData: {
       ...globalGraphData,
-      [newVal.technology]: newGlobalTechnology,
+      [technologyChanged]: newGlobalTechnology,
       total: newGlobalTotal,
     },
   }

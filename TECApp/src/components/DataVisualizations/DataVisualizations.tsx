@@ -20,7 +20,7 @@ const DataVisualizations = ({
   initialData,
   dynamicData,
   initialFossilData,
-  dynamicFossilData
+  dynamicFossilData,
 }: DataVisualizationsProps) => {
   const [activeButton, setActiveButton] = useState('BAU Comparison')
 
@@ -117,7 +117,10 @@ const DataVisualizations = ({
       ) : activeButton === 'Regional Comparison' ? (
         <RegionalComparison region={region} data={dynamicData} />
       ) : activeButton === 'Carbon Budget' ? (
-        <CarbonBudget BAUData={initialFossilData} dynamicData={dynamicFossilData} />
+        <CarbonBudget
+          BAUData={initialFossilData}
+          dynamicData={dynamicFossilData}
+        />
       ) : (
         <TechnologyComparison data={dynamicData[getAbbrv(region)]} />
       )}

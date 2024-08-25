@@ -53,6 +53,9 @@ const regions = [
   'nee',
 ]
 
+/**
+ * Contains all sliders, graphs, etc data and functionality relevant to the app Bottom Sheet
+ */
 export const BottomSheet = ({
   selectedRegion,
   onSwipeDown,
@@ -60,29 +63,31 @@ export const BottomSheet = ({
   const snapPoints = useMemo(() => ['12.5%', '25%', '50%', '80%'], [])
   const bottomSheetRef = useRef<BottomSheetTemplate>(null)
 
-  const [regionalDefaultValues, setRegionalDefaultValues] =
-    useState<RegionalValues>()
-  const [regionalDynamicValues, setRegionalDynamicValues] =
-    useState<RegionalValues>()
-  const [minMaxValues, setMinMaxValues] = useState<RegionalMinMaxValues>()
+  //see api/requests.ts for specific info on structure of data objects
+  const [initialSliderValues, setInitialSliderValues] =
+    useState<RegionalValues>() //default slider values for every region
+  const [dynamicSliderValues, setDynamicSliderValues] =
+    useState<RegionalValues>() //storage of user changes to sliders
+  const [minMaxValues, setMinMaxValues] = useState<RegionalMinMaxValues>() //min-max values for every slider
 
-  const [initialGraphData, setInitialGraphData] = useState<GraphData>()
-  const [dynamicGraphData, setDynamicGraphData] = useState<GraphData>()
+  const [initialGraphData, setInitialGraphData] = useState<GraphData>() //default graph data
+  const [dynamicGraphData, setDynamicGraphData] = useState<GraphData>() //graph data based on user changes to sliders
 
-  const [initialFossilData, setInitialFossilData] = useState<DataPoint[]>()
-  const [dynamicFossilData, setDynamicFossilData] = useState<DataPoint[]>()
+  const [initialFossilData, setInitialFossilData] = useState<DataPoint[]>() //default carbon budget graph data
+  const [dynamicFossilData, setDynamicFossilData] = useState<DataPoint[]>() //carbon budget graph data based on user changes to sliders
   const [fossilReductionData, setFossilReductionData] =
-    useState<FossilReductionData>()
+    useState<FossilReductionData>() //carbon reduction data (to be applied to fossil data above)
 
   const [calculationData, setCalculationData] =
-    useState<RenewableEnergyCalculationData>()
+    useState<RenewableEnergyCalculationData>() //storage of all necessary calculation data for the current region
 
+  //pull all initial data
   useEffect(() => {
     getDefaultValues()
       .then((val) => {
         console.log('finished')
-        setRegionalDefaultValues(val)
-        setRegionalDynamicValues(val)
+        setInitialSliderValues(val)
+        setDynamicSliderValues(val)
       })
       .catch(console.error)
     getMinMaxValues()
@@ -115,6 +120,7 @@ export const BottomSheet = ({
     setFossilReductionData(initialFossilReductionData)
   }, [])
 
+  //update regional calculation data on region select
   useEffect(() => {
     getRegionCalculationData(getAbbrv(selectedRegion))
       .then((val) => {
@@ -129,7 +135,6 @@ export const BottomSheet = ({
     }
   }, [selectedRegion])
 
-  
   return (
     <BottomSheetTemplate
       ref={bottomSheetRef}
@@ -140,52 +145,69 @@ export const BottomSheet = ({
         onSwipeDown()
       }}
     >
-      {regionalDynamicValues && (
+      {dynamicSliderValues && (           //don't render regional sheet until slider values load
         <View style={styles.contentContainer}>
           {selectedRegion !== 'Global' ? (
             <RegionalDashboard
               minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
-              sliderValues={regionalDynamicValues[getAbbrv(selectedRegion)]}
+              sliderValues={dynamicSliderValues[getAbbrv(selectedRegion)]}
               currRegion={selectedRegion}
-              onSliderChange={(val, technologyChanged) => {
-                setRegionalDynamicValues({
-                  ...regionalDynamicValues,
+              onSliderChange={(val, technologyChanged) => {   //on slider change for a region, store changes here to preserve each region changes
+                setDynamicSliderValues({
+                  ...dynamicSliderValues,
                   [getAbbrv(selectedRegion)]: [
-                    regionalDynamicValues[getAbbrv(selectedRegion)][0],
-                    regionalDynamicValues[getAbbrv(selectedRegion)][1],
+                    dynamicSliderValues[getAbbrv(selectedRegion)][0],
+                    dynamicSliderValues[getAbbrv(selectedRegion)][1],
                     val,
                   ],
                 })
-                const { regional, global } = calculateEnergyCurve(
-                  {
-                    technology: technologyChanged,
-                    value: val[getEnergyAbbrv(technologyChanged)],
-                  },
-                  dynamicGraphData[getAbbrv(selectedRegion)],
-                  dynamicGraphData.global,
-                  calculationData,
-                )
+                const { regionalGraphData, globalGraphData } =  //calculate new graph (excluding carbon budget) data for current region and global
+                  calculateEnergyCurve(
+                    val[getEnergyAbbrv(technologyChanged)],
+                    technologyChanged,
+                    dynamicGraphData[getAbbrv(selectedRegion)],
+                    dynamicGraphData.global,
+                    calculationData,
+                  )
                 setDynamicGraphData({
                   ...dynamicGraphData,
-                  [getAbbrv(selectedRegion)]: regional,
-                  global: global,
+                  [getAbbrv(selectedRegion)]: regionalGraphData,
+                  global: globalGraphData,
                 })
 
-                const newRegionFossilReductionData = calculateCarbonReductions(
+                const newRegionFossilReductionData = calculateCarbonReductions( //calculate new global carbon reduction based on new graph data
                   getAbbrv(selectedRegion),
                   calculationData,
-                  regional,
+                  regionalGraphData,
                 )
 
-                const newFossilData = JSON.parse(JSON.stringify(dynamicFossilData))
-                for (let i =0; i < newRegionFossilReductionData.length; i++) {
-                  newFossilData[i+1].value -=
+                const newFossilData = JSON.parse(
+                  JSON.stringify(dynamicFossilData),    //deep copy
+                )
+                for (let i = 0; i < newRegionFossilReductionData.length; i++) {  //apply new reductions to fossil data
+                  newFossilData[i + 1].value -=
                     newRegionFossilReductionData[i].value -
                     fossilReductionData[getAbbrv(selectedRegion)][i].value
                 }
-                newFossilData[7].value = newFossilData[6].value>30?newFossilData[6].value*0.82:newFossilData[6].value>=25?newFossilData[6].value*0.71:newFossilData[6].value*0.6
-                newFossilData[8].value = newFossilData[6].value>30?newFossilData[7].value*0.71:newFossilData[6].value>=25?newFossilData[7].value*0.58:newFossilData[7].value*0.5
-                newFossilData[9].value = newFossilData[6].value>30?newFossilData[8].value*0.542:newFossilData[6].value>=25?newFossilData[8].value*0.436:newFossilData[8].value*0.33
+                //graph extrapolation to 2060
+                newFossilData[7].value =
+                  newFossilData[6].value > 30
+                    ? newFossilData[6].value * 0.82
+                    : newFossilData[6].value >= 25
+                      ? newFossilData[6].value * 0.71
+                      : newFossilData[6].value * 0.6
+                newFossilData[8].value =
+                  newFossilData[6].value > 30
+                    ? newFossilData[7].value * 0.71
+                    : newFossilData[6].value >= 25
+                      ? newFossilData[7].value * 0.58
+                      : newFossilData[7].value * 0.5
+                newFossilData[9].value =
+                  newFossilData[6].value > 30
+                    ? newFossilData[8].value * 0.542
+                    : newFossilData[6].value >= 25
+                      ? newFossilData[8].value * 0.436
+                      : newFossilData[8].value * 0.33
 
                 setDynamicFossilData(newFossilData)
 
@@ -194,11 +216,11 @@ export const BottomSheet = ({
                   [getAbbrv(selectedRegion)]: newRegionFossilReductionData,
                 })
               }}
-              onReset={() => {
-                setRegionalDynamicValues({
-                  ...regionalDynamicValues,
+              onReset={() => {  //when reset button is clicked within region
+                setDynamicSliderValues({
+                  ...dynamicSliderValues,
                   [getAbbrv(selectedRegion)]:
-                    regionalDefaultValues[getAbbrv(selectedRegion)],
+                    initialSliderValues[getAbbrv(selectedRegion)],
                 })
                 setDynamicGraphData({
                   ...dynamicGraphData,
@@ -211,15 +233,32 @@ export const BottomSheet = ({
                   ),
                 })
 
-                const newFossilData = JSON.parse(JSON.stringify(dynamicFossilData))
+                const newFossilData = JSON.parse(
+                  JSON.stringify(dynamicFossilData),
+                )
                 for (let i = 0; i < 6; i++) {
-                  newFossilData[i+1].value +=
+                  newFossilData[i + 1].value +=
                     fossilReductionData[getAbbrv(selectedRegion)][i].value
                 }
 
-                newFossilData[7].value = newFossilData[6].value>30?newFossilData[6].value*0.82:newFossilData[6].value>=25?newFossilData[6].value*0.71:newFossilData[6].value*0.6
-                newFossilData[8].value = newFossilData[6].value>30?newFossilData[7].value*0.71:newFossilData[6].value>=25?newFossilData[7].value*0.58:newFossilData[7].value*0.5
-                newFossilData[9].value = newFossilData[6].value>30?newFossilData[8].value*0.542:newFossilData[6].value>=25?newFossilData[8].value*0.436:newFossilData[7].value*0.33
+                newFossilData[7].value =
+                  newFossilData[6].value > 30
+                    ? newFossilData[6].value * 0.82
+                    : newFossilData[6].value >= 25
+                      ? newFossilData[6].value * 0.71
+                      : newFossilData[6].value * 0.6
+                newFossilData[8].value =
+                  newFossilData[6].value > 30
+                    ? newFossilData[7].value * 0.71
+                    : newFossilData[6].value >= 25
+                      ? newFossilData[7].value * 0.58
+                      : newFossilData[7].value * 0.5
+                newFossilData[9].value =
+                  newFossilData[6].value > 30
+                    ? newFossilData[8].value * 0.542
+                    : newFossilData[6].value >= 25
+                      ? newFossilData[8].value * 0.436
+                      : newFossilData[7].value * 0.33
 
                 setDynamicFossilData(newFossilData)
 
@@ -238,7 +277,7 @@ export const BottomSheet = ({
               initialGraphData={initialGraphData}
               dynamicGraphData={dynamicGraphData}
               sliderDisabled={
-                calculationData.region !== getAbbrv(selectedRegion)
+                calculationData.region !== getAbbrv(selectedRegion) //don't let sliders be changed until region calculation data is updated
               }
             />
           ) : (

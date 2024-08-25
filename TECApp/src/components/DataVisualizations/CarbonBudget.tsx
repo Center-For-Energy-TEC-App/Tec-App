@@ -40,7 +40,10 @@ type CarbonBudgetProps = {
 
 export const CarbonBudget = ({ BAUData, dynamicData }: CarbonBudgetProps) => {
   const yMin = 0
-  const yMax = Math.max(Math.max(...dynamicData.map((val) => val.value)),Math.max(...BAUData.map((val) => val.value)))
+  const yMax = Math.max(
+    Math.max(...dynamicData.map((val) => val.value)),
+    Math.max(...BAUData.map((val) => val.value)),
+  )
 
   let sum = 0
   let dummy1Point5Year: number
@@ -180,20 +183,20 @@ export const CarbonBudget = ({ BAUData, dynamicData }: CarbonBudgetProps) => {
                 Emissions (GT)
               </TextSvg>
               <TextSvg
-                  x={leftMargin-5}
-                  y={graphHeight + 25}
-                  strokeWidth={0.1}
-                  fontWeight={700}
-                  fontSize={10}
-                  fill="#9E9FA7"
-                  stroke="#9E9FA7"
-                >
-                  2024
-                </TextSvg>
+                x={leftMargin - 5}
+                y={graphHeight + 25}
+                strokeWidth={0.1}
+                fontWeight={700}
+                fontSize={10}
+                fill="#9E9FA7"
+                stroke="#9E9FA7"
+              >
+                2024
+              </TextSvg>
               {horizontalAxis.map((e, key) => (
                 <TextSvg
                   key={key}
-                  x={graphWidth * ((e-2030) / 50) + leftMargin + 35}
+                  x={graphWidth * ((e - 2030) / 50) + leftMargin + 35}
                   y={graphHeight + 25}
                   strokeWidth={0.1}
                   fontWeight={700}
@@ -276,7 +279,8 @@ export const CarbonBudget = ({ BAUData, dynamicData }: CarbonBudgetProps) => {
                 x={leftMargin}
                 y={
                   calculateY(
-                    dynamicData.find((val) => val.year == dummy1Point5Year).value,
+                    dynamicData.find((val) => val.year == dummy1Point5Year)
+                      .value,
                   ) - 25
                 }
                 width={62}
@@ -298,7 +302,8 @@ export const CarbonBudget = ({ BAUData, dynamicData }: CarbonBudgetProps) => {
                 x={leftMargin + 3}
                 y={
                   calculateY(
-                    dynamicData.find((val) => val.year == dummy1Point5Year).value,
+                    dynamicData.find((val) => val.year == dummy1Point5Year)
+                      .value,
                   ) - 12
                 }
               >

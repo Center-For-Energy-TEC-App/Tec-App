@@ -22,7 +22,7 @@ import Svg, { Rect } from 'react-native-svg'
 import { getEnergyAbbrv, getTechnologyColor } from '../util/ValueDictionaries'
 import { DefaultValues, MinMaxValues } from '../api/requests'
 
-export type SliderProportions = {
+export type technologyProportions = {
   solar: number
   wind: number
   hydropower: number
@@ -48,7 +48,7 @@ const DistributeRenewables = ({
 }: DistributeRenewablesProps) => {
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
-  
+
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
     return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
@@ -57,19 +57,19 @@ const DistributeRenewables = ({
   }
 
   const isIpad = deviceType() === 'ipad'
-  
-  const [proportionBarWidth, setProportionBarWidth] =
-    useState<number>(undefined)
 
   const [sliderValues, setSliderValues] = useState<DefaultValues>(values[2])
 
-  const [sliderProportions, setSliderProportions] =
-    useState<SliderProportions>(undefined)
+  const [proportionBarWidth, setProportionBarWidth] =  //actual pixel width of proportion bar (based on parent div)
+  useState<number>(undefined)
+  const [technologyProportions, setTechnologyProportions] = //pixel width values of each technology for proportion bar
+    useState<technologyProportions>(undefined)
 
   useEffect(() => {
-    setSliderValues(values[2])
+    setSliderValues(values[2]) 
   }, [values])
 
+  //calculate proportion bar values on every slider change
   useEffect(() => {
     if (proportionBarWidth) {
       const sliderTotal =
@@ -81,7 +81,7 @@ const DistributeRenewables = ({
         sliderValues.nuclear_gw +
         5
 
-      setSliderProportions({
+      setTechnologyProportions({
         wind: (sliderValues.wind_gw / sliderTotal) * proportionBarWidth,
         solar: (sliderValues.solar_gw / sliderTotal) * proportionBarWidth,
         hydropower: (sliderValues.hydro_gw / sliderTotal) * proportionBarWidth,
@@ -157,7 +157,7 @@ const DistributeRenewables = ({
           minimumTrackTintColor={getTechnologyColor(label)}
           maximumTrackTintColor="#B5B1AA"
           trackMarks={[
-            values[0][getEnergyAbbrv(label.toLowerCase())] -
+            values[0][getEnergyAbbrv(label.toLowerCase())] -    //subtract by slight offset because the trackmark div is wider than the trackmark itself
               0.0425 *
                 (parseFloat(minMaxValues.max[label.toLowerCase()]) -
                   parseFloat(minMaxValues.min[label.toLowerCase()])),
@@ -169,19 +169,23 @@ const DistributeRenewables = ({
           renderTrackMarkComponent={(index) =>
             renderTrackMark(
               index,
-              values[0][getEnergyAbbrv(label.toLowerCase())] <
+              values[0][getEnergyAbbrv(label.toLowerCase())] <    //ordering based on which value (2024 or bau) is higher
                 values[1][getEnergyAbbrv(label.toLowerCase())]
                 ? ['2024', 'BAU'][index]
                 : ['BAU', '2024'][index],
             )
           }
           onSlidingStart={() => handleSlidingStart(label)}
-          onValueChange={(val) =>
-            setSliderValues({
+
+          //just change local state during sliding
+          onValueChange={(val) => 
+            setSliderValues({ 
               ...sliderValues,
               [getEnergyAbbrv(label.toLowerCase())]: val[0],
             })
           }
+          
+          //callback once sliding is complete (to send changed data back up to BottomSheet)
           onSlidingComplete={(val) =>
             onSliderChange(
               {
@@ -218,59 +222,59 @@ const DistributeRenewables = ({
         <Text style={styles.capacityProportionText}>
           Renewable Capacity Proportions
         </Text>
-        {proportionBarWidth && sliderProportions && (
+        {proportionBarWidth && technologyProportions && (
           <Svg height={20}>
             <Rect
               x={0}
               y={0}
-              width={sliderProportions.wind}
+              width={technologyProportions.wind}
               height={20}
               fill="#C66AAA"
             />
             <Rect
-              x={sliderProportions.wind}
+              x={technologyProportions.wind}
               y={0}
-              width={sliderProportions.solar}
+              width={technologyProportions.solar}
               height={20}
               fill="#F8CE46"
             />
             <Rect
-              x={sliderProportions.wind + sliderProportions.solar}
+              x={technologyProportions.wind + technologyProportions.solar}
               y={0}
-              width={sliderProportions.hydropower}
+              width={technologyProportions.hydropower}
               height={20}
               fill="#58C4D4"
             />
             <Rect
               x={
-                sliderProportions.wind +
-                sliderProportions.solar +
-                sliderProportions.hydropower
+                technologyProportions.wind +
+                technologyProportions.solar +
+                technologyProportions.hydropower
               }
               y={0}
-              width={sliderProportions.biomass}
+              width={technologyProportions.biomass}
               height={20}
               fill="#779448"
             />
             <Rect
               x={
-                sliderProportions.wind +
-                sliderProportions.solar +
-                sliderProportions.hydropower +
-                sliderProportions.biomass
+                technologyProportions.wind +
+                technologyProportions.solar +
+                technologyProportions.hydropower +
+                technologyProportions.biomass
               }
               y={0}
-              width={sliderProportions.geothermal}
+              width={technologyProportions.geothermal}
               height={20}
               fill="#BF9336"
             />
             <Rect
               x={
-                sliderProportions.wind +
-                sliderProportions.solar +
-                sliderProportions.hydropower +
-                sliderProportions.biomass +
-                sliderProportions.geothermal
+                technologyProportions.wind +
+                technologyProportions.solar +
+                technologyProportions.hydropower +
+                technologyProportions.biomass +
+                technologyProportions.geothermal
               }
               y={0}
               width={5}
@@ -279,15 +283,15 @@ const DistributeRenewables = ({
             />
             <Rect
               x={
-                sliderProportions.wind +
-                sliderProportions.solar +
-                sliderProportions.hydropower +
-                sliderProportions.biomass +
-                sliderProportions.geothermal +
+                technologyProportions.wind +
+                technologyProportions.solar +
+                technologyProportions.hydropower +
+                technologyProportions.biomass +
+                technologyProportions.geothermal +
                 5
               }
               y={0}
-              width={sliderProportions.nuclear}
+              width={technologyProportions.nuclear}
               height={20}
               fill="#EE8E35"
             />
