@@ -11,9 +11,14 @@ const vh = Dimensions.get('window').height
 
 export const Home = () => {
   const [selectedRegion, setSelectedRegion] = useState<string>('Global')
+  const [totalGlobalEnergy, setTotalGlobalEnergy] = useState<number>(0)
 
   const handleRegionSelect = (region: string) => {
     setSelectedRegion(region)
+  }
+
+  const handleGlobalEnergyChange = (energy: number) => {
+    setTotalGlobalEnergy(energy)
   }
 
   return (
@@ -24,10 +29,11 @@ export const Home = () => {
         <BottomSheet
           selectedRegion={selectedRegion}
           onSwipeDown={() => setSelectedRegion('Global')}
+          passGlobalToHome={handleGlobalEnergyChange}
         />
         <View style={mobileStyles.trackerWrapper}>
           <Tracker type="temperature" />
-          <Tracker type="renewable" />
+          <Tracker type="renewable" totalGlobalEnergy={totalGlobalEnergy}/>
         </View>
       </GestureHandlerRootView>
     </View>
