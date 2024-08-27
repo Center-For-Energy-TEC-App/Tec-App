@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { DefaultValues, GraphData, MinMaxValues } from '../api/requests'
@@ -31,11 +38,12 @@ export const RegionalDashboard = ({
 
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
-    return Platform.OS === 'ios' && (width >= 1024 || height >= 1366) ? 'ipad' : 'iphone'
+    return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
+      ? 'ipad'
+      : 'iphone'
   }
 
   const isIpad = deviceType() === 'ipad'
-
 
   return (
     <View style={styles.regionInfoContainer}>
@@ -52,8 +60,8 @@ export const RegionalDashboard = ({
             <Text
               style={
                 activeTab === 'renewables'
-                ? [styles.activeTab, isIpad && styles.iPadText]
-                : [styles.inactiveTab, isIpad && styles.iPadText]
+                  ? [styles.activeTab, isIpad && styles.iPadText]
+                  : [styles.inactiveTab, isIpad && styles.iPadText]
               }
             >
               Distribute Renewables
@@ -71,8 +79,8 @@ export const RegionalDashboard = ({
             <Text
               style={
                 activeTab === 'visualizations'
-                ? [styles.activeTab, isIpad && styles.iPadText]
-                : [styles.inactiveTab, isIpad && styles.iPadText]
+                  ? [styles.activeTab, isIpad && styles.iPadText]
+                  : [styles.inactiveTab, isIpad && styles.iPadText]
               }
             >
               Data Visualizations

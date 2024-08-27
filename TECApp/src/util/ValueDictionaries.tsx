@@ -85,3 +85,28 @@ export const getEnergyAbbrv = (energy: string) => {
       return 'nuclear_gw'
   }
 }
+
+export const getElectricityGenerationCoal = (region: string) => {
+  switch (region) {
+    case 'chn':
+      return 0.87
+    case 'ind':
+      return 0.85
+    case 'mea':
+      return 0.06
+    case 'nam':
+      return 0.2
+    case 'nee':
+      return 0.23
+    case 'sea':
+      return 0.62
+    case 'eur':
+      return 0.21
+    case 'lam':
+      return 0.05
+    case 'ssa':
+      return 0.82
+    case 'opa':
+      return 0.7
+  }
+}

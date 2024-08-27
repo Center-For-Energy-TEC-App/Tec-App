@@ -28,6 +28,13 @@ export type RegionalValues = {
   nee: DefaultValues[]
 }
 
+/**
+ * Slider values object is an object with 10 key-value pairs; one per region
+ * Each region value is a 3 element array:
+ *  index 0: values for 2023 (for the 2023 tick mark on sliders)
+ *  index 1: predicted values for 2030 business-as-usual (for the bau tick and for resetting sliders)
+ *  index 2: to store values after they've been changed by users using the sliders
+ */
 export async function getDefaultValues() {
   const url = `/defaults`
   const response = await fetch(BASE_URL + url, { method: 'GET' })
@@ -65,6 +72,10 @@ export type RegionalMinMaxValues = {
   nee: MinMaxValues
 }
 
+/**
+ * Contains minimum and maximum values for each slider for each region
+ * Each region value is an object with min and max key-value pairs that contain values for each technology
+ */
 export async function getMinMaxValues() {
   const response = await fetch(BASE_URL + '/minmax', { method: 'GET' })
   return (await response.json()) as RegionalMinMaxValues
@@ -94,6 +105,11 @@ export type GraphData = {
   nee: RegionData
 }
 
+/**
+ *
+ * Each regional graph data is an object with 7 key value pairs, one for each technology and one total
+ * Each technology array is 7 element array with a DataPoint object as each element; one per each year from 2024-2027
+ */
 export async function getInitialGraphData() {
   const response = await fetch(BASE_URL + '/initgraph', { method: 'GET' })
   return (await response.json()) as GraphData
@@ -111,12 +127,16 @@ type YearRange = {
 }
 
 type RawData = {
-  solar: YearRange
-  wind: YearRange
-  hydropower: YearRange
-  geothermal: YearRange
-  biomass: YearRange
-  nuclear: YearRange
+  solar?: YearRange
+  wind?: YearRange
+  hydropower?: YearRange
+  geothermal?: YearRange
+  biomass?: YearRange
+  nuclear?: YearRange
+  coal?: YearRange
+  gas?: YearRange
+  oil?: YearRange
+  zero_carbon?: YearRange
 }
 
 export type RenewableEnergyCalculationData = {
@@ -124,10 +144,23 @@ export type RenewableEnergyCalculationData = {
   forecast_cagr: RawData
   forecast_growth_rate: RawData
   capacity_factor: RawData
+  electricity_generation: RawData
+  co2_emissions: RawData
   region: string
 }
 
+/**
+ * Calculation data is split up into 6 categories of data + one key value pair for the region
+ * Each category contains information about a specific technology and its values in years
+ */
 export async function getRegionCalculationData(region: string) {
   const response = await fetch(BASE_URL + `/calc/${region}`, { method: 'GET' })
   return (await response.json()) as RenewableEnergyCalculationData
+}
+
+export async function getInitialFossilData() {
+  const response = await fetch(BASE_URL + '/fossil-emissions', {
+    method: 'GET',
+  })
+  return (await response.json()) as DataPoint[]
 }

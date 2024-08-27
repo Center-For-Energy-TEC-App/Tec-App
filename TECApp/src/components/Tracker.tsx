@@ -5,10 +5,14 @@ import { RenewableIcon } from '../SVGs/RenewableIcon'
 type TrackerProps = {
   type: 'temperature' | 'renewable'
   dashboard?: boolean
-  totalGlobalEnergy?:number
+  totalGlobalEnergy?: number
 }
 
-export const Tracker = ({ type, dashboard, totalGlobalEnergy}: TrackerProps) => {
+export const Tracker = ({
+  type,
+  dashboard,
+  totalGlobalEnergy,
+}: TrackerProps) => {
   return (
     <>
       {type === 'temperature' ? (

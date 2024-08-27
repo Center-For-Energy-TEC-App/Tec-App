@@ -33,7 +33,7 @@ export const Home = () => {
         />
         <View style={mobileStyles.trackerWrapper}>
           <Tracker type="temperature" />
-          <Tracker type="renewable" totalGlobalEnergy={totalGlobalEnergy}/>
+          <Tracker type="renewable" totalGlobalEnergy={totalGlobalEnergy} />
         </View>
       </GestureHandlerRootView>
     </View>
