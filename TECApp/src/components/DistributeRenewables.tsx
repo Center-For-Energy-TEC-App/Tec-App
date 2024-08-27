@@ -60,13 +60,13 @@ const DistributeRenewables = ({
 
   const [sliderValues, setSliderValues] = useState<DefaultValues>(values[2])
 
-  const [proportionBarWidth, setProportionBarWidth] =  //actual pixel width of proportion bar (based on parent div)
-  useState<number>(undefined)
+  const [proportionBarWidth, setProportionBarWidth] = //actual pixel width of proportion bar (based on parent div)
+    useState<number>(undefined)
   const [technologyProportions, setTechnologyProportions] = //pixel width values of each technology for proportion bar
     useState<technologyProportions>(undefined)
 
   useEffect(() => {
-    setSliderValues(values[2]) 
+    setSliderValues(values[2])
   }, [values])
 
   //calculate proportion bar values on every slider change
@@ -157,7 +157,7 @@ const DistributeRenewables = ({
           minimumTrackTintColor={getTechnologyColor(label)}
           maximumTrackTintColor="#B5B1AA"
           trackMarks={[
-            values[0][getEnergyAbbrv(label.toLowerCase())] -    //subtract by slight offset because the trackmark div is wider than the trackmark itself
+            values[0][getEnergyAbbrv(label.toLowerCase())] - //subtract by slight offset because the trackmark div is wider than the trackmark itself
               0.0425 *
                 (parseFloat(minMaxValues.max[label.toLowerCase()]) -
                   parseFloat(minMaxValues.min[label.toLowerCase()])),
@@ -169,22 +169,20 @@ const DistributeRenewables = ({
           renderTrackMarkComponent={(index) =>
             renderTrackMark(
               index,
-              values[0][getEnergyAbbrv(label.toLowerCase())] <    //ordering based on which value (2024 or bau) is higher
+              values[0][getEnergyAbbrv(label.toLowerCase())] < //ordering based on which value (2024 or bau) is higher
                 values[1][getEnergyAbbrv(label.toLowerCase())]
                 ? ['2024', 'BAU'][index]
                 : ['BAU', '2024'][index],
             )
           }
           onSlidingStart={() => handleSlidingStart(label)}
-
           //just change local state during sliding
-          onValueChange={(val) => 
-            setSliderValues({ 
+          onValueChange={(val) =>
+            setSliderValues({
               ...sliderValues,
               [getEnergyAbbrv(label.toLowerCase())]: val[0],
             })
           }
-          
           //callback once sliding is complete (to send changed data back up to BottomSheet)
           onSlidingComplete={(val) =>
             onSliderChange(

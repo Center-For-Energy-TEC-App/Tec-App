@@ -45,10 +45,6 @@ export const RegionalDashboard = ({
 
   const isIpad = deviceType() === 'ipad'
 
-  useEffect(() => {
-    setActiveTab('renewables')
-  }, [currRegion])
-
   return (
     <View style={styles.regionInfoContainer}>
       <Text style={styles.regionName}>{currRegion}</Text>

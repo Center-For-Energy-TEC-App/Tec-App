@@ -15,6 +15,7 @@ import { GraphData } from '../api/requests'
 import { DataPoint } from './DataVisualizations/BAUComparison'
 
 type GlobalDashboardProps = {
+  totalGlobalEnergy: number
   initialGraphData: GraphData
   dynamicGraphData: GraphData
   initialFossilData: DataPoint[]
@@ -22,6 +23,7 @@ type GlobalDashboardProps = {
 }
 
 export const GlobalDashboard = ({
+  totalGlobalEnergy,
   initialGraphData,
   dynamicGraphData,
   initialFossilData,
@@ -55,7 +57,11 @@ export const GlobalDashboard = ({
       </Text>
       <View style={styles.trackersWrapper}>
         <Tracker type="temperature" dashboard />
-        <Tracker type="renewable" dashboard />
+        <Tracker
+          type="renewable"
+          dashboard
+          totalGlobalEnergy={totalGlobalEnergy}
+        />
       </View>
       <View style={styles.tabContainer}>
         <TouchableOpacity onPress={() => setActiveTab('renewables')}>

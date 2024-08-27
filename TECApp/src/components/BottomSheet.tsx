@@ -25,6 +25,7 @@ import { DataPoint } from './DataVisualizations/BAUComparison'
 export interface BottomSheetProps {
   selectedRegion: string
   onSwipeDown: () => void
+  passGlobalToHome: (energy: number) => void
 }
 
 export type FossilReductionData = {
@@ -59,6 +60,7 @@ const regions = [
 export const BottomSheet = ({
   selectedRegion,
   onSwipeDown,
+  passGlobalToHome,
 }: BottomSheetProps) => {
   const snapPoints = useMemo(() => ['12.5%', '25%', '50%', '80%'], [])
   const bottomSheetRef = useRef<BottomSheetTemplate>(null)
@@ -78,6 +80,27 @@ export const BottomSheet = ({
   const [fossilReductionData, setFossilReductionData] =
     useState<FossilReductionData>() //carbon reduction data (to be applied to fossil data above)
 
+  const [totalGlobalEnergy, setTotalGlobalEnergy] = useState<number>(0)
+
+  const calculateTotalGlobalEnergy = (sliderValues: RegionalValues) => {
+    let totalEnergy = 0
+
+    for (const region of regions) {
+      const values = sliderValues[region][2]
+      const regionEnergy =
+        values.solar_gw +
+        values.wind_gw +
+        values.hydro_gw +
+        values.bio_gw +
+        values.geo_gw +
+        values.nuclear_gw
+
+      totalEnergy += regionEnergy
+    }
+
+    return totalEnergy
+  }
+
   const [calculationData, setCalculationData] =
     useState<RenewableEnergyCalculationData>() //storage of all necessary calculation data for the current region
 
@@ -85,11 +108,17 @@ export const BottomSheet = ({
   useEffect(() => {
     getDefaultValues()
       .then((val) => {
-        console.log('finished')
         setInitialSliderValues(val)
         setDynamicSliderValues(val)
+
+        const globalEnergy = calculateTotalGlobalEnergy(val)
+        passGlobalToHome(globalEnergy)
+        setTotalGlobalEnergy(globalEnergy)
       })
-      .catch(console.error)
+      .catch((error) => {
+        console.error('Error fetching default values:', error)
+      })
+
     getMinMaxValues()
       .then((val) => {
         setMinMaxValues(val)
@@ -129,7 +158,7 @@ export const BottomSheet = ({
       .catch(console.error)
 
     if (selectedRegion === 'Global') {
-      bottomSheetRef.current.snapToIndex(0) // Snap to 12.5% for global dashboard
+      bottomSheetRef.current?.snapToIndex(0) // Snap to 12.5% for global dashboard
     } else {
       bottomSheetRef.current?.snapToIndex(2) // Snap to 25% when a region is selected
     }
@@ -141,27 +170,39 @@ export const BottomSheet = ({
       snapPoints={snapPoints}
       enablePanDownToClose
       onClose={() => {
-        bottomSheetRef.current.snapToIndex(0)
+        bottomSheetRef.current?.snapToIndex(0)
         onSwipeDown()
       }}
     >
-      {dynamicSliderValues && (           //don't render regional sheet until slider values load
+      {dynamicSliderValues && ( //don't render regional sheet until slider values load
         <View style={styles.contentContainer}>
           {selectedRegion !== 'Global' ? (
             <RegionalDashboard
               minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
               sliderValues={dynamicSliderValues[getAbbrv(selectedRegion)]}
               currRegion={selectedRegion}
-              onSliderChange={(val, technologyChanged) => {   //on slider change for a region, store changes here to preserve each region changes
-                setDynamicSliderValues({
+              onSliderChange={(val, technologyChanged) => {
+                //on slider change for a region, store changes here to preserve each region changes
+                const newSliderValues = {
                   ...dynamicSliderValues,
                   [getAbbrv(selectedRegion)]: [
                     dynamicSliderValues[getAbbrv(selectedRegion)][0],
                     dynamicSliderValues[getAbbrv(selectedRegion)][1],
                     val,
                   ],
-                })
-                const { regionalGraphData, globalGraphData } =  //calculate new graph (excluding carbon budget) data for current region and global
+                }
+                setDynamicSliderValues(newSliderValues)
+
+                const newGlobalEnergy =
+                  calculateTotalGlobalEnergy(newSliderValues)
+                  
+                passGlobalToHome(newGlobalEnergy)
+                setTotalGlobalEnergy(newGlobalEnergy)
+
+                const {
+                  regionalGraphData,
+                  globalGraphData,
+                } = //calculate new graph (excluding carbon budget) data for current region and global
                   calculateEnergyCurve(
                     val[getEnergyAbbrv(technologyChanged)],
                     technologyChanged,
@@ -175,16 +216,18 @@ export const BottomSheet = ({
                   global: globalGraphData,
                 })
 
-                const newRegionFossilReductionData = calculateCarbonReductions( //calculate new global carbon reduction based on new graph data
+                const newRegionFossilReductionData = calculateCarbonReductions(
+                  //calculate new global carbon reduction based on new graph data
                   getAbbrv(selectedRegion),
                   calculationData,
                   regionalGraphData,
                 )
 
                 const newFossilData = JSON.parse(
-                  JSON.stringify(dynamicFossilData),    //deep copy
+                  JSON.stringify(dynamicFossilData), //deep copy
                 )
-                for (let i = 0; i < newRegionFossilReductionData.length; i++) {  //apply new reductions to fossil data
+                for (let i = 0; i < newRegionFossilReductionData.length; i++) {
+                  //apply new reductions to fossil data
                   newFossilData[i + 1].value -=
                     newRegionFossilReductionData[i].value -
                     fossilReductionData[getAbbrv(selectedRegion)][i].value
@@ -216,12 +259,22 @@ export const BottomSheet = ({
                   [getAbbrv(selectedRegion)]: newRegionFossilReductionData,
                 })
               }}
-              onReset={() => {  //when reset button is clicked within region
-                setDynamicSliderValues({
+              onReset={() => {
+                //when reset button is clicked within region
+                const newSliderValues = {
                   ...dynamicSliderValues,
                   [getAbbrv(selectedRegion)]:
                     initialSliderValues[getAbbrv(selectedRegion)],
-                })
+                }
+
+                setDynamicSliderValues(newSliderValues)
+
+                const newGlobalEnergy =
+                  calculateTotalGlobalEnergy(newSliderValues)
+
+                passGlobalToHome(newGlobalEnergy)
+                setTotalGlobalEnergy(newGlobalEnergy)
+
                 setDynamicGraphData({
                   ...dynamicGraphData,
                   [getAbbrv(selectedRegion)]:
@@ -286,6 +339,7 @@ export const BottomSheet = ({
               dynamicGraphData={dynamicGraphData}
               dynamicFossilData={dynamicFossilData}
               initialFossilData={initialFossilData}
+              totalGlobalEnergy={totalGlobalEnergy}
             />
           )}
         </View>

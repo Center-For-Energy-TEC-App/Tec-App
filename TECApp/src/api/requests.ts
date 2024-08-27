@@ -28,10 +28,9 @@ export type RegionalValues = {
   nee: DefaultValues[]
 }
 
-
 /**
  * Slider values object is an object with 10 key-value pairs; one per region
- * Each region value is a 3 element array: 
+ * Each region value is a 3 element array:
  *  index 0: values for 2023 (for the 2023 tick mark on sliders)
  *  index 1: predicted values for 2030 business-as-usual (for the bau tick and for resetting sliders)
  *  index 2: to store values after they've been changed by users using the sliders
@@ -107,8 +106,8 @@ export type GraphData = {
 }
 
 /**
- * 
- * Each regional graph data is an object with 7 key value pairs, one for each technology and one total 
+ *
+ * Each regional graph data is an object with 7 key value pairs, one for each technology and one total
  * Each technology array is 7 element array with a DataPoint object as each element; one per each year from 2024-2027
  */
 export async function getInitialGraphData() {
