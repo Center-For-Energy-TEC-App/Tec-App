@@ -40,7 +40,7 @@ export const TechnologyComparison = ({ data }: TechnologyComparisonProps) => {
     Math.min(...nuclear_data.map((val) => val.value)),
   )
 
-  //max of both datasets
+  //max of all datasets
   const yMax = Math.max(
     Math.max(...solar_data.map((val) => val.value)),
     Math.max(...wind_data.map((val) => val.value)),

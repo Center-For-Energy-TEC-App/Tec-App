@@ -1,19 +1,33 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+  Dimensions,
+} from 'react-native'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { Tracker } from './Tracker'
 import { ScrollView } from 'react-native-gesture-handler'
 import { GraphData } from '../api/requests'
+import { DataPoint } from './DataVisualizations/BAUComparison'
 
 type GlobalDashboardProps = {
+  totalGlobalEnergy: number
   initialGraphData: GraphData
   dynamicGraphData: GraphData
+  initialFossilData: DataPoint[]
+  dynamicFossilData: DataPoint[]
 }
 
 export const GlobalDashboard = ({
+  totalGlobalEnergy,
   initialGraphData,
   dynamicGraphData,
+  initialFossilData,
+  dynamicFossilData,
 }: GlobalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
@@ -32,18 +46,22 @@ export const GlobalDashboard = ({
       contentContainerStyle={{ alignItems: 'flex-start' }}
     >
       <Text style={styles.regionName}>Global Climate Dashboard</Text>
-      <Text style={[styles.body, isIpad&&styles.iPadText]}>
+      <Text style={[styles.body, isIpad && styles.iPadText]}>
         Set default global renewable values and keep track of your progress
         towards meeting 2030 climate goals.{' '}
       </Text>
       <Text style={styles.header}>2030 Climate Goals</Text>
-      <Text style={[styles.body, isIpad&&styles.iPadText]}>
+      <Text style={[styles.body, isIpad && styles.iPadText]}>
         The world aims to keep global warming below 2°C by 2030. We can do this
         through increasing our current renewable capacity from 8 to 12 TW.{' '}
       </Text>
       <View style={styles.trackersWrapper}>
         <Tracker type="temperature" dashboard />
-        <Tracker type="renewable" dashboard />
+        <Tracker
+          type="renewable"
+          dashboard
+          totalGlobalEnergy={totalGlobalEnergy}
+        />
       </View>
       <View style={styles.tabContainer}>
         <TouchableOpacity onPress={() => setActiveTab('renewables')}>
@@ -57,8 +75,8 @@ export const GlobalDashboard = ({
             <Text
               style={
                 activeTab === 'renewables'
-                ? [styles.activeTab, isIpad && styles.iPadText]
-                : [styles.inactiveTab, isIpad && styles.iPadText]
+                  ? [styles.activeTab, isIpad && styles.iPadText]
+                  : [styles.inactiveTab, isIpad && styles.iPadText]
               }
             >
               Distribute Renewables
@@ -76,8 +94,8 @@ export const GlobalDashboard = ({
             <Text
               style={
                 activeTab === 'visualizations'
-                ? [styles.activeTab, isIpad && styles.iPadText]
-                : [styles.inactiveTab, isIpad && styles.iPadText]
+                  ? [styles.activeTab, isIpad && styles.iPadText]
+                  : [styles.inactiveTab, isIpad && styles.iPadText]
               }
             >
               Data Visualizations
@@ -93,6 +111,8 @@ export const GlobalDashboard = ({
         <DataVisualizations
           initialData={initialGraphData}
           dynamicData={dynamicGraphData}
+          initialFossilData={initialFossilData}
+          dynamicFossilData={dynamicFossilData}
           region="Global"
         />
       )}
@@ -162,6 +182,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   iPadText: {
-    fontSize: 18
+    fontSize: 18,
   },
 })
