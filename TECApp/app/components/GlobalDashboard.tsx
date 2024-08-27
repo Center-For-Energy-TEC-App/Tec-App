@@ -1,41 +1,37 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   View,
   Text,
   StyleSheet,
+  TouchableOpacity,
   Platform,
   Dimensions,
-  TouchableOpacity,
 } from 'react-native'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
-import { DefaultValues, GraphData, MinMaxValues } from '../api/requests'
+import { Tracker } from './Tracker'
+import { ScrollView } from 'react-native-gesture-handler'
+import { GraphData } from '../api/requests'
+import { DataPoint } from './DataVisualizations/BAUComparison'
 
-type RegionalDashboardProps = {
-  currRegion: string
-  sliderValues: DefaultValues
-  minMaxValues: MinMaxValues
-  onSliderChange: (val: DefaultValues, technologyChanged: string) => void
-  onReset: () => void
+type GlobalDashboardProps = {
+  totalGlobalEnergy: number
   initialGraphData: GraphData
   dynamicGraphData: GraphData
-  sliderDisabled: boolean
+  initialFossilData: DataPoint[]
+  dynamicFossilData: DataPoint[]
 }
 
-export const RegionalDashboard = ({
-  currRegion,
-  sliderValues,
-  minMaxValues,
-  onSliderChange,
-  onReset,
+export const GlobalDashboard = ({
+  totalGlobalEnergy,
   initialGraphData,
   dynamicGraphData,
-  sliderDisabled,
-}: RegionalDashboardProps) => {
+  initialFossilData,
+  dynamicFossilData,
+}: GlobalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
   )
-
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
     return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
@@ -44,10 +40,29 @@ export const RegionalDashboard = ({
   }
 
   const isIpad = deviceType() === 'ipad'
-
   return (
-    <View style={styles.regionInfoContainer}>
-      <Text style={styles.regionName}>{currRegion}</Text>
+    <ScrollView
+      style={styles.regionInfoContainer}
+      contentContainerStyle={{ alignItems: 'flex-start' }}
+    >
+      <Text style={styles.regionName}>Global Climate Dashboard</Text>
+      <Text style={[styles.body, isIpad && styles.iPadText]}>
+        Set default global renewable values and keep track of your progress
+        towards meeting 2030 climate goals.{' '}
+      </Text>
+      <Text style={styles.header}>2030 Climate Goals</Text>
+      <Text style={[styles.body, isIpad && styles.iPadText]}>
+        The world aims to keep global warming below 2°C by 2030. We can do this
+        through increasing our current renewable capacity from 8 to 12 TW.{' '}
+      </Text>
+      <View style={styles.trackersWrapper}>
+        <Tracker type="temperature" dashboard />
+        <Tracker
+          type="renewable"
+          dashboard
+          totalGlobalEnergy={totalGlobalEnergy}
+        />
+      </View>
       <View style={styles.tabContainer}>
         <TouchableOpacity onPress={() => setActiveTab('renewables')}>
           <View
@@ -90,21 +105,18 @@ export const RegionalDashboard = ({
       </View>
       <View style={styles.horizontalLine} />
       {activeTab === 'renewables' ? (
-        <DistributeRenewables
-          values={sliderValues}
-          minMaxValues={minMaxValues}
-          onSliderChange={onSliderChange}
-          onReset={onReset}
-          disabled={sliderDisabled}
-        />
+        // <DistributeRenewables defaultValues={null}/>
+        <></>
       ) : (
         <DataVisualizations
           initialData={initialGraphData}
           dynamicData={dynamicGraphData}
-          region={currRegion}
+          initialFossilData={initialFossilData}
+          dynamicFossilData={dynamicFossilData}
+          region="Global"
         />
       )}
-    </View>
+    </ScrollView>
   )
 }
 
@@ -112,15 +124,35 @@ const styles = StyleSheet.create({
   regionInfoContainer: {
     flex: 1,
     width: '100%',
-    alignItems: 'flex-start',
   },
   regionName: {
     color: '#000',
     fontSize: 28,
-    fontFamily: 'Brix Sans',
+    // fontFamily: 'Brix Sans',
     fontWeight: '400',
     paddingBottom: 10,
   },
+  header: {
+    // fontFamily: 'Brix Sans',
+    fontSize: 24,
+    paddingTop: 30,
+    paddingBottom: 10,
+  },
+  body: {
+    fontFamily: 'Roboto',
+    fontSize: 14,
+  },
+
+  trackersWrapper: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
+    width: '100%',
+    marginTop: 16,
+    marginBottom: 32,
+  },
+
   tabContainer: {
     flexDirection: 'row',
     marginTop: 8,

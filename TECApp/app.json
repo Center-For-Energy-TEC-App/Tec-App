@@ -2,6 +2,7 @@
   "expo": {
     "name": "AwesomeProject",
     "slug": "AwesomeProject",
+    "scheme": "tec-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -33,12 +34,6 @@
       }
     },
     "plugins": [
-      [
-      "expo-font",
-      {
-        "fonts": ["./assets/fonts/BrixSans.otf"]
-      }
-    ]
     ]
   }
 }

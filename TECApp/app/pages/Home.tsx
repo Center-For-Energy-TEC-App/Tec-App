@@ -9,7 +9,7 @@ import { Tracker } from '../components/Tracker'
 const vw = Dimensions.get('window').width
 const vh = Dimensions.get('window').height
 
-export const Home = () => {
+export default function Home () {
   const [selectedRegion, setSelectedRegion] = useState<string>('Global')
   const [totalGlobalEnergy, setTotalGlobalEnergy] = useState<number>(0)
 
