@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   regionName: {
     color: '#000',
     fontSize: 28,
-    // fontFamily: 'Brix Sans',
+    fontFamily: 'Brix Sans',
     fontWeight: '400',
     paddingBottom: 10,
   },

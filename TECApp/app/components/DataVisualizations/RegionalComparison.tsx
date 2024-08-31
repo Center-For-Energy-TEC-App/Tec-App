@@ -248,7 +248,7 @@ export const RegionalComparison = ({
 
 const styles = StyleSheet.create({
   header: {
-    // fontFamily: 'Brix Sans',
+    fontFamily: 'Brix Sans',
     fontSize: 24,
     marginBottom: 8,
   },
