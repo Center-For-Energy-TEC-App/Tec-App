@@ -190,7 +190,7 @@ const mobileStyles = StyleSheet.create({
   header: {
     textAlign: 'center',
     fontSize: 24,
-    // fontFamily: 'Brix Sans',
+    fontFamily: 'Brix Sans',
     fontStyle: 'normal',
     fontWeight: '400',
   },

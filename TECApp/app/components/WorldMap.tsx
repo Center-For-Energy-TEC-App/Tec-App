@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import React from 'react'
+import React, { createRef, useEffect, useState } from 'react'
 import { StyleSheet, Dimensions } from 'react-native'
 import data from '../../GeoChart.world.geo.json'
 import Svg, { Path, G, Rect } from 'react-native-svg'
@@ -10,6 +10,9 @@ export interface WorldMapProps {
 }
 
 export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
+  const [currRegion, setCurrRegion] = useState<string>("Global");
+  // const zoomableViewRef = createRef<ReactNativeZoomableView>();
+
   const windowWidth = Dimensions.get('window').width
   const windowHeight = Dimensions.get('window').height
   const widthScale = 3
@@ -19,6 +22,7 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
     //@ts-expect-error: weird property error with map
     .fitSize([windowWidth * widthScale, windowHeight], data)
   const pathGenerator = d3.geoPath().projection(projection)
+
 
   return (
     <ReactNativeZoomableView
@@ -31,6 +35,7 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
       contentHeight={windowHeight} // These lines break browser version
       contentWidth={windowWidth * widthScale} // These lines break browser version
       style={styles.container}
+      // ref={zoomableViewRef}
     >
       <Svg
         style={styles.svg}
@@ -44,7 +49,10 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
             height="100%"
             width="100%"
             fill="#1C2B47"
-            onPress={() => onSelectCountry('Global')}
+            onPress={() => {
+              onSelectCountry('Global')
+              setCurrRegion('Global')}
+            }
           />
           {data.features.map((feature, index) => (
             <Path
@@ -52,10 +60,15 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
               d={pathGenerator(feature)}
               key={index}
               stroke="#FFF"
-              strokeWidth={0}
+              strokeWidth={feature.properties.region===currRegion?2.5:0}
               fill={feature.properties.color}
               onPress={() => {
+                setCurrRegion(feature.properties.region)
                 onSelectCountry(feature.properties.region)
+                // if(zoomableViewRef.current){
+                //   zoomableViewRef.current.moveTo(regionCoordinates[feature.properties.region][0], regionCoordinates[feature.properties.region][1])
+                  // zoomableViewRef.current.zoomBy(1)
+                // }
               }}
             ></Path>
           ))}

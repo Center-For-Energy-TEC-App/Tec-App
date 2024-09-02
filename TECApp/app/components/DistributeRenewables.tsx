@@ -18,11 +18,11 @@ import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon'
 import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon'
 import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon'
 import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
-import Svg, { Rect } from 'react-native-svg'
+import Svg, { Path, Rect } from 'react-native-svg'
 import { getEnergyAbbrv, getTechnologyColor } from '../util/ValueDictionaries'
 import { DefaultValues, MinMaxValues } from '../api/requests'
 
-export type technologyProportions = {
+export type TechnologyProportions = {
   solar: number
   wind: number
   hydropower: number
@@ -63,10 +63,11 @@ const DistributeRenewables = ({
   const [proportionBarWidth, setProportionBarWidth] = //actual pixel width of proportion bar (based on parent div)
     useState<number>(undefined)
   const [technologyProportions, setTechnologyProportions] = //pixel width values of each technology for proportion bar
-    useState<technologyProportions>(undefined)
+    useState<TechnologyProportions>(undefined)
 
   useEffect(() => {
     setSliderValues(values[2])
+
   }, [values])
 
   //calculate proportion bar values on every slider change
@@ -78,16 +79,15 @@ const DistributeRenewables = ({
         sliderValues.hydro_gw +
         sliderValues.bio_gw +
         sliderValues.geo_gw +
-        sliderValues.nuclear_gw +
-        5
+        sliderValues.nuclear_gw 
 
       setTechnologyProportions({
-        wind: (sliderValues.wind_gw / sliderTotal) * proportionBarWidth,
-        solar: (sliderValues.solar_gw / sliderTotal) * proportionBarWidth,
-        hydropower: (sliderValues.hydro_gw / sliderTotal) * proportionBarWidth,
-        biomass: (sliderValues.bio_gw / sliderTotal) * proportionBarWidth,
-        geothermal: (sliderValues.geo_gw / sliderTotal) * proportionBarWidth,
-        nuclear: (sliderValues.nuclear_gw / sliderTotal) * proportionBarWidth,
+        wind: (sliderValues.wind_gw / sliderTotal) * (proportionBarWidth-5),
+        solar: (sliderValues.solar_gw / sliderTotal) * (proportionBarWidth-5),
+        hydropower: (sliderValues.hydro_gw / sliderTotal) * (proportionBarWidth-5),
+        biomass: (sliderValues.bio_gw / sliderTotal) * (proportionBarWidth-5),
+        geothermal: (sliderValues.geo_gw / sliderTotal) * (proportionBarWidth-5),
+        nuclear: (sliderValues.nuclear_gw / sliderTotal) * (proportionBarWidth-5)
       })
     }
   }, [sliderValues, proportionBarWidth])
@@ -293,6 +293,10 @@ const DistributeRenewables = ({
               height={20}
               fill="#EE8E35"
             />
+            <Path d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z" strokeWidth={0.1} stroke="white" fill="white"/>
+            <Path d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z" strokeWidth={0.1} stroke="white" fill="white"/>
+            <Path d={`M ${proportionBarWidth-4} 0 Q ${proportionBarWidth-0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`} strokeWidth={0.1} stroke="white" fill="white"/>
+            <Path d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth-0.5} 19.5 ${proportionBarWidth-4} 20 L ${proportionBarWidth} 20 z`} strokeWidth={0.1} stroke="white" fill="white"/>
           </Svg>
         )}
         {/* <View style={styles.bar}></View> */}

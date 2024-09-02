@@ -121,7 +121,7 @@ export const BAUComparison = ({
 
 const styles = StyleSheet.create({
   header: {
-    // fontFamily: 'Brix Sans',
+    fontFamily: 'Brix Sans',
     fontSize: 24,
     marginBottom: 8,
   },
