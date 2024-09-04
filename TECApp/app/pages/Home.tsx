@@ -5,6 +5,8 @@ import { WelcomePopup } from '../components/WelcomePopup'
 import React, { useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Tracker } from '../components/Tracker'
+import { GlobalDashboardButton } from '../SVGs/GlobalDashboardButton'
+import {router} from "expo-router"
 
 const vw = Dimensions.get('window').width
 const vh = Dimensions.get('window').height
@@ -28,12 +30,15 @@ export default function Home () {
         <WorldMap onSelectCountry={handleRegionSelect} />
         <BottomSheet
           selectedRegion={selectedRegion}
-          onSwipeDown={() => setSelectedRegion('Global')}
           passGlobalToHome={handleGlobalEnergyChange}
         />
         <View style={mobileStyles.trackerWrapper}>
           <Tracker type="temperature" />
           <Tracker type="renewable" totalGlobalEnergy={totalGlobalEnergy} />
+        </View>
+        <View style={mobileStyles.dashboardButton}>
+        <GlobalDashboardButton onPress={()=>router.push('/pages/GlobalDashboard')}/>
+        {/* <GlobalDashboardButtonV2 /> */}
         </View>
       </GestureHandlerRootView>
     </View>
@@ -60,6 +65,13 @@ const mobileStyles = StyleSheet.create({
     left: '3%',
     display: 'flex',
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 15,
   },
+  dashboardButton:{
+    position: 'absolute',
+    top: '6.5%',
+    right: "5%",
+    // right: 0,
+  }
 })

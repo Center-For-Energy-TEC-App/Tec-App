@@ -2,7 +2,6 @@ import React, { useMemo, useEffect, useRef, useState } from 'react'
 import { View, StyleSheet } from 'react-native'
 import BottomSheetTemplate from '@gorhom/bottom-sheet'
 import { RegionalDashboard } from './RegionalDashboard'
-import { GlobalDashboard } from './GlobalDashboard'
 import {
   GraphData,
   RegionalMinMaxValues,
@@ -21,10 +20,11 @@ import {
   calculateNewGlobalOnReset,
 } from '../util/Calculations'
 import { DataPoint } from './DataVisualizations/BAUComparison'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export interface BottomSheetProps {
   selectedRegion: string
-  onSwipeDown: () => void
   passGlobalToHome: (energy: number) => void
 }
 
@@ -59,7 +59,6 @@ const regions = [
  */
 export const BottomSheet = ({
   selectedRegion,
-  onSwipeDown,
   passGlobalToHome,
 }: BottomSheetProps) => {
   const snapPoints = useMemo(() => ['12.5%', '25%', '50%', '80%'], [])
@@ -75,12 +74,9 @@ export const BottomSheet = ({
   const [initialGraphData, setInitialGraphData] = useState<GraphData>() //default graph data
   const [dynamicGraphData, setDynamicGraphData] = useState<GraphData>() //graph data based on user changes to sliders
 
-  const [initialFossilData, setInitialFossilData] = useState<DataPoint[]>() //default carbon budget graph data
   const [dynamicFossilData, setDynamicFossilData] = useState<DataPoint[]>() //carbon budget graph data based on user changes to sliders
   const [fossilReductionData, setFossilReductionData] =
     useState<FossilReductionData>() //carbon reduction data (to be applied to fossil data above)
-
-  const [totalGlobalEnergy, setTotalGlobalEnergy] = useState<number>(0)
 
   const calculateTotalGlobalEnergy = (sliderValues: RegionalValues) => {
     let totalEnergy = 0
@@ -101,6 +97,14 @@ export const BottomSheet = ({
     return totalEnergy
   }
 
+  const storeData = async (key: string, value: string) => {
+    try{
+      await AsyncStorage.setItem(key, value)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   const [calculationData, setCalculationData] =
     useState<RenewableEnergyCalculationData>() //storage of all necessary calculation data for the current region
 
@@ -113,7 +117,7 @@ export const BottomSheet = ({
 
         const globalEnergy = calculateTotalGlobalEnergy(val)
         passGlobalToHome(globalEnergy)
-        setTotalGlobalEnergy(globalEnergy)
+        storeData("global-energy", globalEnergy.toString())
       })
       .catch((error) => {
         console.error('Error fetching default values:', error)
@@ -128,11 +132,17 @@ export const BottomSheet = ({
       .then((val) => {
         setInitialGraphData(val)
         setDynamicGraphData(val)
+
+        storeData("bau-graph-data", JSON.stringify(val.global))
+        storeData("dynamic-graph-data", JSON.stringify(val.global))
+
       })
       .catch(console.error)
     getInitialFossilData().then((val) => {
-      setInitialFossilData(val)
       setDynamicFossilData(val)
+
+      storeData("bau-fossil-data", JSON.stringify(val))
+      storeData("dynamic-fossil-data", JSON.stringify(val))
     })
 
     const initialFossilReductionData = {} as FossilReductionData
@@ -156,27 +166,21 @@ export const BottomSheet = ({
         setCalculationData(val)
       })
       .catch(console.error)
-
-    if (selectedRegion === 'Global') {
-      bottomSheetRef.current?.snapToIndex(0) // Snap to 12.5% for global dashboard
-    } else {
-      bottomSheetRef.current?.snapToIndex(2) // Snap to 25% when a region is selected
-    }
+    
+      if(selectedRegion!=="Global"){
+        bottomSheetRef.current?.snapToIndex(2) // Snap to 25% when a region is selected
+      }else{
+        bottomSheetRef.current?.close()
+      }
   }, [selectedRegion])
 
   return (
     <BottomSheetTemplate
       ref={bottomSheetRef}
       snapPoints={snapPoints}
-      enablePanDownToClose
-      onClose={() => {
-        bottomSheetRef.current?.snapToIndex(0)
-        onSwipeDown()
-      }}
     >
       {dynamicSliderValues && ( //don't render regional sheet until slider values load
         <View style={styles.contentContainer}>
-          {selectedRegion !== 'Global' ? (
             <RegionalDashboard
               minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
               sliderValues={dynamicSliderValues[getAbbrv(selectedRegion)]}
@@ -197,7 +201,7 @@ export const BottomSheet = ({
                   calculateTotalGlobalEnergy(newSliderValues)
                   
                 passGlobalToHome(newGlobalEnergy)
-                setTotalGlobalEnergy(newGlobalEnergy)
+                storeData("global-energy", newGlobalEnergy.toString())
 
                 const {
                   regionalGraphData,
@@ -210,11 +214,13 @@ export const BottomSheet = ({
                     dynamicGraphData.global,
                     calculationData,
                   )
+                
                 setDynamicGraphData({
                   ...dynamicGraphData,
                   [getAbbrv(selectedRegion)]: regionalGraphData,
                   global: globalGraphData,
                 })
+                storeData("dynamic-graph-data", JSON.stringify(globalGraphData))
 
                 const newRegionFossilReductionData = calculateCarbonReductions(
                   //calculate new global carbon reduction based on new graph data
@@ -254,6 +260,8 @@ export const BottomSheet = ({
 
                 setDynamicFossilData(newFossilData)
 
+                storeData("dynamic-fossil-data", JSON.stringify(newFossilData))
+
                 setFossilReductionData({
                   ...fossilReductionData,
                   [getAbbrv(selectedRegion)]: newRegionFossilReductionData,
@@ -266,25 +274,25 @@ export const BottomSheet = ({
                   [getAbbrv(selectedRegion)]:
                     initialSliderValues[getAbbrv(selectedRegion)],
                 }
-
                 setDynamicSliderValues(newSliderValues)
 
                 const newGlobalEnergy =
                   calculateTotalGlobalEnergy(newSliderValues)
-
                 passGlobalToHome(newGlobalEnergy)
-                setTotalGlobalEnergy(newGlobalEnergy)
+                storeData("global-energy", newGlobalEnergy.toString())
 
+                const newGlobalGraphData = calculateNewGlobalOnReset(
+                  initialGraphData[getAbbrv(selectedRegion)],
+                  dynamicGraphData[getAbbrv(selectedRegion)],
+                  dynamicGraphData.global,
+                )
                 setDynamicGraphData({
                   ...dynamicGraphData,
                   [getAbbrv(selectedRegion)]:
                     initialGraphData[getAbbrv(selectedRegion)],
-                  global: calculateNewGlobalOnReset(
-                    initialGraphData[getAbbrv(selectedRegion)],
-                    dynamicGraphData[getAbbrv(selectedRegion)],
-                    dynamicGraphData.global,
-                  ),
+                  global: newGlobalGraphData,
                 })
+                storeData("dynamic-graph-data", JSON.stringify(newGlobalGraphData))
 
                 const newFossilData = JSON.parse(
                   JSON.stringify(dynamicFossilData),
@@ -293,7 +301,6 @@ export const BottomSheet = ({
                   newFossilData[i + 1].value +=
                     fossilReductionData[getAbbrv(selectedRegion)][i].value
                 }
-
                 newFossilData[7].value =
                   newFossilData[6].value > 30
                     ? newFossilData[6].value * 0.82
@@ -315,6 +322,8 @@ export const BottomSheet = ({
 
                 setDynamicFossilData(newFossilData)
 
+                storeData("dynamic-fossil-data", JSON.stringify(newFossilData))
+
                 setFossilReductionData({
                   ...fossilReductionData,
                   [getAbbrv(selectedRegion)]: [
@@ -333,19 +342,12 @@ export const BottomSheet = ({
                 calculationData.region !== getAbbrv(selectedRegion) //don't let sliders be changed until region calculation data is updated
               }
             />
-          ) : (
-            <GlobalDashboard
-              initialGraphData={initialGraphData}
-              dynamicGraphData={dynamicGraphData}
-              dynamicFossilData={dynamicFossilData}
-              initialFossilData={initialFossilData}
-              totalGlobalEnergy={totalGlobalEnergy}
-            />
-          )}
+            
         </View>
       )}
     </BottomSheetTemplate>
   )
+
 }
 
 const styles = StyleSheet.create({
@@ -356,3 +358,4 @@ const styles = StyleSheet.create({
     padding: 16,
   },
 })
+
