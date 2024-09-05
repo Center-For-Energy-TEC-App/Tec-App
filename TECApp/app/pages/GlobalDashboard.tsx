@@ -7,6 +7,9 @@ import { DataPoint } from "../components/DataVisualizations/BAUComparison"
 import DataVisualizations from "../components/DataVisualizations/DataVisualizations"
 import { GraphData, RegionData } from "../api/requests"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { ExportButton } from "../SVGs/ExportButton"
+import { FeedbackButton } from "../SVGs/FeedbackButton"
+import { LearnMoreButton } from "../SVGs/LearnMoreButton"
 
 export default function GlobalDashboard(){
     const [initialGraphData, setInitialGraphData] = useState<RegionData>()
@@ -87,6 +90,11 @@ export default function GlobalDashboard(){
                region="Global"
              />
              </>)}
+          <View style={styles.bottomButtons}>
+            <ExportButton onPress={()=>{alert("Export")}}/>
+            <FeedbackButton onPress={()=>{alert("Feedback")}}/>
+            <LearnMoreButton onPress={()=>{alert("Learn More")}}/>
+          </View>
         </ScrollView>
         </GestureHandlerRootView>
 
@@ -125,6 +133,14 @@ export default function GlobalDashboard(){
       iPadText: {
         fontSize: 18,
       },
+
+      bottomButtons: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-around",
+        width: "100%",
+        marginBottom: 50,
+      }
     })
 
    

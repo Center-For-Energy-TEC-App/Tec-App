@@ -176,10 +176,11 @@ export const BottomSheet = ({
 
   return (
     <BottomSheetTemplate
+      index={-1}
       ref={bottomSheetRef}
       snapPoints={snapPoints}
     >
-      {dynamicSliderValues && ( //don't render regional sheet until slider values load
+      {dynamicSliderValues && selectedRegion!=="Global" && ( //don't render regional sheet until slider values load
         <View style={styles.contentContainer}>
             <RegionalDashboard
               minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
