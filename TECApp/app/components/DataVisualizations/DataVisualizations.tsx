@@ -6,12 +6,14 @@ import { RegionalComparison } from './RegionalComparison'
 import { CarbonBudget } from './CarbonBudget'
 import { TechnologyComparison } from './TechnologyComparison'
 import { getAbbrv } from '../../util/ValueDictionaries'
-import { GraphData } from '../../api/requests'
+import { GraphData, RegionData } from '../../api/requests'
 
 type DataVisualizationsProps = {
   region: string
-  initialData: GraphData
-  dynamicData: GraphData
+  initialData?: GraphData
+  dynamicData?: GraphData
+  initialGlobalData?: RegionData
+  dynamicGlobalData?: RegionData
   initialFossilData?: DataPoint[]
   dynamicFossilData?: DataPoint[]
 }
@@ -19,10 +21,12 @@ const DataVisualizations = ({
   region,
   initialData,
   dynamicData,
+  initialGlobalData,
+  dynamicGlobalData,
   initialFossilData,
   dynamicFossilData,
 }: DataVisualizationsProps) => {
-  const [activeButton, setActiveButton] = useState('BAU Comparison')
+  const [activeButton, setActiveButton] = useState(region==="Global"?"Carbon Budget":'BAU Comparison')
 
   return (
     <ScrollView
@@ -31,25 +35,7 @@ const DataVisualizations = ({
     >
       <View style={styles.buttonsWrapper}>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity
-            onPress={() => setActiveButton('BAU Comparison')}
-            style={
-              activeButton === 'BAU Comparison'
-                ? styles.activeButton
-                : styles.inactiveButton
-            }
-          >
-            <Text
-              style={
-                activeButton === 'BAU Comparison'
-                  ? styles.activeButtonText
-                  : styles.inactiveButtonText
-              }
-            >
-              BAU Comparison
-            </Text>
-          </TouchableOpacity>
-          {region === 'Global' ? (
+        {region === 'Global' && (
             <TouchableOpacity
               onPress={() => setActiveButton('Carbon Budget')}
               style={
@@ -68,7 +54,26 @@ const DataVisualizations = ({
                 Carbon Budget
               </Text>
             </TouchableOpacity>
-          ) : (
+          )}
+          <TouchableOpacity
+            onPress={() => setActiveButton('BAU Comparison')}
+            style={
+              activeButton === 'BAU Comparison'
+                ? styles.activeButton
+                : styles.inactiveButton
+            }
+          >
+            <Text
+              style={
+                activeButton === 'BAU Comparison'
+                  ? styles.activeButtonText
+                  : styles.inactiveButtonText
+              }
+            >
+              BAU Comparison
+            </Text>
+          </TouchableOpacity>
+          {region!=="Global" && (
             <TouchableOpacity
               onPress={() => setActiveButton('Regional Comparison')}
               style={
@@ -111,8 +116,8 @@ const DataVisualizations = ({
       {activeButton === 'BAU Comparison' ? (
         <BAUComparison
           region={region}
-          BAUData={initialData[getAbbrv(region)]}
-          dynamicData={dynamicData[getAbbrv(region)]}
+          BAUData={initialGlobalData?initialGlobalData:initialData[getAbbrv(region)]}
+          dynamicData={dynamicGlobalData?dynamicGlobalData:dynamicData[getAbbrv(region)]}
         />
       ) : activeButton === 'Regional Comparison' ? (
         <RegionalComparison region={region} data={dynamicData} />
@@ -122,7 +127,7 @@ const DataVisualizations = ({
           dynamicData={dynamicFossilData}
         />
       ) : (
-        <TechnologyComparison data={dynamicData[getAbbrv(region)]} />
+        <TechnologyComparison data={dynamicGlobalData?dynamicGlobalData:dynamicData[getAbbrv(region)]} />
       )}
     </ScrollView>
   )
