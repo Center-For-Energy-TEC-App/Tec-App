@@ -34,6 +34,7 @@ type InitialGraphData = {
 const regions = ["global","chn","ind","mea","nam","nee","sea","eur","lam","ssa","opa"]
 
 export const getInitialGraphData = async (req: Request, res: Response, next: NextFunction) => {
+    console.log("log")
 
     let results = {global:{}, chn:{},ind: {}, mea:{}, nam:{}, nee:{}, sea:{}, eur:{}, lam:{}, ssa:{}, opa:{}} as InitialGraphData
 
@@ -85,26 +86,29 @@ type YearRange = {
     "2024-2030"?: number
 }
 
-type RawData = {
-    solar?: YearRange
-    wind?: YearRange
-    hydropower?: YearRange
-    geothermal?: YearRange
-    biomass?: YearRange
-    nuclear?: YearRange
-    coal?: YearRange
-    gas?: YearRange
-    oil?: YearRange
-    zero_carbon?: YearRange
+type ElectricityGenerationData = {
+    solar: YearRange
+    wind: YearRange
+    hydropower: YearRange
+    geothermal: YearRange
+    biomass: YearRange
+    nuclear: YearRange
 }
 
-type RenewableEnergyCalculationData = {
-    installed_capacity: RawData
-    forecast_cagr: RawData
-    forecast_growth_rate: RawData
-    capacity_factor: RawData
-    electricity_generation: RawData,
-    co2_emissions: RawData,
+type CarbonBudgetData = {
+    coal: number
+    gas: number
+    oil: number
+    zero_carbon: number
+}
+
+type CalculationData = {
+    installed_capacity: ElectricityGenerationData
+    forecast_cagr: ElectricityGenerationData
+    forecast_growth_rate: ElectricityGenerationData
+    capacity_factor: ElectricityGenerationData
+    electricity_generation: CarbonBudgetData,
+    co2_emissions: CarbonBudgetData,
     region: string
 }
 
@@ -112,9 +116,10 @@ export const getRegionCalculationData = async (req: Request, res: Response, next
     let technologies = ["solar", "wind", "biomass", "geothermal", "hydropower" , "nuclear"]
     let nonrenewables = ["coal", "gas", "oil", "zero_carbon"]
 
+
     const region = req.params.region
     
-    const results = {installed_capacity: {}, forecast_cagr: {}, forecast_growth_rate: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:region} as RenewableEnergyCalculationData
+    const results = {installed_capacity: {}, forecast_cagr: {}, forecast_growth_rate: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:region} as CalculationData
 
     //installed capacity
     const data_aggregation_installed_capacity_query = await pool.query("SELECT * FROM data_aggregation_installed_capacity WHERE region=$1 AND year=2024 AND (energy_type='Solar' OR energy_type='Wind');", [region])
@@ -123,7 +128,7 @@ export const getRegionCalculationData = async (req: Request, res: Response, next
 
     for(let i=0; i<installed_capacity_rows.length; i++){
         const techKey = technologies[i] as keyof typeof results.installed_capacity
-        results.installed_capacity[techKey] = {"2024": installed_capacity_rows[i].value}
+        results.installed_capacity[techKey] = {"2024": parseFloat(installed_capacity_rows[i].value)}
     }
     
     technologies = ["solar", "wind","hydropower", "geothermal", "biomass",  "nuclear"]  //query order is different from here on
@@ -131,7 +136,7 @@ export const getRegionCalculationData = async (req: Request, res: Response, next
     const forecast_cagr_query = await pool.query("SELECT * FROM secondary_calculations_forecast_cagr WHERE region=$1", [region])
     for(let i = 0; i<forecast_cagr_query.rows.length; i++){
         const techKey = technologies[i] as keyof typeof results.forecast_cagr
-        results.forecast_cagr[techKey] = {"2024-2030": forecast_cagr_query.rows[i].value}
+        results.forecast_cagr[techKey] = {"2024-2030": parseFloat(forecast_cagr_query.rows[i].value)}
     }
 
     //forecast_growth_rate
@@ -140,8 +145,8 @@ export const getRegionCalculationData = async (req: Request, res: Response, next
         const techKey = technologies[Math.floor(i/6)] as keyof typeof results.forecast_growth_rate
         const yearKey = forecast_growth_rate_query.rows[i].year
         results.forecast_growth_rate[techKey] = results.forecast_growth_rate[techKey]?
-            {...results.forecast_growth_rate[techKey], [yearKey]:forecast_growth_rate_query.rows[i].value}: 
-            {[yearKey]:forecast_growth_rate_query.rows[i].value}
+            {...results.forecast_growth_rate[techKey], [yearKey]:parseFloat(forecast_growth_rate_query.rows[i].value)}: 
+            {[yearKey]:parseFloat(forecast_growth_rate_query.rows[i].value)}
     }
 
     //capacity_factor
@@ -150,30 +155,24 @@ export const getRegionCalculationData = async (req: Request, res: Response, next
         const techKey = technologies[Math.floor(i/7)] as keyof typeof results.capacity_factor
         const yearKey = capacity_factor_query.rows[i].year
         results.capacity_factor[techKey] = results.capacity_factor[techKey]?
-            {...results.capacity_factor[techKey], [yearKey]:capacity_factor_query.rows[i].value}:
-            {[yearKey]:capacity_factor_query.rows[i].value}
+            {...results.capacity_factor[techKey], [yearKey]:parseFloat(capacity_factor_query.rows[i].value)}:
+            {[yearKey]:parseFloat(capacity_factor_query.rows[i].value)}
     }
 
     //electricity_generation
-    const transpose_electricity_generation_query = await pool.query("SELECT * FROM transpose_electricity_generation WHERE region=$1 AND year>=2025 AND (energy_type='coal_fired' OR energy_type='gas_fired' OR energy_type='oil_fired');", [region])
-    const data_aggregation_total_zero_carbon_query = await pool.query("SELECT * FROM data_aggregation_electricity_generation WHERE region=$1 AND year>=2025 AND energy_type='Total Zero-Carbon';", [region])
+    const transpose_electricity_generation_query = await pool.query("SELECT * FROM transpose_electricity_generation WHERE region=$1 AND year=2030 AND (energy_type='coal_fired' OR energy_type='gas_fired' OR energy_type='oil_fired');", [region])
+    const data_aggregation_total_zero_carbon_query = await pool.query("SELECT * FROM data_aggregation_electricity_generation WHERE region=$1 AND year=2030 AND energy_type='Total Zero-Carbon';", [region])
     const electricity_generation_query = transpose_electricity_generation_query.rows.concat(data_aggregation_total_zero_carbon_query.rows)
     for(let i = 0; i<electricity_generation_query.length; i++){
-        const nonrenewableKey = nonrenewables[Math.floor(i/6)] as keyof typeof results.electricity_generation
-        const yearKey = electricity_generation_query[i].year
-        results.electricity_generation[nonrenewableKey] = results.electricity_generation[nonrenewableKey]?
-            {...results.electricity_generation[nonrenewableKey], [yearKey]:electricity_generation_query[i].value}:
-            {[yearKey]:electricity_generation_query[i].value}
+        const nonrenewableKey = nonrenewables[i] as keyof typeof results.electricity_generation
+        results.electricity_generation[nonrenewableKey] = parseFloat(electricity_generation_query[i].value)
     }
-    
+
     //co2 emissions
-    const co2_emissions_query = await pool.query("SELECT * FROM transpose_co2_emissions WHERE region=$1 AND year>=2025 AND (energy_type='coal' OR energy_type='natural_gas' OR energy_type='oil')", [region])
+    const co2_emissions_query = await pool.query("SELECT * FROM transpose_co2_emissions WHERE region=$1 AND year>=203-0 AND (energy_type='coal' OR energy_type='natural_gas' OR energy_type='oil')", [region])
     for(let i = 0; i<co2_emissions_query.rows.length; i++){
-        const nonrenewableKey = nonrenewables[Math.floor(i/6)] as keyof typeof results.co2_emissions
-        const yearKey = co2_emissions_query.rows[i].year
-        results.co2_emissions[nonrenewableKey] = results.co2_emissions[nonrenewableKey]?
-            {...results.co2_emissions[nonrenewableKey], [yearKey]:co2_emissions_query.rows[i].value}:
-            {[yearKey]:co2_emissions_query.rows[i].value}
+        const nonrenewableKey = nonrenewables[i] as keyof typeof results.co2_emissions
+        results.co2_emissions[nonrenewableKey] = parseFloat(co2_emissions_query.rows[i].value)
     }
 
     if(results!==null){
@@ -182,26 +181,6 @@ export const getRegionCalculationData = async (req: Request, res: Response, next
         res.status(400)
     }
 }
-
-export const getInitialFossilData = async (req: Request, res: Response, next: NextFunction) => {
-    let results = []
-    const query = await pool.query("SELECT * FROM fossil_emissions_data WHERE region='global' AND year>=2024")
-    let yearCount = 2024
-    for(const row of query.rows){
-        results.push({year: yearCount, value: parseFloat(row.value)})
-        yearCount++
-    }
-    results.push({year: 2040, value: results[6].value>30?results[6].value*0.82:results[6].value>=25?results[6].value*0.71:results[6].value*0.6})
-    results.push({year: 2050, value: results[6].value>30?results[7].value*0.71:results[6].value>=25?results[7].value*0.58:results[7].value*0.5})
-    results.push({year: 2060, value: results[6].value>30?results[8].value*0.542:results[6].value>=25?results[8].value*0.436:results[8].value*0.33})
-
-    if(results!==null){
-        res.status(200).json(results)
-    }else{
-        res.status(400)
-    }
-}
-
 
 /*
 -Initial all region graph data stored in db

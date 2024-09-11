@@ -1,4 +1,5 @@
-import { RegionData, RenewableEnergyCalculationData } from '../api/requests'
+import { RegionData, CalculationData } from '../api/requests'
+import { DataPoint } from '../components/DataVisualizations/BAUComparison'
 import { getElectricityGenerationCoal } from './ValueDictionaries'
 
 export const calculateEnergyCurve = (
@@ -6,7 +7,7 @@ export const calculateEnergyCurve = (
   technologyChanged: string,
   regionGraphData: RegionData,
   globalGraphData: RegionData,
-  calculationData: RenewableEnergyCalculationData,
+  calculationData: CalculationData,
 ) => {
   const installed_capacity =
     calculationData.installed_capacity[technologyChanged]['2024']
@@ -22,7 +23,7 @@ export const calculateEnergyCurve = (
   const climate_path_growth_rate = {}
   for (let i = 2025; i <= 2030; i++) {
     climate_path_growth_rate[i] =
-      parseFloat(forecast_growth_rate[i]) + climate_path_minus_forecast
+      forecast_growth_rate[i] + climate_path_minus_forecast
   }
 
   const newRegionTechnology = []
@@ -71,21 +72,20 @@ export const calculateEnergyCurve = (
 
 export const calculateCarbonReductions = (
   region: string,
-  calculationData: RenewableEnergyCalculationData,
+  calculationData: CalculationData,
   regionData: RegionData,
+  currFossilReduction: number,
+  fossilData: DataPoint[]
 ) => {
   const electricity_generation = calculationData.electricity_generation
   const co2_emissions = calculationData.co2_emissions
 
-  const reduction_fossil_energy = []
-  for (let i = 2025; i <= 2030; i++) {
-    const climate_path_additional_electricity_gen =
-      regionData.total[i - 2024].value -
-      electricity_generation.zero_carbon[i] * 0.001
-    const dnv_forecast =
-      parseFloat(electricity_generation.oil[i]) /
-      (parseFloat(electricity_generation.oil[i]) +
-        parseFloat(electricity_generation.gas[i]))
+  const climate_path_additional_electricity_gen =
+      regionData.total[regionData.total.length-1].value -
+      electricity_generation.zero_carbon * 0.001
+
+
+    const dnv_forecast = electricity_generation.oil / (electricity_generation.oil + electricity_generation.gas)
 
     const additional_electricity_gen_coal = getElectricityGenerationCoal(region)
     const additional_electricity_gen_oil =
@@ -101,28 +101,38 @@ export const calculateCarbonReductions = (
       climate_path_additional_electricity_gen * additional_electricity_gen_oil
 
     const reduction_electricity_gen_coal =
-      displaced_electricity_coal / (electricity_generation.coal[i] * 0.001)
+      displaced_electricity_coal / (electricity_generation.coal * 0.001)
     const reduction_electricity_gen_oil =
-      displaced_electricity_oil / (electricity_generation.oil[i] * 0.001)
+      displaced_electricity_oil / (electricity_generation.oil * 0.001)
     const reduction_electricity_gen_gas =
-      displaced_electricity_gas / (electricity_generation.gas[i] * 0.001)
+      displaced_electricity_gas / (electricity_generation.gas * 0.001)
 
     const reduction_fossil_energy_coal =
-      reduction_electricity_gen_coal * co2_emissions.coal[i]
+      reduction_electricity_gen_coal * co2_emissions.coal
     const reduction_fossil_energy_oil =
-      reduction_electricity_gen_oil * co2_emissions.oil[i]
+      reduction_electricity_gen_oil * co2_emissions.oil
     const reduction_fossil_energy_gas =
-      reduction_electricity_gen_gas * co2_emissions.gas[i]
-    reduction_fossil_energy.push({
-      year: i,
-      value:
-        reduction_fossil_energy_coal +
-        reduction_fossil_energy_oil +
-        reduction_fossil_energy_gas,
-    })
-  }
+      reduction_electricity_gen_gas * co2_emissions.gas
 
-  return reduction_fossil_energy
+    const fossilReduction = reduction_fossil_energy_coal + reduction_fossil_energy_oil + reduction_fossil_energy_gas
+
+    const newFossilData = calculateCarbonCurve(fossilReduction-currFossilReduction, fossilData)
+    console.log(newFossilData)
+
+    return {newFossilReduction: fossilReduction, newFossilData: newFossilData}
+  
+}
+
+export const calculateCarbonCurve = (deltaFossilReduction: number, fossilData: DataPoint[]) =>{
+  fossilData[1].value -= deltaFossilReduction
+  fossilData[2].value = fossilData[1].value<=26?(14.72+((fossilData[1].value-20)/6)*3.97):(18.69+((fossilData[1].value-26)/5.6)*10.71)
+  fossilData[3].value = fossilData[1].value<=26?(12+((fossilData[1].value-20)/6)*1.25):(13.25+((fossilData[1].value-26)/5.6)*12.65)
+  fossilData[4].value = fossilData[1].value<=26?(8.96+((fossilData[1].value-20)/6)*0.64):(9.6+((fossilData[1].value-26)/5.6)*12.5)
+  fossilData[5].value = fossilData[1].value<=26?(6+((fossilData[1].value-20)/6)*1.31):(7.31+((fossilData[1].value-26)/5.6)*11.09)
+  fossilData[6].value = fossilData[1].value<=26?(3.62+((fossilData[1].value-20)/6)*1.68):(5.3+((fossilData[1].value-26)/5.6)*9.7)
+  fossilData[7].value = fossilData[1].value<=26?(2+((fossilData[1].value-20)/6)*1.56):(3.56+((fossilData[1].value-26)/5.6)*6.44)
+  
+  return fossilData
 }
 
 const technologies = [

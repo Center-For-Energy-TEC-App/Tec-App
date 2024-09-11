@@ -3,7 +3,7 @@ import "dotenv/config"
 import { getAllDefaultValues, getMinMaxValues } from "./src/AllocationDefaults"
 import Pool from "pg"
 import cors from "cors"
-import { getInitialFossilData, getInitialGraphData, getRegionCalculationData } from "./src/GraphData"
+import { getInitialGraphData, getRegionCalculationData } from "./src/GraphData"
 
 const app = express()
 const port = process.env.LOCAL_PORT
@@ -35,8 +35,6 @@ router.get('/minmax', getMinMaxValues)
 router.get('/initgraph', getInitialGraphData)
 
 router.get('/calc/:region', getRegionCalculationData)
-
-router.get('/fossil-emissions', getInitialFossilData)
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)

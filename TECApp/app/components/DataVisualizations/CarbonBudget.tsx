@@ -22,10 +22,10 @@ const offset = 20
 const graphWidth = vw * 0.8
 const leftMargin = 60
 
-const dummy1Point5Limit = 100
-const dummy2Point0Limit = 148
+const dummy1Point5Limit = 50
+const dummy2Point0Limit = 70
 
-const xMin = 2024
+const xMin = 2025
 const xMax = 2060
 
 type DataPoint = {

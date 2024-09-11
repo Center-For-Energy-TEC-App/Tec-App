@@ -126,26 +126,29 @@ type YearRange = {
   '2024-2030'?: number
 }
 
-type RawData = {
-  solar?: YearRange
-  wind?: YearRange
-  hydropower?: YearRange
-  geothermal?: YearRange
-  biomass?: YearRange
-  nuclear?: YearRange
-  coal?: YearRange
-  gas?: YearRange
-  oil?: YearRange
-  zero_carbon?: YearRange
+type ElectricityGenerationData = {
+  solar: YearRange
+  wind: YearRange
+  hydropower: YearRange
+  geothermal: YearRange
+  biomass: YearRange
+  nuclear: YearRange
 }
 
-export type RenewableEnergyCalculationData = {
-  installed_capacity: RawData
-  forecast_cagr: RawData
-  forecast_growth_rate: RawData
-  capacity_factor: RawData
-  electricity_generation: RawData
-  co2_emissions: RawData
+type CarbonBudgetData = {
+  coal: number
+  gas: number
+  oil: number
+  zero_carbon: number
+}
+
+export type CalculationData = {
+  installed_capacity: ElectricityGenerationData
+  forecast_cagr: ElectricityGenerationData
+  forecast_growth_rate: ElectricityGenerationData
+  capacity_factor: ElectricityGenerationData
+  electricity_generation: CarbonBudgetData,
+  co2_emissions: CarbonBudgetData,
   region: string
 }
 
@@ -155,12 +158,5 @@ export type RenewableEnergyCalculationData = {
  */
 export async function getRegionCalculationData(region: string) {
   const response = await fetch(BASE_URL + `/calc/${region}`, { method: 'GET' })
-  return (await response.json()) as RenewableEnergyCalculationData
-}
-
-export async function getInitialFossilData() {
-  const response = await fetch(BASE_URL + '/fossil-emissions', {
-    method: 'GET',
-  })
-  return (await response.json()) as DataPoint[]
+  return (await response.json()) as CalculationData
 }
