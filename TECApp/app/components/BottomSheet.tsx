@@ -110,8 +110,8 @@ export const BottomSheet = ({
 
   const initializeFossilData = () => {
     let initialFossilData = []
-    initialFossilData.push({year: 2025, value: 33.3})
-    initialFossilData.push({year: 2030, value: 31.6})
+    initialFossilData.push({year: 2025, value: 33.3+3.82+5.0-0.1})
+    initialFossilData.push({year: 2030, value: 31.6+3.82+5.0-0.2})
     for(let i = 2035; i<=2060; i+=5){
       initialFossilData.push({year: i, value: 0})
     }
