@@ -87,6 +87,7 @@ export const calculateCarbonReductions = (
 
     const dnv_forecast = electricity_generation.oil / (electricity_generation.oil + electricity_generation.gas)
 
+
     const additional_electricity_gen_coal = getElectricityGenerationCoal(region)
     const additional_electricity_gen_oil =
       dnv_forecast * (1 - additional_electricity_gen_coal)
@@ -100,12 +101,15 @@ export const calculateCarbonReductions = (
     const displaced_electricity_oil =
       climate_path_additional_electricity_gen * additional_electricity_gen_oil
 
+
+
     const reduction_electricity_gen_coal =
       displaced_electricity_coal / (electricity_generation.coal * 0.001)
     const reduction_electricity_gen_oil =
       displaced_electricity_oil / (electricity_generation.oil * 0.001)
     const reduction_electricity_gen_gas =
       displaced_electricity_gas / (electricity_generation.gas * 0.001)
+      
 
     const reduction_fossil_energy_coal =
       reduction_electricity_gen_coal * co2_emissions.coal
@@ -115,7 +119,7 @@ export const calculateCarbonReductions = (
       reduction_electricity_gen_gas * co2_emissions.gas
 
     const fossilReduction = reduction_fossil_energy_coal + reduction_fossil_energy_oil + reduction_fossil_energy_gas
-
+console.log(fossilReduction)
     const newFossilData = calculateCarbonCurve(fossilReduction-currFossilReduction, fossilData)
     console.log(newFossilData)
 

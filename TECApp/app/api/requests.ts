@@ -1,6 +1,6 @@
 import { DataPoint } from '../components/DataVisualizations/BAUComparison'
 
-const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL
+const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || "http://localhost:3001"
 
 export type DefaultValues = {
   region: string

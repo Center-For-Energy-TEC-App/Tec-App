@@ -34,7 +34,6 @@ type InitialGraphData = {
 const regions = ["global","chn","ind","mea","nam","nee","sea","eur","lam","ssa","opa"]
 
 export const getInitialGraphData = async (req: Request, res: Response, next: NextFunction) => {
-    console.log("log")
 
     let results = {global:{}, chn:{},ind: {}, mea:{}, nam:{}, nee:{}, sea:{}, eur:{}, lam:{}, ssa:{}, opa:{}} as InitialGraphData
 
@@ -169,7 +168,7 @@ export const getRegionCalculationData = async (req: Request, res: Response, next
     }
 
     //co2 emissions
-    const co2_emissions_query = await pool.query("SELECT * FROM transpose_co2_emissions WHERE region=$1 AND year>=203-0 AND (energy_type='coal' OR energy_type='natural_gas' OR energy_type='oil')", [region])
+    const co2_emissions_query = await pool.query("SELECT * FROM transpose_co2_emissions WHERE region=$1 AND year=2030 AND (energy_type='coal' OR energy_type='natural_gas' OR energy_type='oil')", [region])
     for(let i = 0; i<co2_emissions_query.rows.length; i++){
         const nonrenewableKey = nonrenewables[i] as keyof typeof results.co2_emissions
         results.co2_emissions[nonrenewableKey] = parseFloat(co2_emissions_query.rows[i].value)
