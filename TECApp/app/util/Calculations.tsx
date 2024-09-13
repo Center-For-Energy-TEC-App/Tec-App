@@ -129,13 +129,15 @@ console.log(fossilReduction)
 
 export const calculateCarbonCurve = (deltaFossilReduction: number, fossilData: DataPoint[]) =>{
   fossilData[1].value -= deltaFossilReduction
-  const rawValue = fossilData[1].value - (3.82+5.0-0.2)
-  fossilData[2].value = (rawValue<=26?(14.72+((rawValue-20)/6)*3.97):(18.69+((rawValue-26)/5.6)*10.71))+3.69+4.5-0.4
-  fossilData[3].value = (rawValue<=26?(12+((rawValue-20)/6)*1.25):(13.25+((rawValue-26)/5.6)*12.65))+3.63+3.8-0.6
-  fossilData[4].value = (rawValue<=26?(8.96+((rawValue-20)/6)*0.64):(9.6+((rawValue-26)/5.6)*12.5))+3.38+3.2-0.9
-  fossilData[5].value = (rawValue<=26?(6+((rawValue-20)/6)*1.31):(7.31+((rawValue-26)/5.6)*11.09))+3.05+2.5-1.3
-  fossilData[6].value = (rawValue<=26?(3.62+((rawValue-20)/6)*1.68):(5.3+((rawValue-26)/5.6)*9.7))+2.8+1.7-2.0
-  fossilData[7].value = (rawValue<=26?(2+((rawValue-20)/6)*1.56):(3.56+((rawValue-26)/5.6)*6.44))+2.5+1.2-3.0
+  //for calculations below: all numbers come from B14:I17 section of the Emission.Budget tab of TEC sheet
+  //all the ternary statements are extrapolations based on the 2030 value (also pulled from the TEC sheet)
+  const rawValue = fossilData[1].value - (3.82+5.0-0.2) 
+  fossilData[2].value = (rawValue<=26?(14.72+((rawValue-20)/6)*3.97):(18.69+((rawValue-26)/5.6)*10.71))+(3.69+4.5-0.4)
+  fossilData[3].value = (rawValue<=26?(12+((rawValue-20)/6)*1.25):(13.25+((rawValue-26)/5.6)*12.65))+(3.63+3.8-0.6)
+  fossilData[4].value = (rawValue<=26?(8.96+((rawValue-20)/6)*0.64):(9.6+((rawValue-26)/5.6)*12.5))+(3.38+3.2-0.9)
+  fossilData[5].value = (rawValue<=26?(6+((rawValue-20)/6)*1.31):(7.31+((rawValue-26)/5.6)*11.09))+(3.05+2.5-1.3)
+  fossilData[6].value = (rawValue<=26?(3.62+((rawValue-20)/6)*1.68):(5.3+((rawValue-26)/5.6)*9.7))+(2.8+1.7-2.0)
+  fossilData[7].value = (rawValue<=26?(2+((rawValue-20)/6)*1.56):(3.56+((rawValue-26)/5.6)*6.44))+(2.5+1.2-3.0)
   
   return fossilData
 }
