@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "AwesomeProject",
+    "name": "Triton Energy Climate",
     "slug": "AwesomeProject",
     "scheme": "tec-app",
     "version": "1.0.0",
@@ -16,7 +16,7 @@
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "com.AwesomeProject",
+      "bundleIdentifier": "com.CER.TECApp",
       "supportsTablet": true
     },
     "android": {
@@ -33,7 +33,12 @@
         "projectId": "34278a3e-ba24-4041-81dc-9c190a29c4b4"
       }
     },
-    "plugins": [
-    ]
+    "plugins": [],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/34278a3e-ba24-4041-81dc-9c190a29c4b4"
+    }
   }
 }
