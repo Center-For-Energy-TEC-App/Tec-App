@@ -1,28 +1,24 @@
-import React, { useEffect } from "react"
-import { Redirect } from "expo-router"
-import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
+import React, { useEffect } from 'react'
+import { Redirect } from 'expo-router'
+import { useFonts } from 'expo-font'
+import * as SplashScreen from 'expo-splash-screen'
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync()
 
 export default function App() {
   const [loaded, error] = useFonts({
     'Brix Sans': require('../assets/fonts/BrixSans.otf'),
-  });
+  })
 
   useEffect(() => {
     if (loaded || error) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync()
     }
-  }, [loaded, error]);
+  }, [loaded, error])
 
   if (!loaded && !error) {
-    return null;
+    return null
   }
 
-  return (
-      <Redirect href="/pages/Home" />
-  )
+  return <Redirect href="/pages/Home" />
 }
-
-

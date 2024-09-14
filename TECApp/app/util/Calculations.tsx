@@ -75,128 +75,170 @@ export const calculateCarbonReductions = (
   calculationData: CalculationData,
   regionData: RegionData,
   currFossilReduction: number,
-  fossilData: DataPoint[]
+  fossilData: DataPoint[],
 ) => {
   const electricity_generation = calculationData.electricity_generation
   const co2_emissions = calculationData.co2_emissions
 
   const climate_path_additional_electricity_gen =
-      regionData.total[regionData.total.length-1].value -
-      electricity_generation.zero_carbon * 0.001
+    regionData.total[regionData.total.length - 1].value -
+    electricity_generation.zero_carbon * 0.001
 
+  const dnv_forecast =
+    electricity_generation.oil /
+    (electricity_generation.oil + electricity_generation.gas)
 
-    const dnv_forecast = electricity_generation.oil / (electricity_generation.oil + electricity_generation.gas)
+  const additional_electricity_gen_coal = getElectricityGenerationCoal(region)
+  const additional_electricity_gen_oil =
+    dnv_forecast * (1 - additional_electricity_gen_coal)
+  const additional_electricity_gen_gas =
+    1 - (additional_electricity_gen_coal - additional_electricity_gen_oil)
 
+  const displaced_electricity_coal =
+    climate_path_additional_electricity_gen * additional_electricity_gen_coal
+  const displaced_electricity_gas =
+    climate_path_additional_electricity_gen * additional_electricity_gen_gas
+  const displaced_electricity_oil =
+    climate_path_additional_electricity_gen * additional_electricity_gen_oil
 
-    const additional_electricity_gen_coal = getElectricityGenerationCoal(region)
-    const additional_electricity_gen_oil =
-      dnv_forecast * (1 - additional_electricity_gen_coal)
-    const additional_electricity_gen_gas =
-      1 - (additional_electricity_gen_coal - additional_electricity_gen_oil)
+  const reduction_electricity_gen_coal =
+    displaced_electricity_coal / (electricity_generation.coal * 0.001)
+  const reduction_electricity_gen_oil =
+    displaced_electricity_oil / (electricity_generation.oil * 0.001)
+  const reduction_electricity_gen_gas =
+    displaced_electricity_gas / (electricity_generation.gas * 0.001)
 
-    const displaced_electricity_coal =
-      climate_path_additional_electricity_gen * additional_electricity_gen_coal
-    const displaced_electricity_gas =
-      climate_path_additional_electricity_gen * additional_electricity_gen_gas
-    const displaced_electricity_oil =
-      climate_path_additional_electricity_gen * additional_electricity_gen_oil
+  const reduction_fossil_energy_coal =
+    reduction_electricity_gen_coal * co2_emissions.coal
+  const reduction_fossil_energy_oil =
+    reduction_electricity_gen_oil * co2_emissions.oil
+  const reduction_fossil_energy_gas =
+    reduction_electricity_gen_gas * co2_emissions.gas
 
+  const fossilReduction =
+    reduction_fossil_energy_coal +
+    reduction_fossil_energy_oil +
+    reduction_fossil_energy_gas
+  const newFossilData = calculateCarbonCurve(
+    fossilReduction - currFossilReduction,
+    fossilData,
+  )
 
-
-    const reduction_electricity_gen_coal =
-      displaced_electricity_coal / (electricity_generation.coal * 0.001)
-    const reduction_electricity_gen_oil =
-      displaced_electricity_oil / (electricity_generation.oil * 0.001)
-    const reduction_electricity_gen_gas =
-      displaced_electricity_gas / (electricity_generation.gas * 0.001)
-      
-
-    const reduction_fossil_energy_coal =
-      reduction_electricity_gen_coal * co2_emissions.coal
-    const reduction_fossil_energy_oil =
-      reduction_electricity_gen_oil * co2_emissions.oil
-    const reduction_fossil_energy_gas =
-      reduction_electricity_gen_gas * co2_emissions.gas
-
-    const fossilReduction = reduction_fossil_energy_coal + reduction_fossil_energy_oil + reduction_fossil_energy_gas
-    const newFossilData = calculateCarbonCurve(fossilReduction-currFossilReduction, fossilData)
-
-    return {newFossilReduction: fossilReduction, newFossilData: newFossilData}
-  
+  return { newFossilReduction: fossilReduction, newFossilData: newFossilData }
 }
 
-export const calculateCarbonCurve = (deltaFossilReduction: number, fossilData: DataPoint[]) =>{
+export const calculateCarbonCurve = (
+  deltaFossilReduction: number,
+  fossilData: DataPoint[],
+) => {
   fossilData[1].value -= deltaFossilReduction
   //for calculations below: all numbers come from B14:I17 section of the Emission.Budget tab of TEC sheet
   //all the ternary statements are extrapolations based on the 2030 value (also pulled from the TEC sheet)
-  const rawValue = fossilData[1].value - (3.82+5.0-0.2) 
-  fossilData[2].value = (rawValue<=26?(14.72+((rawValue-20)/6)*3.97):(18.69+((rawValue-26)/5.6)*10.71))+(3.69+4.5-0.4)
-  fossilData[3].value = (rawValue<=26?(12+((rawValue-20)/6)*1.25):(13.25+((rawValue-26)/5.6)*12.65))+(3.63+3.8-0.6)
-  fossilData[4].value = (rawValue<=26?(8.96+((rawValue-20)/6)*0.64):(9.6+((rawValue-26)/5.6)*12.5))+(3.38+3.2-0.9)
-  fossilData[5].value = (rawValue<=26?(6+((rawValue-20)/6)*1.31):(7.31+((rawValue-26)/5.6)*11.09))+(3.05+2.5-1.3)
-  fossilData[6].value = (rawValue<=26?(3.62+((rawValue-20)/6)*1.68):(5.3+((rawValue-26)/5.6)*9.7))+(2.8+1.7-2.0)
-  fossilData[7].value = (rawValue<=26?(2+((rawValue-20)/6)*1.56):(3.56+((rawValue-26)/5.6)*6.44))+(2.5+1.2-3.0)
-  
+  const rawValue = fossilData[1].value - (3.82 + 5.0 - 0.2)
+  fossilData[2].value =
+    (rawValue <= 26
+      ? 14.72 + ((rawValue - 20) / 6) * 3.97
+      : 18.69 + ((rawValue - 26) / 5.6) * 10.71) +
+    (3.69 + 4.5 - 0.4)
+  fossilData[3].value =
+    (rawValue <= 26
+      ? 12 + ((rawValue - 20) / 6) * 1.25
+      : 13.25 + ((rawValue - 26) / 5.6) * 12.65) +
+    (3.63 + 3.8 - 0.6)
+  fossilData[4].value =
+    (rawValue <= 26
+      ? 8.96 + ((rawValue - 20) / 6) * 0.64
+      : 9.6 + ((rawValue - 26) / 5.6) * 12.5) +
+    (3.38 + 3.2 - 0.9)
+  fossilData[5].value =
+    (rawValue <= 26
+      ? 6 + ((rawValue - 20) / 6) * 1.31
+      : 7.31 + ((rawValue - 26) / 5.6) * 11.09) +
+    (3.05 + 2.5 - 1.3)
+  fossilData[6].value =
+    (rawValue <= 26
+      ? 3.62 + ((rawValue - 20) / 6) * 1.68
+      : 5.3 + ((rawValue - 26) / 5.6) * 9.7) +
+    (2.8 + 1.7 - 2.0)
+  fossilData[7].value =
+    (rawValue <= 26
+      ? 2 + ((rawValue - 20) / 6) * 1.56
+      : 3.56 + ((rawValue - 26) / 5.6) * 6.44) +
+    (2.5 + 1.2 - 3.0)
+
   return fossilData
 }
 
 export const calculateTemperature = (fossilData: DataPoint[]) => {
-  const cumulativeEmmissions2025To2060 = {2025: 0}
+  const cumulativeEmmissions2025To2060 = { 2025: 0 }
   let currTotal = 0
-  for(let i = 0; i<fossilData.length-1; i++){
-    cumulativeEmmissions2025To2060[2030+i*5] = ((fossilData[i].value+fossilData[i+1].value)/2)*5 + currTotal
-    currTotal=cumulativeEmmissions2025To2060[2030+i*5]
+  for (let i = 0; i < fossilData.length - 1; i++) {
+    cumulativeEmmissions2025To2060[2030 + i * 5] =
+      ((fossilData[i].value + fossilData[i + 1].value) / 2) * 5 + currTotal
+    currTotal = cumulativeEmmissions2025To2060[2030 + i * 5]
   }
   console.log(cumulativeEmmissions2025To2060)
 
   let onePointFiveYear = 0
   let onePointEightYear = 0
-  let twoPointZeroYear =0 
-  for(let i = 2026; i<=2060; i++){
-    const current = 200 + cumulativeEmmissions2025To2060[i-(i-2025)%5]
-    const next = 200 + cumulativeEmmissions2025To2060[i+5-(i-2025)%5]
-    const currentValue=i%5==0?current:current+(i%5*(next-current))/5
-    console.log(850-currentValue)
+  let twoPointZeroYear = 0
+  for (let i = 2026; i <= 2060; i++) {
+    const current = 200 + cumulativeEmmissions2025To2060[i - ((i - 2025) % 5)]
+    const next = 200 + cumulativeEmmissions2025To2060[i + 5 - ((i - 2025) % 5)]
+    const currentValue =
+      i % 5 == 0 ? current : current + ((i % 5) * (next - current)) / 5
+    console.log(850 - currentValue)
 
-    if(400-currentValue<0 && !onePointFiveYear){
-      onePointFiveYear = i-1
+    if (400 - currentValue < 0 && !onePointFiveYear) {
+      onePointFiveYear = i - 1
     }
-    if(850-currentValue<0 && !onePointEightYear){
-      onePointEightYear = i-1
+    if (850 - currentValue < 0 && !onePointEightYear) {
+      onePointEightYear = i - 1
     }
-    if(1150-currentValue<0 && !twoPointZeroYear){
-      twoPointZeroYear = i-1
+    if (1150 - currentValue < 0 && !twoPointZeroYear) {
+      twoPointZeroYear = i - 1
     }
-    if(onePointFiveYear && onePointEightYear && twoPointZeroYear){
+    if (onePointFiveYear && onePointEightYear && twoPointZeroYear) {
       break
     }
   }
-  if(!twoPointZeroYear) twoPointZeroYear = 2060
+  if (!twoPointZeroYear) twoPointZeroYear = 2060
 
-  const IPCC50thPercentile = [150, 350, 500, 650, 850, 1000, 1200, 1350, 1500, 1700, 1850, 2050]
-  const IPCC83rdPercentile = [50, 200, 300, 400, 550, 650, 800, 900, 1050, 1150, 1250, 1400]
+  const IPCC50thPercentile = [
+    150, 350, 500, 650, 850, 1000, 1200, 1350, 1500, 1700, 1850, 2050,
+  ]
+  const IPCC83rdPercentile = [
+    50, 200, 300, 400, 550, 650, 800, 900, 1050, 1150, 1250, 1400,
+  ]
   let lowerBound2035 = 0
   let upperBound2035 = 0
-  const constant2035 = 200+cumulativeEmmissions2025To2060[2035]
+  const constant2035 = 200 + cumulativeEmmissions2025To2060[2035]
   let lowerBound2050 = 0
   let upperBound2050 = 0
-  const constant2050 = 200+cumulativeEmmissions2025To2060[2050]
-  for(let i = 0; i<12; i++){
-    if(IPCC50thPercentile[i]-constant2035>0 && !lowerBound2035){
-      lowerBound2035 = 1.3+(i/10)
+  const constant2050 = 200 + cumulativeEmmissions2025To2060[2050]
+  for (let i = 0; i < 12; i++) {
+    if (IPCC50thPercentile[i] - constant2035 > 0 && !lowerBound2035) {
+      lowerBound2035 = 1.3 + i / 10
     }
-    if(IPCC83rdPercentile[i]-constant2035>0 && !upperBound2035){
-      upperBound2035 = 1.3+(i/10)
+    if (IPCC83rdPercentile[i] - constant2035 > 0 && !upperBound2035) {
+      upperBound2035 = 1.3 + i / 10
     }
-    if(IPCC50thPercentile[i]-constant2050>0 && !lowerBound2050){
-      lowerBound2050 = 1.3+(i/10)
+    if (IPCC50thPercentile[i] - constant2050 > 0 && !lowerBound2050) {
+      lowerBound2050 = 1.3 + i / 10
     }
-    if(IPCC83rdPercentile[i]-constant2050>0 && !upperBound2050){
-      upperBound2050 = 1.3+(i/10)
+    if (IPCC83rdPercentile[i] - constant2050 > 0 && !upperBound2050) {
+      upperBound2050 = 1.3 + i / 10
     }
   }
-  console.log(onePointFiveYear, onePointEightYear, twoPointZeroYear, lowerBound2035, upperBound2035, lowerBound2050, upperBound2050)
-
+  console.log(
+    onePointFiveYear,
+    onePointEightYear,
+    twoPointZeroYear,
+    lowerBound2035,
+    upperBound2035,
+    lowerBound2050,
+    upperBound2050,
+  )
 }
 
 const technologies = [

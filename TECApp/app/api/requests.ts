@@ -1,6 +1,6 @@
 import { DataPoint } from '../components/DataVisualizations/BAUComparison'
 
-const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || "http://localhost:3001"
+const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3001'
 
 export type DefaultValues = {
   region: string
@@ -147,8 +147,8 @@ export type CalculationData = {
   forecast_cagr: ElectricityGenerationData
   forecast_growth_rate: ElectricityGenerationData
   capacity_factor: ElectricityGenerationData
-  electricity_generation: CarbonBudgetData,
-  co2_emissions: CarbonBudgetData,
+  electricity_generation: CarbonBudgetData
+  co2_emissions: CarbonBudgetData
   region: string
 }
 

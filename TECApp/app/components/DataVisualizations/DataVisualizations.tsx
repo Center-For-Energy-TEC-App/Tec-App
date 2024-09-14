@@ -26,7 +26,9 @@ const DataVisualizations = ({
   initialFossilData,
   dynamicFossilData,
 }: DataVisualizationsProps) => {
-  const [activeButton, setActiveButton] = useState(region==="Global"?"Carbon Budget":'BAU Comparison')
+  const [activeButton, setActiveButton] = useState(
+    region === 'Global' ? 'Carbon Budget' : 'BAU Comparison',
+  )
 
   return (
     <ScrollView
@@ -35,7 +37,7 @@ const DataVisualizations = ({
     >
       <View style={styles.buttonsWrapper}>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-        {region === 'Global' && (
+          {region === 'Global' && (
             <TouchableOpacity
               onPress={() => setActiveButton('Carbon Budget')}
               style={
@@ -73,7 +75,7 @@ const DataVisualizations = ({
               BAU Comparison
             </Text>
           </TouchableOpacity>
-          {region!=="Global" && (
+          {region !== 'Global' && (
             <TouchableOpacity
               onPress={() => setActiveButton('Regional Comparison')}
               style={
@@ -116,8 +118,16 @@ const DataVisualizations = ({
       {activeButton === 'BAU Comparison' ? (
         <BAUComparison
           region={region}
-          BAUData={initialGlobalData?initialGlobalData:initialData[getAbbrv(region)]}
-          dynamicData={dynamicGlobalData?dynamicGlobalData:dynamicData[getAbbrv(region)]}
+          BAUData={
+            initialGlobalData
+              ? initialGlobalData
+              : initialData[getAbbrv(region)]
+          }
+          dynamicData={
+            dynamicGlobalData
+              ? dynamicGlobalData
+              : dynamicData[getAbbrv(region)]
+          }
         />
       ) : activeButton === 'Regional Comparison' ? (
         <RegionalComparison region={region} data={dynamicData} />
@@ -127,7 +137,13 @@ const DataVisualizations = ({
           dynamicData={dynamicFossilData}
         />
       ) : (
-        <TechnologyComparison data={dynamicGlobalData?dynamicGlobalData:dynamicData[getAbbrv(region)]} />
+        <TechnologyComparison
+          data={
+            dynamicGlobalData
+              ? dynamicGlobalData
+              : dynamicData[getAbbrv(region)]
+          }
+        />
       )}
     </ScrollView>
   )

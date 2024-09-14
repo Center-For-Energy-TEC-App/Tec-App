@@ -21,7 +21,11 @@ import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
 import Svg, { Path, Rect } from 'react-native-svg'
 import { getEnergyAbbrv, getTechnologyColor } from '../util/ValueDictionaries'
 import { DefaultValues, MinMaxValues } from '../api/requests'
-import { Gesture, GestureDetector, NativeViewGestureHandler } from 'react-native-gesture-handler'
+import {
+  Gesture,
+  GestureDetector,
+  NativeViewGestureHandler,
+} from 'react-native-gesture-handler'
 
 export type TechnologyProportions = {
   solar: number
@@ -68,7 +72,6 @@ const DistributeRenewables = ({
 
   useEffect(() => {
     setSliderValues(values[2])
-
   }, [values])
 
   //calculate proportion bar values on every slider change
@@ -80,15 +83,18 @@ const DistributeRenewables = ({
         sliderValues.hydro_gw +
         sliderValues.bio_gw +
         sliderValues.geo_gw +
-        sliderValues.nuclear_gw 
+        sliderValues.nuclear_gw
 
       setTechnologyProportions({
-        wind: (sliderValues.wind_gw / sliderTotal) * (proportionBarWidth-5),
-        solar: (sliderValues.solar_gw / sliderTotal) * (proportionBarWidth-5),
-        hydropower: (sliderValues.hydro_gw / sliderTotal) * (proportionBarWidth-5),
-        biomass: (sliderValues.bio_gw / sliderTotal) * (proportionBarWidth-5),
-        geothermal: (sliderValues.geo_gw / sliderTotal) * (proportionBarWidth-5),
-        nuclear: (sliderValues.nuclear_gw / sliderTotal) * (proportionBarWidth-5)
+        wind: (sliderValues.wind_gw / sliderTotal) * (proportionBarWidth - 5),
+        solar: (sliderValues.solar_gw / sliderTotal) * (proportionBarWidth - 5),
+        hydropower:
+          (sliderValues.hydro_gw / sliderTotal) * (proportionBarWidth - 5),
+        biomass: (sliderValues.bio_gw / sliderTotal) * (proportionBarWidth - 5),
+        geothermal:
+          (sliderValues.geo_gw / sliderTotal) * (proportionBarWidth - 5),
+        nuclear:
+          (sliderValues.nuclear_gw / sliderTotal) * (proportionBarWidth - 5),
       })
     }
   }, [sliderValues, proportionBarWidth])
@@ -138,65 +144,64 @@ const DistributeRenewables = ({
       {renderTooltip(label, tooltip)}
       <View style={styles.sliderWrapper}>
         <NativeViewGestureHandler disallowInterruption>
-        <Slider
-          disabled={disabled}
-          trackClickable={false}
-          thumbTouchSize={{width: 50, height: 50}}
-          containerStyle={styles.slider}
-          minimumValue={Math.round(
-            parseFloat(minMaxValues.min[label.toLowerCase()]),
-          )}
-          maximumValue={Math.round(
-            parseFloat(minMaxValues.max[label.toLowerCase()]),
-          )}
-          value={sliderValues[getEnergyAbbrv(label.toLowerCase())]}
-          step={1.0}
-          thumbTintColor={
-            selectedSlider === label ? getTechnologyColor(label) : '#B5B1AA'
-          }
-          minimumTrackTintColor={getTechnologyColor(label)}
-          maximumTrackTintColor="#B5B1AA"
-          trackMarks={[
-            values[0][getEnergyAbbrv(label.toLowerCase())] - //subtract by slight offset because the trackmark div is wider than the trackmark itself
-              0.0425 *
-                (parseFloat(minMaxValues.max[label.toLowerCase()]) -
-                  parseFloat(minMaxValues.min[label.toLowerCase()])),
-            values[1][getEnergyAbbrv(label.toLowerCase())] -
-              0.0275 *
-                (parseFloat(minMaxValues.max[label.toLowerCase()]) -
-                  parseFloat(minMaxValues.min[label.toLowerCase()])),
-          ]}
-          renderTrackMarkComponent={(index) =>
-            renderTrackMark(
-              index,
-              values[0][getEnergyAbbrv(label.toLowerCase())] < //ordering based on which value (2024 or bau) is higher
-                values[1][getEnergyAbbrv(label.toLowerCase())]
-                ? ['2024', 'BAU'][index]
-                : ['BAU', '2024'][index],
-            )
-          }
-          onSlidingStart={() => {
-            setSelectedSlider(label)
-          }}
-          //just change local state during sliding
-          onValueChange={(val) =>
-            setSliderValues({
-              ...sliderValues,
-              [getEnergyAbbrv(label.toLowerCase())]: val[0],
-            })
-          }
-          //callback once sliding is complete (to send changed data back up to BottomSheet)
-          onSlidingComplete={(val) => {
-            onSliderChange(
-              {
+          <Slider
+            disabled={disabled}
+            trackClickable={false}
+            thumbTouchSize={{ width: 50, height: 50 }}
+            containerStyle={styles.slider}
+            minimumValue={Math.round(
+              parseFloat(minMaxValues.min[label.toLowerCase()]),
+            )}
+            maximumValue={Math.round(
+              parseFloat(minMaxValues.max[label.toLowerCase()]),
+            )}
+            value={sliderValues[getEnergyAbbrv(label.toLowerCase())]}
+            step={1.0}
+            thumbTintColor={
+              selectedSlider === label ? getTechnologyColor(label) : '#B5B1AA'
+            }
+            minimumTrackTintColor={getTechnologyColor(label)}
+            maximumTrackTintColor="#B5B1AA"
+            trackMarks={[
+              values[0][getEnergyAbbrv(label.toLowerCase())] - //subtract by slight offset because the trackmark div is wider than the trackmark itself
+                0.0425 *
+                  (parseFloat(minMaxValues.max[label.toLowerCase()]) -
+                    parseFloat(minMaxValues.min[label.toLowerCase()])),
+              values[1][getEnergyAbbrv(label.toLowerCase())] -
+                0.0275 *
+                  (parseFloat(minMaxValues.max[label.toLowerCase()]) -
+                    parseFloat(minMaxValues.min[label.toLowerCase()])),
+            ]}
+            renderTrackMarkComponent={(index) =>
+              renderTrackMark(
+                index,
+                values[0][getEnergyAbbrv(label.toLowerCase())] < //ordering based on which value (2024 or bau) is higher
+                  values[1][getEnergyAbbrv(label.toLowerCase())]
+                  ? ['2024', 'BAU'][index]
+                  : ['BAU', '2024'][index],
+              )
+            }
+            onSlidingStart={() => {
+              setSelectedSlider(label)
+            }}
+            //just change local state during sliding
+            onValueChange={(val) =>
+              setSliderValues({
                 ...sliderValues,
                 [getEnergyAbbrv(label.toLowerCase())]: val[0],
-              },
-              label.toLowerCase(),
-            )
-          }
-          }
-        />
+              })
+            }
+            //callback once sliding is complete (to send changed data back up to BottomSheet)
+            onSlidingComplete={(val) => {
+              onSliderChange(
+                {
+                  ...sliderValues,
+                  [getEnergyAbbrv(label.toLowerCase())]: val[0],
+                },
+                label.toLowerCase(),
+              )
+            }}
+          />
         </NativeViewGestureHandler>
         <View style={styles.sliderValueBox}>
           <Text style={styles.sliderValue}>
@@ -297,10 +302,30 @@ const DistributeRenewables = ({
               height={20}
               fill="#EE8E35"
             />
-            <Path d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z" strokeWidth={0.1} stroke="white" fill="white"/>
-            <Path d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z" strokeWidth={0.1} stroke="white" fill="white"/>
-            <Path d={`M ${proportionBarWidth-4} 0 Q ${proportionBarWidth-0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`} strokeWidth={0.1} stroke="white" fill="white"/>
-            <Path d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth-0.5} 19.5 ${proportionBarWidth-4} 20 L ${proportionBarWidth} 20 z`} strokeWidth={0.1} stroke="white" fill="white"/>
+            <Path
+              d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <Path
+              d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <Path
+              d={`M ${proportionBarWidth - 4} 0 Q ${proportionBarWidth - 0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`}
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <Path
+              d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth - 0.5} 19.5 ${proportionBarWidth - 4} 20 L ${proportionBarWidth} 20 z`}
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
           </Svg>
         )}
         {/* <View style={styles.bar}></View> */}
