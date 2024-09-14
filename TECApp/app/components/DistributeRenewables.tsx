@@ -21,6 +21,7 @@ import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
 import Svg, { Path, Rect } from 'react-native-svg'
 import { getEnergyAbbrv, getTechnologyColor } from '../util/ValueDictionaries'
 import { DefaultValues, MinMaxValues } from '../api/requests'
+import { Gesture, GestureDetector, NativeViewGestureHandler } from 'react-native-gesture-handler'
 
 export type TechnologyProportions = {
   solar: number
@@ -99,10 +100,6 @@ const DistributeRenewables = ({
     </View>
   )
 
-  const handleSlidingStart = (label: string) => {
-    setSelectedSlider(label)
-  }
-
   const toggleTooltip = (label: string) => {
     setVisibleTooltip(visibleTooltip === label ? null : label)
   }
@@ -140,8 +137,11 @@ const DistributeRenewables = ({
       </View>
       {renderTooltip(label, tooltip)}
       <View style={styles.sliderWrapper}>
+        <NativeViewGestureHandler disallowInterruption>
         <Slider
           disabled={disabled}
+          trackClickable={false}
+          thumbTouchSize={{width: 50, height: 50}}
           containerStyle={styles.slider}
           minimumValue={Math.round(
             parseFloat(minMaxValues.min[label.toLowerCase()]),
@@ -175,7 +175,9 @@ const DistributeRenewables = ({
                 : ['BAU', '2024'][index],
             )
           }
-          onSlidingStart={() => handleSlidingStart(label)}
+          onSlidingStart={() => {
+            setSelectedSlider(label)
+          }}
           //just change local state during sliding
           onValueChange={(val) =>
             setSliderValues({
@@ -184,7 +186,7 @@ const DistributeRenewables = ({
             })
           }
           //callback once sliding is complete (to send changed data back up to BottomSheet)
-          onSlidingComplete={(val) =>
+          onSlidingComplete={(val) => {
             onSliderChange(
               {
                 ...sliderValues,
@@ -193,7 +195,9 @@ const DistributeRenewables = ({
               label.toLowerCase(),
             )
           }
+          }
         />
+        </NativeViewGestureHandler>
         <View style={styles.sliderValueBox}>
           <Text style={styles.sliderValue}>
             {Math.round(sliderValues[getEnergyAbbrv(label.toLowerCase())]) +

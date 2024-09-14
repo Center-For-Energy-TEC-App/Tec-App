@@ -119,9 +119,7 @@ export const calculateCarbonReductions = (
       reduction_electricity_gen_gas * co2_emissions.gas
 
     const fossilReduction = reduction_fossil_energy_coal + reduction_fossil_energy_oil + reduction_fossil_energy_gas
-console.log(fossilReduction)
     const newFossilData = calculateCarbonCurve(fossilReduction-currFossilReduction, fossilData)
-    console.log(newFossilData)
 
     return {newFossilReduction: fossilReduction, newFossilData: newFossilData}
   
@@ -140,6 +138,65 @@ export const calculateCarbonCurve = (deltaFossilReduction: number, fossilData: D
   fossilData[7].value = (rawValue<=26?(2+((rawValue-20)/6)*1.56):(3.56+((rawValue-26)/5.6)*6.44))+(2.5+1.2-3.0)
   
   return fossilData
+}
+
+export const calculateTemperature = (fossilData: DataPoint[]) => {
+  const cumulativeEmmissions2025To2060 = {2025: 0}
+  let currTotal = 0
+  for(let i = 0; i<fossilData.length-1; i++){
+    cumulativeEmmissions2025To2060[2030+i*5] = ((fossilData[i].value+fossilData[i+1].value)/2)*5 + currTotal
+    currTotal=cumulativeEmmissions2025To2060[2030+i*5]
+  }
+  console.log(cumulativeEmmissions2025To2060)
+
+  let onePointFiveYear = 0
+  let onePointEightYear = 0
+  let twoPointZeroYear =0 
+  for(let i = 2026; i<=2060; i++){
+    const current = 200 + cumulativeEmmissions2025To2060[i-(i-2025)%5]
+    const next = 200 + cumulativeEmmissions2025To2060[i+5-(i-2025)%5]
+    const currentValue=i%5==0?current:current+(i%5*(next-current))/5
+    console.log(850-currentValue)
+
+    if(400-currentValue<0 && !onePointFiveYear){
+      onePointFiveYear = i-1
+    }
+    if(850-currentValue<0 && !onePointEightYear){
+      onePointEightYear = i-1
+    }
+    if(1150-currentValue<0 && !twoPointZeroYear){
+      twoPointZeroYear = i-1
+    }
+    if(onePointFiveYear && onePointEightYear && twoPointZeroYear){
+      break
+    }
+  }
+  if(!twoPointZeroYear) twoPointZeroYear = 2060
+
+  const IPCC50thPercentile = [150, 350, 500, 650, 850, 1000, 1200, 1350, 1500, 1700, 1850, 2050]
+  const IPCC83rdPercentile = [50, 200, 300, 400, 550, 650, 800, 900, 1050, 1150, 1250, 1400]
+  let lowerBound2035 = 0
+  let upperBound2035 = 0
+  const constant2035 = 200+cumulativeEmmissions2025To2060[2035]
+  let lowerBound2050 = 0
+  let upperBound2050 = 0
+  const constant2050 = 200+cumulativeEmmissions2025To2060[2050]
+  for(let i = 0; i<12; i++){
+    if(IPCC50thPercentile[i]-constant2035>0 && !lowerBound2035){
+      lowerBound2035 = 1.3+(i/10)
+    }
+    if(IPCC83rdPercentile[i]-constant2035>0 && !upperBound2035){
+      upperBound2035 = 1.3+(i/10)
+    }
+    if(IPCC50thPercentile[i]-constant2050>0 && !lowerBound2050){
+      lowerBound2050 = 1.3+(i/10)
+    }
+    if(IPCC83rdPercentile[i]-constant2050>0 && !upperBound2050){
+      upperBound2050 = 1.3+(i/10)
+    }
+  }
+  console.log(onePointFiveYear, onePointEightYear, twoPointZeroYear, lowerBound2035, upperBound2035, lowerBound2050, upperBound2050)
+
 }
 
 const technologies = [

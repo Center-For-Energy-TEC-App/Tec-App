@@ -18,6 +18,7 @@ import {
   calculateCarbonReductions,
   calculateEnergyCurve,
   calculateNewGlobalOnReset,
+  calculateTemperature,
 } from '../util/Calculations'
 import { DataPoint } from './DataVisualizations/BAUComparison'
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -81,6 +82,8 @@ export const BottomSheet = ({
   const [calculationData, setCalculationData] =
     useState<CalculationData>() //storage of all necessary calculation data for the current region
 
+  const [temperatureData, setTemperatureData] = useState({})
+
   const calculateTotalGlobalEnergy = (sliderValues: RegionalValues) => {
     let totalEnergy = 0
 
@@ -110,8 +113,8 @@ export const BottomSheet = ({
 
   const initializeFossilData = () => {
     let initialFossilData = []
-    initialFossilData.push({year: 2025, value: 33.3+3.82+5.0-0.1})
-    initialFossilData.push({year: 2030, value: 31.6+3.82+5.0-0.2})
+    initialFossilData.push({year: 2025, value: 33.3+(3.82+5.0-0.1)})
+    initialFossilData.push({year: 2030, value: 31.6+(3.82+5.0-0.2)})
     for(let i = 2035; i<=2060; i+=5){
       initialFossilData.push({year: i, value: 0})
     }
@@ -181,6 +184,8 @@ export const BottomSheet = ({
       index={-1}
       ref={bottomSheetRef}
       snapPoints={snapPoints}
+      enableHandlePanningGesture={true}    
+      enableContentPanningGesture={true}
     >
       {dynamicSliderValues && selectedRegion!=="Global" && ( //don't render regional sheet until slider values load
         <View style={styles.contentContainer}>
@@ -242,6 +247,8 @@ export const BottomSheet = ({
                   ...fossilReductionData,
                   [getAbbrv(selectedRegion)]: newFossilReduction,
                 })
+
+                calculateTemperature(dynamicFossilData)
               }}
               onReset={() => {
                 //when reset button is clicked within region
