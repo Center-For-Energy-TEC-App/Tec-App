@@ -26,6 +26,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 export interface BottomSheetProps {
   selectedRegion: string
   passGlobalToHome: (energy: number) => void
+  passTemperatureToHome: (temperature: {
+    yearAtDegree: number[]
+    degreeAtYear: number[]
+  }) => void
 }
 
 export type FossilReductionData = {
@@ -60,6 +64,7 @@ const regions = [
 export const BottomSheet = ({
   selectedRegion,
   passGlobalToHome,
+  passTemperatureToHome,
 }: BottomSheetProps) => {
   const snapPoints = useMemo(() => ['12.5%', '25%', '50%', '80%'], [])
   const bottomSheetRef = useRef<BottomSheetTemplate>(null)
@@ -79,8 +84,6 @@ export const BottomSheet = ({
     useState<FossilReductionData>() //carbon reduction data (to be applied to fossil data above)
 
   const [calculationData, setCalculationData] = useState<CalculationData>() //storage of all necessary calculation data for the current region
-
-  const [temperatureData, setTemperatureData] = useState({})
 
   const calculateTotalGlobalEnergy = (sliderValues: RegionalValues) => {
     let totalEnergy = 0
@@ -111,8 +114,8 @@ export const BottomSheet = ({
 
   const initializeFossilData = () => {
     let initialFossilData = []
-    initialFossilData.push({ year: 2025, value: 33.3 + (3.82 + 5.0 - 0.1) })
-    initialFossilData.push({ year: 2030, value: 31.6 + (3.82 + 5.0 - 0.2) })
+    initialFossilData.push({ year: 2025, value: 33.29 + (3.8205 + 5.0 - 0.07) })
+    initialFossilData.push({ year: 2030, value: 31.6 + (3.815 + 5.0 - 0.19) })
     for (let i = 2035; i <= 2060; i += 5) {
       initialFossilData.push({ year: i, value: 0 })
     }
@@ -126,6 +129,10 @@ export const BottomSheet = ({
       initialFossilReductionData[region] = 0
     }
     setFossilReductionData(initialFossilReductionData)
+
+    const temperatureData = calculateTemperature(initialFossilData)
+    passTemperatureToHome(temperatureData)
+    storeData('temperature-data', JSON.stringify(temperatureData))
   }
 
   //pull all initial data
@@ -247,7 +254,9 @@ export const BottomSheet = ({
                   [getAbbrv(selectedRegion)]: newFossilReduction,
                 })
 
-                calculateTemperature(dynamicFossilData)
+                const temperatureData = calculateTemperature(newFossilData)
+                passTemperatureToHome(temperatureData)
+                storeData('temperature-data', JSON.stringify(temperatureData))
               }}
               onReset={() => {
                 //when reset button is clicked within region
@@ -292,6 +301,10 @@ export const BottomSheet = ({
                   ...fossilReductionData,
                   [getAbbrv(selectedRegion)]: 0,
                 })
+
+                const temperatureData = calculateTemperature(newFossilData)
+                passTemperatureToHome(temperatureData)
+                storeData('temperature-data', JSON.stringify(temperatureData))
               }}
               initialGraphData={initialGraphData}
               dynamicGraphData={dynamicGraphData}

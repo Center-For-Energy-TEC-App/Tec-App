@@ -14,6 +14,10 @@ const vh = Dimensions.get('window').height
 export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState<string>('Global')
   const [totalGlobalEnergy, setTotalGlobalEnergy] = useState<number>(0)
+  const [temperatureData, setTemperatureData] = useState<{
+    yearAtDegree: number[]
+    degreeAtYear: number[]
+  }>()
 
   const handleRegionSelect = (region: string) => {
     setSelectedRegion(region)
@@ -30,17 +34,20 @@ export default function Home() {
         <WorldMap onSelectCountry={handleRegionSelect} />
         <BottomSheet
           selectedRegion={selectedRegion}
-          passGlobalToHome={handleGlobalEnergyChange}
+          passGlobalToHome={(energy) => setTotalGlobalEnergy(energy)}
+          passTemperatureToHome={(temperature) =>
+            setTemperatureData(temperature)
+          }
         />
+
         <View style={mobileStyles.trackerWrapper}>
-          <Tracker type="temperature" />
+          <Tracker type="temperature" temperatureData={temperatureData} />
           <Tracker type="renewable" totalGlobalEnergy={totalGlobalEnergy} />
         </View>
         <View style={mobileStyles.dashboardButton}>
           <GlobalDashboardButton
             onPress={() => router.push('/pages/GlobalDashboard')}
           />
-          {/* <GlobalDashboardButtonV2 /> */}
         </View>
       </GestureHandlerRootView>
     </View>

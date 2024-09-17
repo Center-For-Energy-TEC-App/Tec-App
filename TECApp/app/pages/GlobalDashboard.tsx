@@ -26,6 +26,10 @@ export default function GlobalDashboard() {
   const [dynamicFossilData, setDynamicFossilData] = useState<DataPoint[]>()
 
   const [globalEnergy, setGlobalEnergy] = useState<number>()
+  const [temperatureData, setTemperatureData] = useState<{
+    yearAtDegree: number[]
+    degreeAtYear: number[]
+  }>()
 
   const getValue = async (key: string) => {
     try {
@@ -52,6 +56,9 @@ export default function GlobalDashboard() {
     getValue('global-energy').then((value) => {
       setGlobalEnergy(Number(value))
     })
+    getValue('temperature-data').then((value) => {
+      setTemperatureData(JSON.parse(value))
+    })
   }, [])
 
   const deviceType = () => {
@@ -71,17 +78,22 @@ export default function GlobalDashboard() {
         {initialGraphData &&
           dynamicGraphData &&
           initialFossilData &&
-          dynamicFossilData && (
+          dynamicFossilData &&
+          temperatureData && (
             <>
               <Text style={styles.regionName}>Global Progress</Text>
 
               <Text style={[styles.body, isIpad && styles.iPadText]}>
                 The world aims to keep global warming below 2°C by 2030. We can
                 do this through increasing our current renewable capacity from 8
-                to 12 TW.{' '}
+                to 12 TW.
               </Text>
               <View style={styles.trackersWrapper}>
-                <Tracker type="temperature" dashboard />
+                <Tracker
+                  type="temperature"
+                  dashboard
+                  temperatureData={temperatureData}
+                />
                 <Tracker
                   type="renewable"
                   dashboard

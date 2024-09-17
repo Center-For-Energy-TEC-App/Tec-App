@@ -11,20 +11,10 @@ export const calculateEnergyCurve = (
 ) => {
   const installed_capacity =
     calculationData.installed_capacity[technologyChanged]['2024']
-  const forecast_cagr =
-    calculationData.forecast_cagr[technologyChanged]['2024-2030']
-  const forecast_growth_rate =
-    calculationData.forecast_growth_rate[technologyChanged]
+
   const capacity_factor = calculationData.capacity_factor[technologyChanged]
 
   const climate_path_cagr = Math.pow(newVal / installed_capacity, 1 / 6) - 1
-  const climate_path_minus_forecast = climate_path_cagr - forecast_cagr
-
-  const climate_path_growth_rate = {}
-  for (let i = 2025; i <= 2030; i++) {
-    climate_path_growth_rate[i] =
-      forecast_growth_rate[i] + climate_path_minus_forecast
-  }
 
   const newRegionTechnology = []
   const newRegionTotal = []
@@ -35,7 +25,7 @@ export const calculateEnergyCurve = (
     const electricity_generation =
       climate_path_installed_capacty * 8760 * capacity_factor[i] * 0.001
     climate_path_installed_capacty =
-      climate_path_installed_capacty * (1 + climate_path_growth_rate[i + 1])
+      climate_path_installed_capacty * (1 + climate_path_cagr)
 
     const valueChange =
       electricity_generation -
@@ -56,6 +46,7 @@ export const calculateEnergyCurve = (
       value: globalGraphData.total[i - 2024].value + valueChange,
     })
   }
+
   return {
     regionalGraphData: {
       ...regionGraphData,
@@ -123,7 +114,6 @@ export const calculateCarbonReductions = (
     fossilReduction - currFossilReduction,
     fossilData,
   )
-
   return { newFossilReduction: fossilReduction, newFossilData: newFossilData }
 }
 
@@ -134,27 +124,27 @@ export const calculateCarbonCurve = (
   fossilData[1].value -= deltaFossilReduction
   //for calculations below: all numbers come from B14:I17 section of the Emission.Budget tab of TEC sheet
   //all the ternary statements are extrapolations based on the 2030 value (also pulled from the TEC sheet)
-  const rawValue = fossilData[1].value - (3.82 + 5.0 - 0.2)
+  const rawValue = fossilData[1].value - (3.815 + 5.0 - 0.19)
   fossilData[2].value =
     (rawValue <= 26
       ? 14.72 + ((rawValue - 20) / 6) * 3.97
       : 18.69 + ((rawValue - 26) / 5.6) * 10.71) +
-    (3.69 + 4.5 - 0.4)
+    (3.6903 + 4.5 - 0.37)
   fossilData[3].value =
     (rawValue <= 26
       ? 12 + ((rawValue - 20) / 6) * 1.25
       : 13.25 + ((rawValue - 26) / 5.6) * 12.65) +
-    (3.63 + 3.8 - 0.6)
+    (3.629 + 3.8 - 0.58)
   fossilData[4].value =
     (rawValue <= 26
       ? 8.96 + ((rawValue - 20) / 6) * 0.64
       : 9.6 + ((rawValue - 26) / 5.6) * 12.5) +
-    (3.38 + 3.2 - 0.9)
+    (3.382 + 3.2 - 0.89)
   fossilData[5].value =
     (rawValue <= 26
       ? 6 + ((rawValue - 20) / 6) * 1.31
       : 7.31 + ((rawValue - 26) / 5.6) * 11.09) +
-    (3.05 + 2.5 - 1.3)
+    (3.054 + 2.5 - 1.26)
   fossilData[6].value =
     (rawValue <= 26
       ? 3.62 + ((rawValue - 20) / 6) * 1.68
@@ -177,7 +167,6 @@ export const calculateTemperature = (fossilData: DataPoint[]) => {
       ((fossilData[i].value + fossilData[i + 1].value) / 2) * 5 + currTotal
     currTotal = cumulativeEmmissions2025To2060[2030 + i * 5]
   }
-  console.log(cumulativeEmmissions2025To2060)
 
   let onePointFiveYear = 0
   let onePointEightYear = 0
@@ -187,7 +176,6 @@ export const calculateTemperature = (fossilData: DataPoint[]) => {
     const next = 200 + cumulativeEmmissions2025To2060[i + 5 - ((i - 2025) % 5)]
     const currentValue =
       i % 5 == 0 ? current : current + ((i % 5) * (next - current)) / 5
-    console.log(850 - currentValue)
 
     if (400 - currentValue < 0 && !onePointFiveYear) {
       onePointFiveYear = i - 1
@@ -230,15 +218,16 @@ export const calculateTemperature = (fossilData: DataPoint[]) => {
       upperBound2050 = 1.3 + i / 10
     }
   }
-  console.log(
-    onePointFiveYear,
-    onePointEightYear,
-    twoPointZeroYear,
-    lowerBound2035,
-    upperBound2035,
-    lowerBound2050,
-    upperBound2050,
-  )
+
+  return {
+    yearAtDegree: [onePointFiveYear, onePointEightYear, twoPointZeroYear],
+    degreeAtYear: [
+      lowerBound2035,
+      upperBound2035,
+      lowerBound2050,
+      upperBound2050,
+    ],
+  }
 }
 
 const technologies = [

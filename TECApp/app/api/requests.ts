@@ -144,8 +144,6 @@ type CarbonBudgetData = {
 
 export type CalculationData = {
   installed_capacity: ElectricityGenerationData
-  forecast_cagr: ElectricityGenerationData
-  forecast_growth_rate: ElectricityGenerationData
   capacity_factor: ElectricityGenerationData
   electricity_generation: CarbonBudgetData
   co2_emissions: CarbonBudgetData
