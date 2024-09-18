@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import React, { createRef, useEffect, useState } from 'react'
-import { StyleSheet, Dimensions } from 'react-native'
+import { StyleSheet, Dimensions, Platform } from 'react-native'
 import data from '../../GeoChart.world.geo.json'
 import Svg, { Path, G, Rect } from 'react-native-svg'
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view'
@@ -10,6 +10,8 @@ export interface WorldMapProps {
 }
 
 export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
+  const platform = Platform.OS
+
   const [currRegion, setCurrRegion] = useState<string>('Global')
   // const zoomableViewRef = createRef<ReactNativeZoomableView>();
 
@@ -36,6 +38,7 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
       style={styles.container}
       // ref={zoomableViewRef}
     >
+      {platform==="android"?(
       <Svg
         style={styles.svg}
         width={windowWidth * widthScale}
@@ -48,7 +51,7 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
             height="100%"
             width="100%"
             fill="#1C2B47"
-            onPress={() => {
+            onPressIn={() => {
               onSelectCountry('Global')
               setCurrRegion('Global')
             }}
@@ -61,7 +64,44 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
               stroke="#FFF"
               strokeWidth={feature.properties.region === currRegion ? 2.5 : 0}
               fill={feature.properties.color}
-              onPress={() => {
+              onPressIn={() => {
+                setCurrRegion(feature.properties.region)
+                onSelectCountry(feature.properties.region)
+                // if(zoomableViewRef.current){
+                //   zoomableViewRef.current.moveTo(regionCoordinates[feature.properties.region][0], regionCoordinates[feature.properties.region][1])
+                // zoomableViewRef.current.zoomBy(1)
+                // }
+              }}
+            ></Path>
+          ))}
+        </G>
+      </Svg>):(
+<Svg
+        style={styles.svg}
+        width={windowWidth * widthScale}
+        height={windowHeight}
+      >
+        <G>
+          <Rect
+            x={0}
+            y={0}
+            height="100%"
+            width="100%"
+            fill="#1C2B47"
+            onPressIn={() => {
+              onSelectCountry('Global')
+              setCurrRegion('Global')
+            }}
+          />
+          {data.features.map((feature, index) => (
+            <Path
+              //@ts-expect-error
+              d={pathGenerator(feature)}
+              key={index}
+              stroke="#FFF"
+              strokeWidth={feature.properties.region === currRegion ? 2.5 : 0}
+              fill={feature.properties.color}
+              onPressIn={() => {
                 setCurrRegion(feature.properties.region)
                 onSelectCountry(feature.properties.region)
                 // if(zoomableViewRef.current){
@@ -73,6 +113,7 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
           ))}
         </G>
       </Svg>
+      )}
     </ReactNativeZoomableView>
   )
 }

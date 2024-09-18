@@ -5,11 +5,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
   Modal,
   Platform,
   Dimensions,
 } from 'react-native'
+import {ScrollView} from "react-native-gesture-handler"
 import { Slider } from '@miblanchard/react-native-slider'
 import { WindIcon } from '../SVGs/DistributeRenewablesIcons/WindIcon'
 import { SolarIcon } from '../SVGs/DistributeRenewablesIcons/SolarIcon'
@@ -379,6 +379,7 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 32,
     padding: 4,
+    flexGrow: 1
   },
   description: {
     color: '#000',

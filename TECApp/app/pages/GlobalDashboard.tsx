@@ -3,11 +3,11 @@ import { StyleSheet } from 'react-native'
 import {
   Dimensions,
   Platform,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Tracker } from '../components/Tracker'
 import { DataPoint } from '../components/DataVisualizations/BAUComparison'

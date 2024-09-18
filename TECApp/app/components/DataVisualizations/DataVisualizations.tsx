@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Text, StyleSheet, View, ScrollView } from 'react-native'
+import { Text, StyleSheet, View } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { BAUComparison, DataPoint } from './BAUComparison'
 import { RegionalComparison } from './RegionalComparison'
