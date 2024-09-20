@@ -103,8 +103,6 @@ type CarbonBudgetData = {
 
 type CalculationData = {
     installed_capacity: ElectricityGenerationData
-    forecast_cagr: ElectricityGenerationData
-    forecast_growth_rate: ElectricityGenerationData
     capacity_factor: ElectricityGenerationData
     electricity_generation: CarbonBudgetData,
     co2_emissions: CarbonBudgetData,
@@ -115,10 +113,9 @@ export const getRegionCalculationData = async (req: Request, res: Response, next
     let technologies = ["solar", "wind", "biomass", "geothermal", "hydropower" , "nuclear"]
     let nonrenewables = ["coal", "gas", "oil", "zero_carbon"]
 
-
     const region = req.params.region
     
-    const results = {installed_capacity: {}, forecast_cagr: {}, forecast_growth_rate: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:region} as CalculationData
+    const results = {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:region} as CalculationData
 
     //installed capacity
     const data_aggregation_installed_capacity_query = await pool.query("SELECT * FROM data_aggregation_installed_capacity WHERE region=$1 AND year=2024 AND (energy_type='Solar' OR energy_type='Wind');", [region])
@@ -131,22 +128,6 @@ export const getRegionCalculationData = async (req: Request, res: Response, next
     }
     
     technologies = ["solar", "wind","hydropower", "geothermal", "biomass",  "nuclear"]  //query order is different from here on
-    //forecast cagr
-    const forecast_cagr_query = await pool.query("SELECT * FROM secondary_calculations_forecast_cagr WHERE region=$1", [region])
-    for(let i = 0; i<forecast_cagr_query.rows.length; i++){
-        const techKey = technologies[i] as keyof typeof results.forecast_cagr
-        results.forecast_cagr[techKey] = {"2024-2030": parseFloat(forecast_cagr_query.rows[i].value)}
-    }
-
-    //forecast_growth_rate
-    const forecast_growth_rate_query = await pool.query("SELECT * FROM secondary_calculations_forecast_growth_rate WHERE region=$1 AND year>=2025", [region])
-    for(let i = 0; i<forecast_growth_rate_query.rows.length; i++){
-        const techKey = technologies[Math.floor(i/6)] as keyof typeof results.forecast_growth_rate
-        const yearKey = forecast_growth_rate_query.rows[i].year
-        results.forecast_growth_rate[techKey] = results.forecast_growth_rate[techKey]?
-            {...results.forecast_growth_rate[techKey], [yearKey]:parseFloat(forecast_growth_rate_query.rows[i].value)}: 
-            {[yearKey]:parseFloat(forecast_growth_rate_query.rows[i].value)}
-    }
 
     //capacity_factor
     const capacity_factor_query = await pool.query("SELECT * FROM secondary_calculations_capacity_factor WHERE region=$1 AND year>=2024", [region])

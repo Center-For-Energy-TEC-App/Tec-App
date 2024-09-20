@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Text, StyleSheet, View, ScrollView } from 'react-native'
+import { Text, StyleSheet, View } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { BAUComparison, DataPoint } from './BAUComparison'
 import { RegionalComparison } from './RegionalComparison'
@@ -26,7 +27,9 @@ const DataVisualizations = ({
   initialFossilData,
   dynamicFossilData,
 }: DataVisualizationsProps) => {
-  const [activeButton, setActiveButton] = useState(region==="Global"?"Carbon Budget":'BAU Comparison')
+  const [activeButton, setActiveButton] = useState(
+    region === 'Global' ? 'Carbon Budget' : 'BAU Comparison',
+  )
 
   return (
     <ScrollView
@@ -35,7 +38,7 @@ const DataVisualizations = ({
     >
       <View style={styles.buttonsWrapper}>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-        {region === 'Global' && (
+          {region === 'Global' && (
             <TouchableOpacity
               onPress={() => setActiveButton('Carbon Budget')}
               style={
@@ -73,7 +76,7 @@ const DataVisualizations = ({
               BAU Comparison
             </Text>
           </TouchableOpacity>
-          {region!=="Global" && (
+          {region !== 'Global' && (
             <TouchableOpacity
               onPress={() => setActiveButton('Regional Comparison')}
               style={
@@ -116,8 +119,16 @@ const DataVisualizations = ({
       {activeButton === 'BAU Comparison' ? (
         <BAUComparison
           region={region}
-          BAUData={initialGlobalData?initialGlobalData:initialData[getAbbrv(region)]}
-          dynamicData={dynamicGlobalData?dynamicGlobalData:dynamicData[getAbbrv(region)]}
+          BAUData={
+            initialGlobalData
+              ? initialGlobalData
+              : initialData[getAbbrv(region)]
+          }
+          dynamicData={
+            dynamicGlobalData
+              ? dynamicGlobalData
+              : dynamicData[getAbbrv(region)]
+          }
         />
       ) : activeButton === 'Regional Comparison' ? (
         <RegionalComparison region={region} data={dynamicData} />
@@ -127,7 +138,13 @@ const DataVisualizations = ({
           dynamicData={dynamicFossilData}
         />
       ) : (
-        <TechnologyComparison data={dynamicGlobalData?dynamicGlobalData:dynamicData[getAbbrv(region)]} />
+        <TechnologyComparison
+          data={
+            dynamicGlobalData
+              ? dynamicGlobalData
+              : dynamicData[getAbbrv(region)]
+          }
+        />
       )}
     </ScrollView>
   )
