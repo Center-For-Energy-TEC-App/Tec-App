@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity } from 'react-native'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
@@ -13,6 +13,10 @@ type RegionalDashboardProps = {
   initialGraphData: GraphData
   dynamicGraphData: GraphData
   sliderDisabled: boolean
+  slidersRef: React.RefObject<View>
+  bauRef: React.RefObject<View>
+  regionalComparisonRef: React.RefObject<View>
+  technologyComparisonRef: React.RefObject<View>
 }
 
 export const RegionalDashboard = ({
@@ -24,6 +28,10 @@ export const RegionalDashboard = ({
   initialGraphData,
   dynamicGraphData,
   sliderDisabled,
+  slidersRef,
+  bauRef,
+  regionalComparisonRef,
+  technologyComparisonRef
 }: RegionalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
@@ -58,6 +66,33 @@ export const RegionalDashboard = ({
             >
               Distribute Renewables
             </Text>
+
+            <View style={styles.offScreenContainer}>
+        <View ref={bauRef} collapsable={false}>
+            <DistributeRenewables
+          values={sliderValues}
+          minMaxValues={minMaxValues}
+          onSliderChange={onSliderChange}
+          onReset={onReset}
+          disabled={sliderDisabled}
+          slidersRef={slidersRef}
+        />
+        </View>
+        </View>
+            <View style={styles.offScreenContainer}>
+        <View ref={bauRef} collapsable={false}>
+          <DataVisualizations
+            initialData={initialGraphData}
+            dynamicData={dynamicGraphData}
+            region={currRegion}
+            bauRef={bauRef}
+            regionalComparisonRef={regionalComparisonRef}
+            technologyComparisonRef={technologyComparisonRef}
+          />
+        </View>
+
+
+      </View>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setActiveTab('visualizations')}>
@@ -88,14 +123,19 @@ export const RegionalDashboard = ({
           onSliderChange={onSliderChange}
           onReset={onReset}
           disabled={sliderDisabled}
+          slidersRef={slidersRef}
         />
       ) : (
         <DataVisualizations
           initialData={initialGraphData}
           dynamicData={dynamicGraphData}
           region={currRegion}
+          bauRef={bauRef}
+          regionalComparisonRef={regionalComparisonRef}
+          technologyComparisonRef={technologyComparisonRef}
         />
       )}
+
     </View>
   )
 }
@@ -143,5 +183,11 @@ const styles = StyleSheet.create({
   },
   iPadText: {
     fontSize: 18,
+  },
+  offScreenContainer: {
+    position: 'absolute', 
+    top: -1000, 
+    left: -1000,
+    opacity: 0, 
   },
 })

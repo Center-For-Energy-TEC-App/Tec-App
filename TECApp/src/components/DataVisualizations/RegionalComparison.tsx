@@ -1,11 +1,5 @@
-import { useEffect, useState } from 'react'
-import React, {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Dimensions,
-} from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, Pressable, Dimensions } from 'react-native'
 import { SelectBarArrow } from '../../SVGs/SelectBarArrow'
 import Checkbox from 'expo-checkbox'
 import { CurveObject, LineGraph } from './LineGraph'
@@ -28,6 +22,7 @@ type DataPoint = {
 type RegionalComparisonProps = {
   region: string
   data: GraphData
+  // regionalComparisonRef: React.RefObject<View>
 }
 
 const vw = Dimensions.get('window').width
@@ -43,6 +38,7 @@ const xMax = 2030
 export const RegionalComparison = ({
   region,
   data,
+  // regionalComparisonRef,
 }: RegionalComparisonProps) => {
   const [dropdown, setDropdown] = useState<boolean>(false)
   const [dropdownOptions, setDropDownOptions] = useState<RegionObject[]>([
@@ -161,87 +157,89 @@ export const RegionalComparison = ({
       }}
       style={{ width: '100%' }}
     >
-      <Text style={styles.header}>Regional Comparison</Text>
-      <Text style={styles.body}>
-        This graph compares the total renewable energy generation between two or
-        more regions. Select regions from the dropdown to visualize their
-        resulting data.
-      </Text>
-      <View style={styles.graphHeader}>
-        <Text style={styles.body}>{region + ' vs. '}</Text>
-        <View style={styles.dropdownWrapper}>
-          <View style={styles.selectBarWrapper}>
-            <Pressable
-              onPress={() => setDropdown(!dropdown)}
-              style={styles.selectBar}
-            >
-              <Text style={styles.body}>
-                {numSelected === 0
-                  ? 'Select region(s)'
-                  : numSelected === 1
-                    ? dropdownOptions.find((item) => item.selected).region
-                    : numSelected + ' selected'}
-              </Text>
-            </Pressable>
-            <View style={{ position: 'absolute', right: 10 }}>
-              <SelectBarArrow />
+      <View >{/* ref={regionalComparisonRef} */}
+        <Text style={styles.header}>Regional Comparison</Text>
+        <Text style={styles.body}>
+          This graph compares the total renewable energy generation between two
+          or more regions. Select regions from the dropdown to visualize their
+          resulting data.
+        </Text>
+        <View style={styles.graphHeader}>
+          <Text style={styles.body}>{region + ' vs. '}</Text>
+          <View style={styles.dropdownWrapper}>
+            <View style={styles.selectBarWrapper}>
+              <Pressable
+                onPress={() => setDropdown(!dropdown)}
+                style={styles.selectBar}
+              >
+                <Text style={styles.body}>
+                  {numSelected === 0
+                    ? 'Select region(s)'
+                    : numSelected === 1
+                      ? dropdownOptions.find((item) => item.selected).region
+                      : numSelected + ' selected'}
+                </Text>
+              </Pressable>
+              <View style={{ position: 'absolute', right: 10 }}>
+                <SelectBarArrow />
+              </View>
             </View>
-          </View>
-          {dropdown && (
-            <View style={styles.dropdown}>
-              {dropdownOptions.map(
-                (regionObject, key) =>
-                  regionObject.region !== region && (
-                    <Pressable
-                      key={key}
-                      style={styles.dropdownOption}
-                      onPress={() => {
-                        onCheck(key)
-                      }}
-                    >
-                      <Checkbox
-                        color="#266297"
-                        style={styles.checkbox}
-                        value={dropdownOptions[key].selected}
-                        onValueChange={() => {
+            {dropdown && (
+              <View style={styles.dropdown}>
+                {dropdownOptions.map(
+                  (regionObject, key) =>
+                    regionObject.region !== region && (
+                      <Pressable
+                        key={key}
+                        style={styles.dropdownOption}
+                        onPress={() => {
                           onCheck(key)
                         }}
-                      />
-                      <Text>{regionObject.region}</Text>
-                    </Pressable>
-                  ),
-              )}
-            </View>
-          )}
-        </View>
-      </View>
-      {currGradientCurve && currLineCurves && (
-        <View style={styles.graphContainer}>
-          <View style={styles.graphInnerContainer}>
-            <GraphKey
-              label={region.toUpperCase()}
-              color={getRegionColor(region)}
-            />
-            {dropdownOptions
-              .filter((item) => item.selected)
-              .map((e, key) => (
-                <GraphKey
-                  key={key}
-                  label={e.region.toUpperCase()}
-                  color={getRegionColor(e.region)}
-                />
-              ))}
-            <LineGraph
-              yMin={yMin}
-              yMax={yMax}
-              gradient={currGradient}
-              gradientCurve={currGradientCurve}
-              lineCurves={currLineCurves}
-            />
+                      >
+                        <Checkbox
+                          color="#266297"
+                          style={styles.checkbox}
+                          value={dropdownOptions[key].selected}
+                          onValueChange={() => {
+                            onCheck(key)
+                          }}
+                        />
+                        <Text>{regionObject.region}</Text>
+                      </Pressable>
+                    ),
+                )}
+              </View>
+            )}
           </View>
         </View>
-      )}
-      <View style={{ height: 50 }} />
+        {currGradientCurve && currLineCurves && (
+          <View style={styles.graphContainer}>
+            <View style={styles.graphInnerContainer}>
+              <GraphKey
+                label={region.toUpperCase()}
+                color={getRegionColor(region)}
+              />
+              {dropdownOptions
+                .filter((item) => item.selected)
+                .map((e, key) => (
+                  <GraphKey
+                    key={key}
+                    label={e.region.toUpperCase()}
+                    color={getRegionColor(e.region)}
+                  />
+                ))}
+              <LineGraph
+                yMin={yMin}
+                yMax={yMax}
+                gradient={currGradient}
+                gradientCurve={currGradientCurve}
+                lineCurves={currLineCurves}
+              />
+            </View>
+          </View>
+        )}
+        <View style={{ height: 50 }} />
+      </View>
     </Pressable>
   )
 }

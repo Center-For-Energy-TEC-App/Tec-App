@@ -37,6 +37,7 @@ type DistributeRenewablesProps = {
   onSliderChange: (val: DefaultValues, technologyChanged: string) => void
   onReset: () => void
   disabled: boolean
+  slidersRef: React.RefObject<View>
 }
 
 const DistributeRenewables = ({
@@ -45,10 +46,11 @@ const DistributeRenewables = ({
   onSliderChange,
   onReset,
   disabled,
+  slidersRef,
 }: DistributeRenewablesProps) => {
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
-  
+
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
     return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
@@ -57,7 +59,7 @@ const DistributeRenewables = ({
   }
 
   const isIpad = deviceType() === 'ipad'
-  
+
   const [proportionBarWidth, setProportionBarWidth] =
     useState<number>(undefined)
 
@@ -204,138 +206,139 @@ const DistributeRenewables = ({
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={[styles.description, isIpad && styles.iPadText]}>
-        Using the sliders below, make region specific changes for each renewable
-        energy source to reach 12 TW of renewable capacity. This will override
-        default values set in the global dashboard.
-      </Text>
-      <View
-        style={styles.capacityProportionContainer}
-        onLayout={(event) => {
-          setProportionBarWidth(event.nativeEvent.layout.width - 20)
-        }}
-      >
-        <Text style={styles.capacityProportionText}>
-          Renewable Capacity Proportions
+      <View ref={slidersRef}>
+        <Text style={[styles.description, isIpad && styles.iPadText]}>
+          Using the sliders below, make region specific changes for each
+          renewable energy source to reach 12 TW of renewable capacity. This
+          will override default values set in the global dashboard.
         </Text>
-        {proportionBarWidth && sliderProportions && (
-          <Svg height={20}>
-            <Rect
-              x={0}
-              y={0}
-              width={sliderProportions.wind}
-              height={20}
-              fill="#C66AAA"
-            />
-            <Rect
-              x={sliderProportions.wind}
-              y={0}
-              width={sliderProportions.solar}
-              height={20}
-              fill="#F8CE46"
-            />
-            <Rect
-              x={sliderProportions.wind + sliderProportions.solar}
-              y={0}
-              width={sliderProportions.hydropower}
-              height={20}
-              fill="#58C4D4"
-            />
-            <Rect
-              x={
-                sliderProportions.wind +
-                sliderProportions.solar +
-                sliderProportions.hydropower
-              }
-              y={0}
-              width={sliderProportions.biomass}
-              height={20}
-              fill="#779448"
-            />
-            <Rect
-              x={
-                sliderProportions.wind +
-                sliderProportions.solar +
-                sliderProportions.hydropower +
-                sliderProportions.biomass
-              }
-              y={0}
-              width={sliderProportions.geothermal}
-              height={20}
-              fill="#BF9336"
-            />
-            <Rect
-              x={
-                sliderProportions.wind +
-                sliderProportions.solar +
-                sliderProportions.hydropower +
-                sliderProportions.biomass +
-                sliderProportions.geothermal
-              }
-              y={0}
-              width={5}
-              height={20}
-              fill="white"
-            />
-            <Rect
-              x={
-                sliderProportions.wind +
-                sliderProportions.solar +
-                sliderProportions.hydropower +
-                sliderProportions.biomass +
-                sliderProportions.geothermal +
-                5
-              }
-              y={0}
-              width={sliderProportions.nuclear}
-              height={20}
-              fill="#EE8E35"
-            />
-          </Svg>
+        <View
+          style={styles.capacityProportionContainer}
+          onLayout={(event) => {
+            setProportionBarWidth(event.nativeEvent.layout.width - 20)
+          }}
+        >
+          <Text style={styles.capacityProportionText}>
+            Renewable Capacity Proportions
+          </Text>
+          {proportionBarWidth && sliderProportions && (
+            <Svg height={20}>
+              <Rect
+                x={0}
+                y={0}
+                width={sliderProportions.wind}
+                height={20}
+                fill="#C66AAA"
+              />
+              <Rect
+                x={sliderProportions.wind}
+                y={0}
+                width={sliderProportions.solar}
+                height={20}
+                fill="#F8CE46"
+              />
+              <Rect
+                x={sliderProportions.wind + sliderProportions.solar}
+                y={0}
+                width={sliderProportions.hydropower}
+                height={20}
+                fill="#58C4D4"
+              />
+              <Rect
+                x={
+                  sliderProportions.wind +
+                  sliderProportions.solar +
+                  sliderProportions.hydropower
+                }
+                y={0}
+                width={sliderProportions.biomass}
+                height={20}
+                fill="#779448"
+              />
+              <Rect
+                x={
+                  sliderProportions.wind +
+                  sliderProportions.solar +
+                  sliderProportions.hydropower +
+                  sliderProportions.biomass
+                }
+                y={0}
+                width={sliderProportions.geothermal}
+                height={20}
+                fill="#BF9336"
+              />
+              <Rect
+                x={
+                  sliderProportions.wind +
+                  sliderProportions.solar +
+                  sliderProportions.hydropower +
+                  sliderProportions.biomass +
+                  sliderProportions.geothermal
+                }
+                y={0}
+                width={5}
+                height={20}
+                fill="white"
+              />
+              <Rect
+                x={
+                  sliderProportions.wind +
+                  sliderProportions.solar +
+                  sliderProportions.hydropower +
+                  sliderProportions.biomass +
+                  sliderProportions.geothermal +
+                  5
+                }
+                y={0}
+                width={sliderProportions.nuclear}
+                height={20}
+                fill="#EE8E35"
+              />
+            </Svg>
+          )}
+        </View>
+        {renderSlider(
+          'Wind',
+          WindIcon,
+          'Wind power involves using wind turbines to convert moving air in the form of kinetic energy into electrical energy. Wind power is captured through wind turbines that rotate when wind passes through them.',
         )}
-        {/* <View style={styles.bar}></View> */}
+        {renderSlider(
+          'Solar',
+          SolarIcon,
+          'Solar power converts sunlight into electrical energy through photovoltaic panels. This energy can be used to generate electricity or can be stored in batteries.',
+        )}
+        {renderSlider(
+          'Hydropower',
+          HydroIcon,
+          'Hydropower generates electricity using the energy of water. This is harnessed by using turbines and generators to convert the natural kinetic energy of water into electricity.',
+        )}
+        {renderSlider(
+          'Biomass',
+          BiomassIcon,
+          'Most biomass power systems are generated by the direct combustion of organic materials such as crops and waste products, which are burned and produce steam that drives a generator. ',
+        )}
+        {renderSlider(
+          'Geothermal',
+          GeothermalIcon,
+          'Geothermal power is generated from heat within the Earth’s core. Geothermal wells and heat exchangers are used to tap into reservoirs of steam and hot water.',
+        )}
+        {renderSlider(
+          'Nuclear',
+          NuclearIcon,
+          'Nuclear power is generated through nuclear reactions, typically involving the splitting of atoms to release energy. This is then harnessed to generate electricity.',
+        )}
+
+        <Text style={[styles.nuclearNote, isIpad && styles.iPadText]}>
+          {' '}
+          *Not a renewable energy source, but supports carbon reduction goals by
+          reducing reliance on fossil fuels.
+        </Text>
+
+        <TouchableOpacity onPress={onReset} style={styles.resetButton}>
+          <Text style={styles.resetButtonText}>Reset to Global Values</Text>
+        </TouchableOpacity>
+        <View style={styles.spacer}></View>
       </View>
-      {renderSlider(
-        'Wind',
-        WindIcon,
-        'Wind power involves using wind turbines to convert moving air in the form of kinetic energy into electrical energy. Wind power is captured through wind turbines that rotate when wind passes through them.',
-      )}
-      {renderSlider(
-        'Solar',
-        SolarIcon,
-        'Solar power converts sunlight into electrical energy through photovoltaic panels. This energy can be used to generate electricity or can be stored in batteries.',
-      )}
-      {renderSlider(
-        'Hydropower',
-        HydroIcon,
-        'Hydropower generates electricity using the energy of water. This is harnessed by using turbines and generators to convert the natural kinetic energy of water into electricity.',
-      )}
-      {renderSlider(
-        'Biomass',
-        BiomassIcon,
-        'Most biomass power systems are generated by the direct combustion of organic materials such as crops and waste products, which are burned and produce steam that drives a generator. ',
-      )}
-      {renderSlider(
-        'Geothermal',
-        GeothermalIcon,
-        'Geothermal power is generated from heat within the Earth’s core. Geothermal wells and heat exchangers are used to tap into reservoirs of steam and hot water.',
-      )}
-      {renderSlider(
-        'Nuclear',
-        NuclearIcon,
-        'Nuclear power is generated through nuclear reactions, typically involving the splitting of atoms to release energy. This is then harnessed to generate electricity.',
-      )}
-
-      <Text style={[styles.nuclearNote, isIpad && styles.iPadText]}>
-        {' '}
-        *Not a renewable energy source, but supports carbon reduction goals by
-        reducing reliance on fossil fuels.
-      </Text>
-
-      <TouchableOpacity onPress={onReset} style={styles.resetButton}>
-        <Text style={styles.resetButtonText}>Reset to Global Values</Text>
-      </TouchableOpacity>
-      <View style={styles.spacer}></View>
     </ScrollView>
   )
 }

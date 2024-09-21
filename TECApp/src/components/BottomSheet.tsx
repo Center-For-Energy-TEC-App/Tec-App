@@ -20,12 +20,20 @@ export interface BottomSheetProps {
   selectedRegion: string
   onSwipeDown: () => void
   passGlobalToHome: (energy: number) => void
+  slidersRef: React.RefObject<View>
+  bauRef: React.RefObject<View>
+  regionalComparisonRef: React.RefObject<View>
+  technologyComparisonRef: React.RefObject<View>
 }
 
 export const BottomSheet = ({
   selectedRegion,
   onSwipeDown,
-  passGlobalToHome
+  passGlobalToHome,
+  slidersRef,
+  bauRef,
+  regionalComparisonRef,
+  technologyComparisonRef
 }: BottomSheetProps) => {
   const snapPoints = useMemo(() => ['12.5%', '25%', '50%', '80%'], [])
   const bottomSheetRef = useRef<BottomSheetTemplate>(null)
@@ -146,6 +154,10 @@ export const BottomSheet = ({
               minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
               sliderValues={regionalDynamicValues[getAbbrv(selectedRegion)]}
               currRegion={selectedRegion}
+              slidersRef={slidersRef}
+              bauRef={bauRef}
+              regionalComparisonRef={regionalComparisonRef}
+              technologyComparisonRef={technologyComparisonRef}
               onSliderChange={(val, technologyChanged) => {
                 setRegionalDynamicValues({
                   ...regionalDynamicValues,
@@ -166,17 +178,7 @@ export const BottomSheet = ({
                     calculationData,
                   ),
                 })       
-              //   const updatedGlobalEnergy = calculateTotalGlobalEnergy({
-              //     ...regionalDynamicValues,
-              //     [abbrvMap[currRegion]]: [
-              //       regionalDynamicValues[abbrvMap[currRegion]][0],
-              //       regionalDynamicValues[abbrvMap[currRegion]][1],
-              //       val,
-              //     ],
-              //   })
-              //   passGlobalToHome(updatedGlobalEnergy)
-              //   setTotalGlobalEnergy(updatedGlobalEnergy)
-              // }}
+
               const updatedGlobalEnergy = calculateTotalGlobalEnergy({
                 ...regionalDynamicValues,
                 [getAbbrv(selectedRegion)]: [

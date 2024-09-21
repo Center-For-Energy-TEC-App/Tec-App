@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState} from 'react'
 import { Text, StyleSheet, View, ScrollView } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { BAUComparison } from './BAUComparison'
@@ -8,25 +8,55 @@ import { TechnologyComparison } from './TechnologyComparison'
 import { getAbbrv } from '../../util/ValueDictionaries'
 import { GraphData } from '../../api/requests'
 
+
 type DataVisualizationsProps = {
   region: string
   initialData: GraphData
   dynamicData: GraphData
+  bauRef: React.RefObject<View>
+  regionalComparisonRef: React.RefObject<View>
+  technologyComparisonRef: React.RefObject<View>
 }
 const DataVisualizations = ({
   region,
   initialData,
   dynamicData,
+  bauRef,
+  regionalComparisonRef,
+  technologyComparisonRef
 }: DataVisualizationsProps) => {
   const [activeButton, setActiveButton] = useState('BAU Comparison')
-
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={{ display: 'flex', alignItems: 'flex-start' }}
-    >
+    >    
       <View style={styles.buttonsWrapper}>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+
+        <View style={styles.offScreenContainer}>
+        {/* BAU Comparison */}
+        <View ref={bauRef} collapsable={false}>
+          <BAUComparison
+            region={region}
+            BAUData={initialData[getAbbrv(region)]}
+            dynamicData={dynamicData[getAbbrv(region)]}
+          />
+        </View>
+
+        {/* Regional Comparison */}
+        <View ref={regionalComparisonRef} collapsable={false}>
+          <RegionalComparison region={region} data={dynamicData} />
+        </View>
+
+        {/* Technology Comparison */}
+        <View ref={technologyComparisonRef} collapsable={false}>
+          <TechnologyComparison data={dynamicData[getAbbrv(region)]} />
+        </View>
+
+
+      </View>
+
           <TouchableOpacity
             onPress={() => setActiveButton('BAU Comparison')}
             style={
@@ -111,7 +141,7 @@ const DataVisualizations = ({
           dynamicData={dynamicData[getAbbrv(region)]}
         />
       ) : activeButton === 'Regional Comparison' ? (
-        <RegionalComparison region={region} data={dynamicData} />
+        <RegionalComparison region={region} data={dynamicData}/> 
       ) : activeButton === 'Carbon Budget' ? (
         <CarbonBudget />
       ) : (
@@ -124,6 +154,12 @@ const DataVisualizations = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+  },
+  offScreenContainer: {
+    position: 'absolute', // Position off-screen
+    top: -1000, // Push off-screen
+    left: -1000, // Push off-screen
+    opacity: 0, // Hide from view
   },
   text: {
     color: '#000',

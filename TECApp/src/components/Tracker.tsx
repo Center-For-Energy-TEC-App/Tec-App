@@ -44,7 +44,7 @@ export const Tracker = ({ type, dashboard, totalGlobalEnergy}: TrackerProps) => 
                 dashboard ? mobileStyles.dashboardHeader : mobileStyles.header
               }
             >
-              {(totalGlobalEnergy / 1000).toFixed(1)}/15.5
+              {(totalGlobalEnergy / 1000).toFixed(1)}/12
             </Text>
             <Text
               style={

@@ -35,7 +35,7 @@ const isIpad = deviceType() === 'ipad'
 export const BAUComparison = ({
   region,
   BAUData,
-  dynamicData,
+  dynamicData
 }: BAUComparisonProps) => {
   const BAU_data = BAUData.total
   const altered_data = dynamicData.total
