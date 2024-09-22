@@ -177,7 +177,7 @@ export const BottomSheet = ({
       .catch(console.error)
 
     if (selectedRegion !== 'Global') {
-      bottomSheetRef.current?.snapToIndex(2) // Snap to 25% when a region is selected
+      bottomSheetRef.current?.snapToIndex(3) // Snap
     } else {
       bottomSheetRef.current?.close()
     }

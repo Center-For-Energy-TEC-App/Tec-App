@@ -368,7 +368,7 @@ const DistributeRenewables = ({
       </Text>
 
       <TouchableOpacity onPress={onReset} style={styles.resetButton}>
-        <Text style={styles.resetButtonText}>Reset to Global Values</Text>
+        <Text style={styles.resetButtonText}>Reset to 2030 Forecast</Text>
       </TouchableOpacity>
       <View style={styles.spacer}></View>
     </ScrollView>
