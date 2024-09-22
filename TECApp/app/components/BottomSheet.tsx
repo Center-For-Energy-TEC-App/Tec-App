@@ -21,7 +21,7 @@ import {
   calculateTemperature,
 } from '../util/Calculations'
 import { DataPoint } from './DataVisualizations/BAUComparison'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { storeData } from '../util/Caching'
 
 export interface BottomSheetProps {
   selectedRegion: string
@@ -104,14 +104,6 @@ export const BottomSheet = ({
     return totalEnergy
   }
 
-  const storeData = async (key: string, value: string) => {
-    try {
-      await AsyncStorage.setItem(key, value)
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
   const initializeFossilData = () => {
     let initialFossilData = []
     initialFossilData.push({ year: 2025, value: 33.29 + (3.8205 + 5.0 - 0.07) })
@@ -145,27 +137,26 @@ export const BottomSheet = ({
         const globalEnergy = calculateTotalGlobalEnergy(val)
         passGlobalToHome(globalEnergy)
         storeData('global-energy', globalEnergy.toString())
-      })
-      .catch((error) => {
-        console.error('Error fetching default values:', error)
-      })
 
-    getMinMaxValues()
-      .then((val) => {
-        setMinMaxValues(val)
+        getMinMaxValues()
+          .then((val) => {
+            setMinMaxValues(val)
+
+            getInitialGraphData()
+              .then((val) => {
+                setInitialGraphData(val)
+                setDynamicGraphData(val)
+
+                storeData('bau-graph-data', JSON.stringify(val.global))
+                storeData('dynamic-graph-data', JSON.stringify(val.global))
+
+                initializeFossilData()
+              })
+              .catch(console.error)
+          })
+          .catch(console.error)
       })
       .catch(console.error)
-    getInitialGraphData()
-      .then((val) => {
-        setInitialGraphData(val)
-        setDynamicGraphData(val)
-
-        storeData('bau-graph-data', JSON.stringify(val.global))
-        storeData('dynamic-graph-data', JSON.stringify(val.global))
-      })
-      .catch(console.error)
-
-    initializeFossilData()
   }, [])
 
   //update regional calculation data on region select
@@ -177,7 +168,7 @@ export const BottomSheet = ({
       .catch(console.error)
 
     if (selectedRegion !== 'Global') {
-      bottomSheetRef.current?.snapToIndex(2) // Snap to 25% when a region is selected
+      bottomSheetRef.current?.snapToIndex(3) // Snap to 80% when a region is selected
     } else {
       bottomSheetRef.current?.close()
     }
@@ -188,11 +179,13 @@ export const BottomSheet = ({
       index={-1}
       ref={bottomSheetRef}
       snapPoints={snapPoints}
-      enableHandlePanningGesture={true}
-      enableContentPanningGesture={true}
+      enableHandlePanningGesture
+      enableContentPanningGesture
+      enablePanDownToClose
     >
-      {dynamicSliderValues &&
-        selectedRegion !== 'Global' && ( //don't render regional sheet until slider values load
+      {dynamicFossilData &&
+        calculationData && //don't render regional sheet until all values load
+        selectedRegion !== 'Global' && (
           <View style={styles.contentContainer}>
             <RegionalDashboard
               minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}

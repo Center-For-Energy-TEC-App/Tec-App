@@ -17,6 +17,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { ExportButton } from '../SVGs/ExportButton'
 import { FeedbackButton } from '../SVGs/FeedbackButton'
 import { LearnMoreButton } from '../SVGs/LearnMoreButton'
+import { getData } from '../util/Caching'
 
 export default function GlobalDashboard() {
   const [initialGraphData, setInitialGraphData] = useState<RegionData>()
@@ -31,32 +32,23 @@ export default function GlobalDashboard() {
     degreeAtYear: number[]
   }>()
 
-  const getValue = async (key: string) => {
-    try {
-      const value = await AsyncStorage.getItem(key)
-      return value
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
   useEffect(() => {
-    getValue('bau-graph-data').then((value) => {
+    getData('bau-graph-data').then((value) => {
       setInitialGraphData(JSON.parse(value))
     })
-    getValue('dynamic-graph-data').then((value) => {
+    getData('dynamic-graph-data').then((value) => {
       setDynamicGraphData(JSON.parse(value))
     })
-    getValue('bau-fossil-data').then((value) => {
+    getData('bau-fossil-data').then((value) => {
       setInitialFossilData(JSON.parse(value))
     })
-    getValue('dynamic-fossil-data').then((value) => {
+    getData('dynamic-fossil-data').then((value) => {
       setDynamicFossilData(JSON.parse(value))
     })
-    getValue('global-energy').then((value) => {
+    getData('global-energy').then((value) => {
       setGlobalEnergy(Number(value))
     })
-    getValue('temperature-data').then((value) => {
+    getData('temperature-data').then((value) => {
       setTemperatureData(JSON.parse(value))
     })
   }, [])
