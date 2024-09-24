@@ -36,6 +36,10 @@ export const RegionalDashboard = ({
     'renewables',
   )
 
+  useEffect(() => {
+    setActiveTab('renewables')
+  }, [currRegion])
+
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
     return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)

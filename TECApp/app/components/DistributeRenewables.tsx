@@ -9,7 +9,7 @@ import {
   Platform,
   Dimensions,
 } from 'react-native'
-import {ScrollView} from "react-native-gesture-handler"
+import { ScrollView } from 'react-native-gesture-handler'
 import { Slider } from '@miblanchard/react-native-slider'
 import { WindIcon } from '../SVGs/DistributeRenewablesIcons/WindIcon'
 import { SolarIcon } from '../SVGs/DistributeRenewablesIcons/SolarIcon'
@@ -131,23 +131,26 @@ const DistributeRenewables = ({
   )
 
   const renderSlider = (label, IconComponent, tooltip) => (
-    <View style={styles.sliderContainer} key={label}>
-      <View style={styles.labelContainer}>
+    <View style={styles.sliderContainer}>
+      <TouchableOpacity
+        onPress={() => toggleTooltip(label)}
+        style={styles.labelContainer}
+      >
         <IconComponent width={22} height={22} />
         <Text style={styles.label}>
           {label === 'Nuclear' ? 'Nuclear*' : label}
         </Text>
-        <TouchableOpacity onPress={() => toggleTooltip(label)}>
-          <ToolTipIcon />
-        </TouchableOpacity>
-      </View>
+        <ToolTipIcon />
+      </TouchableOpacity>
+
       {renderTooltip(label, tooltip)}
       <View style={styles.sliderWrapper}>
         <NativeViewGestureHandler disallowInterruption>
           <Slider
+            trackStyle={{ height: 3 }}
             disabled={disabled}
             trackClickable={false}
-            thumbTouchSize={{ width: 50, height: 50 }}
+            thumbTouchSize={{ width: 50, height: 25 }}
             containerStyle={styles.slider}
             minimumValue={Math.round(
               parseFloat(minMaxValues.min[label.toLowerCase()]),
@@ -214,7 +217,10 @@ const DistributeRenewables = ({
   )
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      stickyHeaderIndices={[1]}
+    >
       <Text style={[styles.description, isIpad && styles.iPadText]}>
         Using the sliders below, make region specific changes for each renewable
         energy source to reach 12 TW of renewable capacity. This will override
@@ -368,7 +374,9 @@ const DistributeRenewables = ({
       </Text>
 
       <TouchableOpacity onPress={onReset} style={styles.resetButton}>
-        <Text style={styles.resetButtonText}>Reset to 2030 Forecast</Text>
+        <Text style={styles.resetButtonText}>
+          Reset to 2030 Forecast Values
+        </Text>
       </TouchableOpacity>
       <View style={styles.spacer}></View>
     </ScrollView>
@@ -377,9 +385,10 @@ const DistributeRenewables = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 32,
+    paddingTop: 30,
+    marginTop: 2,
     padding: 4,
-    flexGrow: 1
+    flexGrow: 1,
   },
   description: {
     color: '#000',
@@ -420,10 +429,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   labelContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    maxWidth: '50%',
+    paddingBottom: 10,
     gap: 8,
+    // backgroundColor: "red"
   },
   label: {
     color: '#000',
@@ -450,7 +462,11 @@ const styles = StyleSheet.create({
   tooltipCloseButton: {
     position: 'absolute',
     top: 10,
-    right: 10,
+    right: 5,
+    display: 'flex',
+    alignItems: 'center',
+    width: 20,
+    height: 20,
   },
   tooltipCloseButtonText: {
     fontSize: 16,
@@ -462,7 +478,7 @@ const styles = StyleSheet.create({
   },
   slider: {
     flex: 1,
-    height: 40,
+    // backgroundColor: "red",
   },
   sliderValueBox: {
     marginLeft: 8,

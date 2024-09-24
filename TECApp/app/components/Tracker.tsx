@@ -41,7 +41,9 @@ export const Tracker = ({
                           : mobileStyles.label
                       }
                     >
-                      {'+1.5° by: ' + temperatureData.yearAtDegree[0]}
+                      {'+1.5° by: ' +
+                        temperatureData.yearAtDegree[0] +
+                        (temperatureData.yearAtDegree[0] == 2060 ? '+' : '')}
                     </Text>
                     <Text
                       style={
@@ -50,7 +52,9 @@ export const Tracker = ({
                           : mobileStyles.label
                       }
                     >
-                      {'+1.8° by: ' + temperatureData.yearAtDegree[1]}
+                      {'+1.8° by: ' +
+                        temperatureData.yearAtDegree[1] +
+                        (temperatureData.yearAtDegree[1] == 2060 ? '+' : '')}
                     </Text>
                     <Text
                       style={
@@ -59,7 +63,9 @@ export const Tracker = ({
                           : mobileStyles.label
                       }
                     >
-                      {'+2.0° by: ' + temperatureData.yearAtDegree[2]}
+                      {'+2.0° by: ' +
+                        temperatureData.yearAtDegree[2] +
+                        (temperatureData.yearAtDegree[2] == 2060 ? '+' : '')}
                     </Text>
                   </View>
                 ) : (

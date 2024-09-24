@@ -38,81 +38,82 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
       style={styles.container}
       // ref={zoomableViewRef}
     >
-      {platform==="android"?(
-      <Svg
-        style={styles.svg}
-        width={windowWidth * widthScale}
-        height={windowHeight}
-      >
-        <G>
-          <Rect
-            x={0}
-            y={0}
-            height="100%"
-            width="100%"
-            fill="#1C2B47"
-            onPressIn={() => {
-              onSelectCountry('Global')
-              setCurrRegion('Global')
-            }}
-          />
-          {data.features.map((feature, index) => (
-            <Path
-              //@ts-expect-error
-              d={pathGenerator(feature)}
-              key={index}
-              stroke="#FFF"
-              strokeWidth={feature.properties.region === currRegion ? 2.5 : 0}
-              fill={feature.properties.color}
+      {platform === 'android' ? (
+        <Svg
+          style={styles.svg}
+          width={windowWidth * widthScale}
+          height={windowHeight}
+        >
+          <G>
+            <Rect
+              x={0}
+              y={0}
+              height="100%"
+              width="100%"
+              fill="#1C2B47"
               onPressIn={() => {
-                setCurrRegion(feature.properties.region)
-                onSelectCountry(feature.properties.region)
-                // if(zoomableViewRef.current){
-                //   zoomableViewRef.current.moveTo(regionCoordinates[feature.properties.region][0], regionCoordinates[feature.properties.region][1])
-                // zoomableViewRef.current.zoomBy(1)
-                // }
+                onSelectCountry('Global')
+                setCurrRegion('Global')
               }}
-            ></Path>
-          ))}
-        </G>
-      </Svg>):(
-<Svg
-        style={styles.svg}
-        width={windowWidth * widthScale}
-        height={windowHeight}
-      >
-        <G>
-          <Rect
-            x={0}
-            y={0}
-            height="100%"
-            width="100%"
-            fill="#1C2B47"
-            onPressIn={() => {
-              onSelectCountry('Global')
-              setCurrRegion('Global')
-            }}
-          />
-          {data.features.map((feature, index) => (
-            <Path
-              //@ts-expect-error
-              d={pathGenerator(feature)}
-              key={index}
-              stroke="#FFF"
-              strokeWidth={feature.properties.region === currRegion ? 2.5 : 0}
-              fill={feature.properties.color}
-              onPressIn={() => {
-                setCurrRegion(feature.properties.region)
-                onSelectCountry(feature.properties.region)
-                // if(zoomableViewRef.current){
-                //   zoomableViewRef.current.moveTo(regionCoordinates[feature.properties.region][0], regionCoordinates[feature.properties.region][1])
-                // zoomableViewRef.current.zoomBy(1)
-                // }
+            />
+            {data.features.map((feature, index) => (
+              <Path
+                //@ts-expect-error
+                d={pathGenerator(feature)}
+                key={index}
+                stroke="#FFF"
+                strokeWidth={feature.properties.region === currRegion ? 2.5 : 0}
+                fill={feature.properties.color}
+                onPressIn={() => {
+                  setCurrRegion(feature.properties.region)
+                  onSelectCountry(feature.properties.region)
+                  // if(zoomableViewRef.current){
+                  //   zoomableViewRef.current.moveTo(regionCoordinates[feature.properties.region][0], regionCoordinates[feature.properties.region][1])
+                  // zoomableViewRef.current.zoomBy(1)
+                  // }
+                }}
+              ></Path>
+            ))}
+          </G>
+        </Svg>
+      ) : (
+        <Svg
+          style={styles.svg}
+          width={windowWidth * widthScale}
+          height={windowHeight}
+        >
+          <G>
+            <Rect
+              x={0}
+              y={0}
+              height="100%"
+              width="100%"
+              fill="#1C2B47"
+              onPress={() => {
+                onSelectCountry('Global')
+                setCurrRegion('Global')
               }}
-            ></Path>
-          ))}
-        </G>
-      </Svg>
+            />
+            {data.features.map((feature, index) => (
+              <Path
+                //@ts-expect-error
+                d={pathGenerator(feature)}
+                key={index}
+                stroke="#FFF"
+                strokeWidth={feature.properties.region === currRegion ? 2.5 : 0}
+                fill={feature.properties.color}
+                onPress={() => {
+                  setCurrRegion(feature.properties.region)
+                  onSelectCountry(feature.properties.region)
+                  // if(zoomableViewRef.current){
+                  //   zoomableViewRef.current.moveTo(regionCoordinates[feature.properties.region][0], regionCoordinates[feature.properties.region][1])
+                  // zoomableViewRef.current.zoomBy(1)
+                  // }
+                }}
+              ></Path>
+            ))}
+          </G>
+        </Svg>
       )}
     </ReactNativeZoomableView>
   )
