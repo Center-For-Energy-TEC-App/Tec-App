@@ -159,6 +159,11 @@ export const calculateCarbonCurve = (
   return fossilData
 }
 
+export type TemperatureData = {
+  yearAtDegree: number[]
+  degreeAtYear: number[]
+}
+
 export const calculateTemperature = (fossilData: DataPoint[]) => {
   const cumulativeEmmissions2025To2060 = { 2025: 0 }
   let currTotal = 0

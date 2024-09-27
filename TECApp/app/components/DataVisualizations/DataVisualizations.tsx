@@ -8,6 +8,7 @@ import { CarbonBudget } from './CarbonBudget'
 import { TechnologyComparison } from './TechnologyComparison'
 import { getAbbrv } from '../../util/ValueDictionaries'
 import { GraphData, RegionData } from '../../api/requests'
+import { TemperatureData } from '../../util/Calculations'
 
 type DataVisualizationsProps = {
   region: string
@@ -17,6 +18,8 @@ type DataVisualizationsProps = {
   dynamicGlobalData?: RegionData
   initialFossilData?: DataPoint[]
   dynamicFossilData?: DataPoint[]
+  temperatureData?: TemperatureData
+  isInteracting?: (interacting: boolean) => void
 }
 const DataVisualizations = ({
   region,
@@ -26,15 +29,19 @@ const DataVisualizations = ({
   dynamicGlobalData,
   initialFossilData,
   dynamicFossilData,
+  temperatureData,
+  isInteracting,
 }: DataVisualizationsProps) => {
   const [activeButton, setActiveButton] = useState(
     region === 'Global' ? 'Carbon Budget' : 'BAU Comparison',
   )
+  const [scrollEnabled, setScrollEnabled] = useState<boolean>(true)
 
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={{ display: 'flex', alignItems: 'flex-start' }}
+      scrollEnabled={scrollEnabled}
     >
       <View style={styles.buttonsWrapper}>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
@@ -136,6 +143,11 @@ const DataVisualizations = ({
         <CarbonBudget
           BAUData={initialFossilData}
           dynamicData={dynamicFossilData}
+          temperatureData={temperatureData}
+          isInteracting={(interacting) => {
+            setScrollEnabled(!interacting)
+            isInteracting(interacting)
+          }}
         />
       ) : (
         <TechnologyComparison
