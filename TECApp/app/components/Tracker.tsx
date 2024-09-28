@@ -41,7 +41,7 @@ export const Tracker = ({
                           : mobileStyles.label
                       }
                     >
-                      {'+1.5° by: ' +
+                      {'+1.5°C by: ' +
                         temperatureData.yearAtDegree[0] +
                         (temperatureData.yearAtDegree[0] == 2060 ? '+' : '')}
                     </Text>
@@ -52,7 +52,7 @@ export const Tracker = ({
                           : mobileStyles.label
                       }
                     >
-                      {'+1.8° by: ' +
+                      {'+1.8°C by: ' +
                         temperatureData.yearAtDegree[1] +
                         (temperatureData.yearAtDegree[1] == 2060 ? '+' : '')}
                     </Text>
@@ -63,7 +63,7 @@ export const Tracker = ({
                           : mobileStyles.label
                       }
                     >
-                      {'+2.0° by: ' +
+                      {'+2.0°C by: ' +
                         temperatureData.yearAtDegree[2] +
                         (temperatureData.yearAtDegree[2] == 2060 ? '+' : '')}
                     </Text>
@@ -77,7 +77,7 @@ export const Tracker = ({
                           : mobileStyles.label
                       }
                     >
-                      {`By 2035: +${temperatureData.degreeAtYear[0].toFixed(1)}° to +${temperatureData.degreeAtYear[1].toFixed(1)}°`}
+                      {`By 2035: +${temperatureData.degreeAtYear[0].toFixed(1)}°C to +${temperatureData.degreeAtYear[1].toFixed(1)}°C`}
                     </Text>
                     <Text
                       style={
@@ -86,7 +86,7 @@ export const Tracker = ({
                           : mobileStyles.label
                       }
                     >
-                      {`By 2050: +${temperatureData.degreeAtYear[2].toFixed(1)}° to +${temperatureData.degreeAtYear[3].toFixed(1)}°`}
+                      {`By 2050: +${temperatureData.degreeAtYear[2].toFixed(1)}°C to +${temperatureData.degreeAtYear[3].toFixed(1)}°C`}
                     </Text>
                   </View>
                 )}
