@@ -52,6 +52,9 @@ export const CarbonBudget = ({
 }: CarbonBudgetProps) => {
   const [currPosition, setCurrPosition] = useState<number>(null)
 
+  useEffect(()=>{
+    console.log(currPosition)
+  }, [currPosition])
 
   let BAU1Point5Year = 2029
   let BAU2Point0Year = 2054
@@ -109,7 +112,6 @@ export const CarbonBudget = ({
   const calculateX = (val: number) => {
     return leftMargin + ((val - xMin) / xRange) * (contentWidth - leftMargin)
   }
-
 
   const y = d3.scaleLinear().domain([0, yMax]).range([graphHeight, 0])
   const x = d3
@@ -176,25 +178,27 @@ export const CarbonBudget = ({
         the amount of emissions you’re allowed to emit before exceeding the
         global temperature threshold.
       </Text>
-      <View style={styles.graphContainer}>
-        <View
-          onStartShouldSetResponder={() => true}
-          onMoveShouldSetResponder={() => true}
-          onResponderTerminationRequest={() => false}
-          onResponderStart={(evt) => {
-            isInteracting(true)
-            setCurrPosition(evt.nativeEvent.locationX)
-          }}
-          onResponderMove={(evt) => setCurrPosition(evt.nativeEvent.locationX)}
-          onResponderRelease={(evt) => {
-            isInteracting(false)
-            setCurrPosition(null)
-          }}
-          style={styles.graphInnerContainer}
-        >
-          <GraphKey label="BAU CARBON EMISSIONS" color="#266297" />
-          <GraphKey label="ALTERED CARBON EMISSIONS" color="#58C4D4" />
-
+      <View style={styles.graphContainer}
+      onStartShouldSetResponder={() => true}
+      onMoveShouldSetResponder={() => true}
+      onResponderTerminationRequest={() => false}
+      onResponderStart={(evt) => {
+        isInteracting(true)
+        setCurrPosition(evt.nativeEvent.locationX)
+      }}
+      onResponderMove={(evt) => setCurrPosition(evt.nativeEvent.locationX)}
+      onResponderRelease={(evt) => {
+        isInteracting(false)
+        setCurrPosition(null)
+      }}>
+        <View style={styles.graphTopRow}>
+          {currPosition!==null && currPosition>=60 && currPosition<contentWidth?
+        <Text style={{color: "#757678", fontSize: 12}}>{Math.round(((currPosition-leftMargin)/(contentWidth-leftMargin))*xRange+xMin)}</Text>:<Text></Text>}
+         <View style={styles.keyContainer}>
+         <GraphKey label="ALTERED CARBON EMISSIONS" color="#266297" />
+          <GraphKey label="PROJECTED CARBON EMISSIONS" color="#757678" />
+        </View>
+       </View>
           <Svg width={graphWidth} height={svgHeight}>
             <Defs>
               <LinearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
@@ -384,7 +388,6 @@ export const CarbonBudget = ({
               )}
             </G>
           </Svg>
-        </View>
       </View>
     </View>
   )
@@ -401,16 +404,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   graphContainer: {
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  graphInnerContainer: {
     width: vw*0.9,
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    gap: 4,
+    marginTop: 20,
+    gap: 4
   },
+  graphTopRow: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingRight: 30,
+    paddingLeft: 60
+  },
+  keyContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+    alignItems: "flex-start"
+  }
 })
