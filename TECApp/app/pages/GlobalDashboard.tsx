@@ -32,6 +32,8 @@ export default function GlobalDashboard() {
     degreeAtYear: number[]
   }>()
 
+  const [scrollEnabled, setScrollEnabled] = useState<boolean>(true)
+
   useEffect(() => {
     getData('bau-graph-data').then((value) => {
       setInitialGraphData(JSON.parse(value))
@@ -66,6 +68,7 @@ export default function GlobalDashboard() {
       <ScrollView
         style={styles.regionInfoContainer}
         contentContainerStyle={{ alignItems: 'flex-start' }}
+        scrollEnabled={scrollEnabled}
       >
         {initialGraphData &&
           dynamicGraphData &&
@@ -98,6 +101,8 @@ export default function GlobalDashboard() {
                 dynamicGlobalData={dynamicGraphData}
                 initialFossilData={initialFossilData}
                 dynamicFossilData={dynamicFossilData}
+                temperatureData={temperatureData}
+                isInteracting={(interacting) => setScrollEnabled(!interacting)}
                 region="Global"
               />
             </>
