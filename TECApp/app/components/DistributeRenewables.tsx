@@ -26,6 +26,7 @@ import {
   GestureDetector,
   NativeViewGestureHandler,
 } from 'react-native-gesture-handler'
+import { getData } from '../util/Caching'
 
 export type TechnologyProportions = {
   solar: number
@@ -53,7 +54,7 @@ const DistributeRenewables = ({
 }: DistributeRenewablesProps) => {
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
-
+  
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
     return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
@@ -63,6 +64,7 @@ const DistributeRenewables = ({
 
   const isIpad = deviceType() === 'ipad'
 
+  const [initialSliderValues, setInitialSliderValues] = useState<DefaultValues>(values[2])
   const [sliderValues, setSliderValues] = useState<DefaultValues>(values[2])
 
   const [proportionBarWidth, setProportionBarWidth] = //actual pixel width of proportion bar (based on parent div)
@@ -70,8 +72,12 @@ const DistributeRenewables = ({
   const [technologyProportions, setTechnologyProportions] = //pixel width values of each technology for proportion bar
     useState<TechnologyProportions>(undefined)
 
+  const [globalEnergyProportion, setGlobalEnergyProportion] = useState<number>();
+
   useEffect(() => {
+    setInitialSliderValues(values[2])
     setSliderValues(values[2])
+
   }, [values])
 
   //calculate proportion bar values on every slider change
@@ -96,7 +102,21 @@ const DistributeRenewables = ({
         nuclear:
           (sliderValues.nuclear_gw / sliderTotal) * (proportionBarWidth - 5),
       })
+
+      const initialSliderTotal = 
+        initialSliderValues.wind_gw +
+        initialSliderValues.solar_gw +
+        initialSliderValues.hydro_gw +
+        initialSliderValues.bio_gw +
+        initialSliderValues.geo_gw +
+        initialSliderValues.nuclear_gw
+      getData("global-energy").then((value)=>{
+        console.log(value)
+
+        setGlobalEnergyProportion((sliderTotal/(parseFloat(value)+sliderTotal-initialSliderTotal))*proportionBarWidth)
+      })
     }
+
   }, [sliderValues, proportionBarWidth])
 
   const renderTrackMark = (index: number, mark: string) => (
@@ -226,6 +246,40 @@ const DistributeRenewables = ({
         energy source to reach 12 TW of renewable capacity. This will override
         default values set in the global dashboard.
       </Text>
+      <View style={styles.capacityProportionContainer}>
+        <Text style={styles.capacityProportionText}>
+          Total Renewable Energy Capacity
+        </Text>
+        {proportionBarWidth && globalEnergyProportion && 
+        <Svg height={20} style={{marginTop: 10}}>
+          <Rect x={0} y={0} width={proportionBarWidth} height={20} fill="#DEDCD9" />
+          <Rect x={0} y={0} width={globalEnergyProportion} height={20} fill="#266297" />
+          <Path
+              d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <Path
+              d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <Path
+              d={`M ${proportionBarWidth - 4} 0 Q ${proportionBarWidth - 0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`}
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <Path
+              d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth - 0.5} 19.5 ${proportionBarWidth - 4} 20 L ${proportionBarWidth} 20 z`}
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+        </Svg>}
+      </View>
       <View
         style={styles.capacityProportionContainer}
         onLayout={(event) => {
