@@ -21,11 +21,7 @@ import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
 import Svg, { Path, Rect } from 'react-native-svg'
 import { getEnergyAbbrv, getTechnologyColor } from '../util/ValueDictionaries'
 import { DefaultValues, MinMaxValues } from '../api/requests'
-import {
-  Gesture,
-  GestureDetector,
-  NativeViewGestureHandler,
-} from 'react-native-gesture-handler'
+import { NativeViewGestureHandler } from 'react-native-gesture-handler'
 import { getData } from '../util/Caching'
 
 export type TechnologyProportions = {
@@ -54,7 +50,7 @@ const DistributeRenewables = ({
 }: DistributeRenewablesProps) => {
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
-  
+
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
     return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
@@ -64,7 +60,9 @@ const DistributeRenewables = ({
 
   const isIpad = deviceType() === 'ipad'
 
-  const [initialSliderValues, setInitialSliderValues] = useState<DefaultValues>(values[2])
+  const [initialSliderValues, setInitialSliderValues] = useState<DefaultValues>(
+    values[2],
+  )
   const [sliderValues, setSliderValues] = useState<DefaultValues>(values[2])
 
   const [proportionBarWidth, setProportionBarWidth] = //actual pixel width of proportion bar (based on parent div)
@@ -72,12 +70,26 @@ const DistributeRenewables = ({
   const [technologyProportions, setTechnologyProportions] = //pixel width values of each technology for proportion bar
     useState<TechnologyProportions>(undefined)
 
-  const [globalEnergyProportion, setGlobalEnergyProportion] = useState<number>();
+  const [globalEnergy, setGlobalEnergy] = useState<number>()
+  const [globalEnergyProportion, setGlobalEnergyProportion] = useState<number>()
 
   useEffect(() => {
-    setInitialSliderValues(values[2])
-    setSliderValues(values[2])
+    getData('global-energy').then((value) => {
+      setGlobalEnergy(parseFloat(value))
+      const sliderTotal =
+        sliderValues.wind_gw +
+        sliderValues.solar_gw +
+        sliderValues.hydro_gw +
+        sliderValues.bio_gw +
+        sliderValues.geo_gw +
+        sliderValues.nuclear_gw
+      setGlobalEnergyProportion(
+        (sliderTotal / parseFloat(value)) * proportionBarWidth,
+      )
 
+      setInitialSliderValues(values[2])
+      setSliderValues(values[2])
+    })
   }, [values])
 
   //calculate proportion bar values on every slider change
@@ -103,20 +115,19 @@ const DistributeRenewables = ({
           (sliderValues.nuclear_gw / sliderTotal) * (proportionBarWidth - 5),
       })
 
-      const initialSliderTotal = 
+      const initialSliderTotal =
         initialSliderValues.wind_gw +
         initialSliderValues.solar_gw +
         initialSliderValues.hydro_gw +
         initialSliderValues.bio_gw +
         initialSliderValues.geo_gw +
         initialSliderValues.nuclear_gw
-      getData("global-energy").then((value)=>{
-        console.log(value)
 
-        setGlobalEnergyProportion((sliderTotal/(parseFloat(value)+sliderTotal-initialSliderTotal))*proportionBarWidth)
-      })
+      setGlobalEnergyProportion(
+        (sliderTotal / (globalEnergy + sliderTotal - initialSliderTotal)) *
+          proportionBarWidth,
+      )
     }
-
   }, [sliderValues, proportionBarWidth])
 
   const renderTrackMark = (index: number, mark: string) => (
@@ -246,149 +257,168 @@ const DistributeRenewables = ({
         energy source to reach 12 TW of renewable capacity. This will override
         default values set in the global dashboard.
       </Text>
-      <View style={styles.capacityProportionContainer}>
-        <Text style={styles.capacityProportionText}>
-          Total Renewable Energy Capacity
-        </Text>
-        {proportionBarWidth && globalEnergyProportion && 
-        <Svg height={20} style={{marginTop: 10}}>
-          <Rect x={0} y={0} width={proportionBarWidth} height={20} fill="#DEDCD9" />
-          <Rect x={0} y={0} width={globalEnergyProportion} height={20} fill="#266297" />
-          <Path
-              d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-            <Path
-              d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-            <Path
-              d={`M ${proportionBarWidth - 4} 0 Q ${proportionBarWidth - 0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`}
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-            <Path
-              d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth - 0.5} 19.5 ${proportionBarWidth - 4} 20 L ${proportionBarWidth} 20 z`}
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-        </Svg>}
-      </View>
-      <View
-        style={styles.capacityProportionContainer}
-        onLayout={(event) => {
-          setProportionBarWidth(event.nativeEvent.layout.width - 20)
-        }}
-      >
-        <Text style={styles.capacityProportionText}>
-          Renewable Capacity Proportions
-        </Text>
-        {proportionBarWidth && technologyProportions && (
-          <Svg height={20}>
-            <Rect
-              x={0}
-              y={0}
-              width={technologyProportions.wind}
-              height={20}
-              fill="#C66AAA"
-            />
-            <Rect
-              x={technologyProportions.wind}
-              y={0}
-              width={technologyProportions.solar}
-              height={20}
-              fill="#F8CE46"
-            />
-            <Rect
-              x={technologyProportions.wind + technologyProportions.solar}
-              y={0}
-              width={technologyProportions.hydropower}
-              height={20}
-              fill="#58C4D4"
-            />
-            <Rect
-              x={
-                technologyProportions.wind +
-                technologyProportions.solar +
-                technologyProportions.hydropower
-              }
-              y={0}
-              width={technologyProportions.biomass}
-              height={20}
-              fill="#779448"
-            />
-            <Rect
-              x={
-                technologyProportions.wind +
-                technologyProportions.solar +
-                technologyProportions.hydropower +
-                technologyProportions.biomass
-              }
-              y={0}
-              width={technologyProportions.geothermal}
-              height={20}
-              fill="#BF9336"
-            />
-            <Rect
-              x={
-                technologyProportions.wind +
-                technologyProportions.solar +
-                technologyProportions.hydropower +
-                technologyProportions.biomass +
-                technologyProportions.geothermal
-              }
-              y={0}
-              width={5}
-              height={20}
-              fill="white"
-            />
-            <Rect
-              x={
-                technologyProportions.wind +
-                technologyProportions.solar +
-                technologyProportions.hydropower +
-                technologyProportions.biomass +
-                technologyProportions.geothermal +
-                5
-              }
-              y={0}
-              width={technologyProportions.nuclear}
-              height={20}
-              fill="#EE8E35"
-            />
-            <Path
-              d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-            <Path
-              d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-            <Path
-              d={`M ${proportionBarWidth - 4} 0 Q ${proportionBarWidth - 0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`}
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-            <Path
-              d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth - 0.5} 19.5 ${proportionBarWidth - 4} 20 L ${proportionBarWidth} 20 z`}
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-          </Svg>
-        )}
-        {/* <View style={styles.bar}></View> */}
+      <View style={{ paddingBottom: 20 }}>
+        <View style={styles.capacityProportionContainer}>
+          <Text style={styles.capacityProportionText}>
+            Total Renewable Energy Capacity
+          </Text>
+          {proportionBarWidth && globalEnergyProportion ? (
+            <Svg height={20}>
+              <Rect
+                x={0}
+                y={0}
+                width={proportionBarWidth}
+                height={20}
+                fill="#DEDCD9"
+              />
+              <Rect
+                x={0}
+                y={0}
+                width={globalEnergyProportion}
+                height={20}
+                fill="#266297"
+              />
+              <Path
+                d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d={`M ${proportionBarWidth - 4} 0 Q ${proportionBarWidth - 0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`}
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth - 0.5} 19.5 ${proportionBarWidth - 4} 20 L ${proportionBarWidth} 20 z`}
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+            </Svg>
+          ) : (
+            <></>
+          )}
+        </View>
+        <View
+          style={styles.capacityProportionContainer}
+          onLayout={(event) => {
+            setProportionBarWidth(event.nativeEvent.layout.width - 20)
+          }}
+        >
+          <Text style={styles.capacityProportionText}>
+            Renewable Capacity Proportions
+          </Text>
+          {proportionBarWidth && technologyProportions ? (
+            <Svg height={20}>
+              <Rect
+                x={0}
+                y={0}
+                width={technologyProportions.wind}
+                height={20}
+                fill="#C66AAA"
+              />
+              <Rect
+                x={technologyProportions.wind}
+                y={0}
+                width={technologyProportions.solar}
+                height={20}
+                fill="#F8CE46"
+              />
+              <Rect
+                x={technologyProportions.wind + technologyProportions.solar}
+                y={0}
+                width={technologyProportions.hydropower}
+                height={20}
+                fill="#58C4D4"
+              />
+              <Rect
+                x={
+                  technologyProportions.wind +
+                  technologyProportions.solar +
+                  technologyProportions.hydropower
+                }
+                y={0}
+                width={technologyProportions.biomass}
+                height={20}
+                fill="#779448"
+              />
+              <Rect
+                x={
+                  technologyProportions.wind +
+                  technologyProportions.solar +
+                  technologyProportions.hydropower +
+                  technologyProportions.biomass
+                }
+                y={0}
+                width={technologyProportions.geothermal}
+                height={20}
+                fill="#BF9336"
+              />
+              <Rect
+                x={
+                  technologyProportions.wind +
+                  technologyProportions.solar +
+                  technologyProportions.hydropower +
+                  technologyProportions.biomass +
+                  technologyProportions.geothermal
+                }
+                y={0}
+                width={5}
+                height={20}
+                fill="white"
+              />
+              <Rect
+                x={
+                  technologyProportions.wind +
+                  technologyProportions.solar +
+                  technologyProportions.hydropower +
+                  technologyProportions.biomass +
+                  technologyProportions.geothermal +
+                  5
+                }
+                y={0}
+                width={technologyProportions.nuclear}
+                height={20}
+                fill="#EE8E35"
+              />
+              <Path
+                d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d={`M ${proportionBarWidth - 4} 0 Q ${proportionBarWidth - 0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`}
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth - 0.5} 19.5 ${proportionBarWidth - 4} 20 L ${proportionBarWidth} 20 z`}
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+            </Svg>
+          ) : (
+            <></>
+          )}
+          {/* <View style={styles.bar}></View> */}
+        </View>
       </View>
       {renderSlider(
         'Wind',
@@ -420,27 +450,35 @@ const DistributeRenewables = ({
           into electricity.
         </Text>,
       )}
-{renderSlider(
-  'Biomass',
-  BiomassIcon,
-  <Text>
-    <Text>Most </Text><Text style={{ fontWeight: 'bold' }}>biomass power</Text> systems are generated by the direct combustion of organic materials such as crops and waste products, which are burned and produce steam that drives a generator.
-  </Text>
-)}
-{renderSlider(
-  'Geothermal',
-  GeothermalIcon,
-  <Text>
-    <Text style={{ fontWeight: 'bold' }}>Geothermal power</Text> is generated from heat within the Earth’s core. Geothermal wells and heat exchangers are used to tap into reservoirs of steam and hot water.
-  </Text>
-)}
-{renderSlider(
-  'Nuclear',
-  NuclearIcon,
-  <Text>
-    <Text style={{ fontWeight: 'bold' }}>Nuclear power</Text> is generated through nuclear reactions, typically involving the splitting of atoms to release energy. This is then harnessed to generate electricity.
-  </Text>
-)}
+      {renderSlider(
+        'Biomass',
+        BiomassIcon,
+        <Text>
+          <Text>Most </Text>
+          <Text style={{ fontWeight: 'bold' }}>biomass power</Text> systems are
+          generated by the direct combustion of organic materials such as crops
+          and waste products, which are burned and produce steam that drives a
+          generator.
+        </Text>,
+      )}
+      {renderSlider(
+        'Geothermal',
+        GeothermalIcon,
+        <Text>
+          <Text style={{ fontWeight: 'bold' }}>Geothermal power</Text> is
+          generated from heat within the Earth’s core. Geothermal wells and heat
+          exchangers are used to tap into reservoirs of steam and hot water.
+        </Text>,
+      )}
+      {renderSlider(
+        'Nuclear',
+        NuclearIcon,
+        <Text>
+          <Text style={{ fontWeight: 'bold' }}>Nuclear power</Text> is generated
+          through nuclear reactions, typically involving the splitting of atoms
+          to release energy. This is then harnessed to generate electricity.
+        </Text>,
+      )}
 
       <Text style={[styles.nuclearNote, isIpad && styles.iPadText]}>
         {' '}
@@ -479,7 +517,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingHorizontal: 10,
     paddingVertical: 16,
-    marginBottom: 32,
+    marginBottom: 8,
     gap: 10,
     alignSelf: 'stretch',
     borderRadius: 8,

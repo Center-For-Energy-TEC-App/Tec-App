@@ -38,7 +38,7 @@ export const RegionalDashboard = ({
     'renewables',
   )
 
-  const [modal, setModal] = useState<boolean>(false);
+  const [modal, setModal] = useState<boolean>(false)
 
   useEffect(() => {
     setActiveTab('renewables')
@@ -73,13 +73,17 @@ export const RegionalDashboard = ({
     </Modal>
   )
 
-
   return (
     <View style={styles.regionInfoContainer}>
-      <TouchableOpacity style={styles.regionHeader} onPress={()=>setModal(true)}>
-        {renderTooltip("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")}
-      <Text style={styles.regionName}>{currRegion}</Text>
-      <ToolTipIcon header/>
+      <TouchableOpacity
+        style={styles.regionHeader}
+        onPress={() => setModal(true)}
+      >
+        {renderTooltip(
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        )}
+        <Text style={styles.regionName}>{currRegion}</Text>
+        <ToolTipIcon header />
       </TouchableOpacity>
       <View style={styles.tabContainer}>
         <TouchableOpacity onPress={() => setActiveTab('renewables')}>
@@ -149,17 +153,17 @@ const styles = StyleSheet.create({
   },
   regionHeader: {
     display: 'flex',
-    flexDirection: "row",
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingBottom: 4
+    paddingBottom: 4,
   },
   regionName: {
     color: '#000',
     fontSize: 28,
     fontFamily: 'Brix Sans',
     fontWeight: '400',
-    paddingBottom: 6
+    paddingBottom: 6,
   },
   tabContainer: {
     flexDirection: 'row',

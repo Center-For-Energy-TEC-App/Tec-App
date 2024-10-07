@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
-import {
-  Dimensions,
-  Platform,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Dimensions, Platform, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Tracker } from '../components/Tracker'
 import { DataPoint } from '../components/DataVisualizations/BAUComparison'
 import DataVisualizations from '../components/DataVisualizations/DataVisualizations'
-import { GraphData, RegionData } from '../api/requests'
+import { RegionData } from '../api/requests'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { ExportButton } from '../SVGs/ExportButton'
 import { FeedbackButton } from '../SVGs/FeedbackButton'
