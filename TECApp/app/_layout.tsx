@@ -1,5 +1,5 @@
 import { router, Stack } from 'expo-router'
-import React, { Alert, Pressable, Text } from 'react-native'
+import React, { Alert } from 'react-native'
 import { HelpButton } from './SVGs/HelpButton'
 import { BackArrow } from './SVGs/BackArrow'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -23,17 +23,17 @@ const RootLayout = () => {
             headerShown: true,
             headerBackTitleVisible: false,
             headerShadowVisible: false,
-            headerTitle(props) {
+            headerTitle() {
               return <></>
             },
-            headerRight(props) {
+            headerRight() {
               return (
                 <HelpButton
                   onPress={() => Alert.alert('Help', 'Information here')}
                 />
               )
             },
-            headerLeft(props) {
+            headerLeft() {
               return <BackArrow onPress={() => router.back()} />
             },
 

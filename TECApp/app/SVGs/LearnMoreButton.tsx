@@ -1,6 +1,6 @@
 import React from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import Svg, { Circle, G, Path, Rect, Text as TextSvg } from 'react-native-svg'
+import Svg, { G, Path, Rect, Text as TextSvg } from 'react-native-svg'
 
 type LearnMoreButtonProps = {
   onPress: () => void
