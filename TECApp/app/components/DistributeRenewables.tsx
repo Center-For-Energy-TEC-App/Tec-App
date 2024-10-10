@@ -234,7 +234,6 @@ const DistributeRenewables = ({
         energy source to reach 12 TW of renewable capacity. This will override
         default values set in the global dashboard.
       </Text>
-      {/* <View style={{ paddingBottom: 20 }}> */}
         <View style={styles.capacityProportionContainer}>
           <Text style={styles.capacityProportionText}>
             Region's Contribution to 12 TW Goal
@@ -394,7 +393,6 @@ const DistributeRenewables = ({
           ) : (
             <></>
           )}
-          {/* <View style={styles.bar}></View> */}
         </View>
       {/* </View> */}
       {renderSlider(
@@ -494,7 +492,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingHorizontal: 10,
     paddingVertical: 16,
-    marginBottom: 8,
+    marginBottom: 16,
     gap: 10,
     alignSelf: 'stretch',
     borderRadius: 8,
