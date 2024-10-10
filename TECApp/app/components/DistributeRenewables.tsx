@@ -70,26 +70,11 @@ const DistributeRenewables = ({
   const [technologyProportions, setTechnologyProportions] = //pixel width values of each technology for proportion bar
     useState<TechnologyProportions>(undefined)
 
-  const [globalEnergy, setGlobalEnergy] = useState<number>()
-  const [globalEnergyProportion, setGlobalEnergyProportion] = useState<number>()
+  const [globalEnergyProportion, setGlobalEnergyProportion] = useState<number>();
 
   useEffect(() => {
-    getData('global-energy').then((value) => {
-      setGlobalEnergy(parseFloat(value))
-      const sliderTotal =
-        sliderValues.wind_gw +
-        sliderValues.solar_gw +
-        sliderValues.hydro_gw +
-        sliderValues.bio_gw +
-        sliderValues.geo_gw +
-        sliderValues.nuclear_gw
-      setGlobalEnergyProportion(
-        (sliderTotal / parseFloat(value)) * proportionBarWidth,
-      )
-
-      setInitialSliderValues(values[2])
-      setSliderValues(values[2])
-    })
+    setInitialSliderValues(values[2])
+    setSliderValues(values[2])
   }, [values])
 
   //calculate proportion bar values on every slider change
@@ -115,16 +100,8 @@ const DistributeRenewables = ({
           (sliderValues.nuclear_gw / sliderTotal) * (proportionBarWidth - 5),
       })
 
-      const initialSliderTotal =
-        initialSliderValues.wind_gw +
-        initialSliderValues.solar_gw +
-        initialSliderValues.hydro_gw +
-        initialSliderValues.bio_gw +
-        initialSliderValues.geo_gw +
-        initialSliderValues.nuclear_gw
-
       setGlobalEnergyProportion(
-        (sliderTotal / (globalEnergy + sliderTotal - initialSliderTotal)) *
+        (sliderTotal / 12000) *
           proportionBarWidth,
       )
     }
@@ -250,17 +227,17 @@ const DistributeRenewables = ({
   return (
     <ScrollView
       contentContainerStyle={styles.container}
-      stickyHeaderIndices={[1]}
+      stickyHeaderIndices={[2]}
     >
       <Text style={[styles.description, isIpad && styles.iPadText]}>
         Using the sliders below, make region specific changes for each renewable
         energy source to reach 12 TW of renewable capacity. This will override
         default values set in the global dashboard.
       </Text>
-      <View style={{ paddingBottom: 20 }}>
+      {/* <View style={{ paddingBottom: 20 }}> */}
         <View style={styles.capacityProportionContainer}>
           <Text style={styles.capacityProportionText}>
-            Total Renewable Energy Capacity
+            Region's Contribution to 12 TW Goal
           </Text>
           {proportionBarWidth && globalEnergyProportion ? (
             <Svg height={20}>
@@ -419,7 +396,7 @@ const DistributeRenewables = ({
           )}
           {/* <View style={styles.bar}></View> */}
         </View>
-      </View>
+      {/* </View> */}
       {renderSlider(
         'Wind',
         WindIcon,
