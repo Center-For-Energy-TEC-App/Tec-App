@@ -30,6 +30,10 @@ export interface BottomSheetProps {
     yearAtDegree: number[]
     degreeAtYear: number[]
   }) => void
+  slidersRef: React.RefObject<View>
+  bauRef: React.RefObject<View>
+  regionalComparisonRef: React.RefObject<View>
+  technologyComparisonRef: React.RefObject<View>
 }
 
 export type FossilReductionData = {
@@ -65,6 +69,10 @@ export const BottomSheet = ({
   selectedRegion,
   passGlobalToHome,
   passTemperatureToHome,
+  slidersRef,
+  bauRef,
+  regionalComparisonRef,
+  technologyComparisonRef,
 }: BottomSheetProps) => {
   const snapPoints = useMemo(() => ['12.5%', '25%', '50%', '80%'], [])
   const bottomSheetRef = useRef<BottomSheetTemplate>(null)
@@ -190,6 +198,10 @@ export const BottomSheet = ({
             <RegionalDashboard
               minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
               sliderValues={dynamicSliderValues[getAbbrv(selectedRegion)]}
+              slidersRef={slidersRef}
+              bauRef={bauRef}
+              regionalComparisonRef={regionalComparisonRef}
+              technologyCmparisonRef={technologyComparisonRef}
               currRegion={selectedRegion}
               onSliderChange={(val, technologyChanged) => {
                 //on slider change for a region, store changes here to preserve each region changes
