@@ -14,6 +14,7 @@ import { Tracker } from '../components/Tracker'
 import { GlobalDashboardButton } from '../SVGs/GlobalDashboardButton'
 import { router } from 'expo-router'
 import { removeData } from '../util/Caching'
+import { ExportButton } from '../SVGs/ExportButton'
 
 const vw = Dimensions.get('window').width
 const vh = Dimensions.get('window').height
@@ -69,6 +70,9 @@ export default function Home() {
         >
           <Text>View Tutorial</Text>
         </TouchableOpacity>
+        <View style={mobileStyles.exportButton}>
+          <ExportButton onPress={() => alert('export')} />
+        </View>
       </View>
     </GestureHandlerRootView>
   )
@@ -105,11 +109,16 @@ const mobileStyles = StyleSheet.create({
   },
   resetTutorial: {
     position: 'absolute',
-    top: '16%',
+    top: vh * 0.07 + 75,
     left: '3%',
     backgroundColor: 'white',
     borderRadius: 4,
     paddingHorizontal: 10,
     paddingVertical: 6,
+  },
+  exportButton: {
+    position: 'absolute',
+    right: '3%',
+    bottom: '3%',
   },
 })
