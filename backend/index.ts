@@ -4,8 +4,11 @@ import { getAllDefaultValues, getMinMaxValues } from "./src/AllocationDefaults"
 import Pool from "pg"
 import cors from "cors"
 import { getInitialGraphData, getRegionCalculationData } from "./src/GraphData"
+import { insertFeedback } from "./src/Feedback"
 
 const app = express()
+app.use(express.json())
+
 const port = process.env.LOCAL_PORT
 
 const newPool = Pool.Pool;
@@ -23,7 +26,6 @@ export const pool = new newPool({
 const router = Router()
 
 app.use(router)
-app.use(express.json())
 app.use(cors({
     origin: "*"
 }))
@@ -35,6 +37,8 @@ router.get('/minmax', getMinMaxValues)
 router.get('/initgraph', getInitialGraphData)
 
 router.get('/calc/:region', getRegionCalculationData)
+
+router.post('/feedback', insertFeedback)
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)
