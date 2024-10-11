@@ -24,17 +24,17 @@ const RootLayout = () => {
             headerShown: true,
             headerBackTitleVisible: false,
             headerShadowVisible: false,
-            headerTitle(props) {
+            headerTitle() {
               return <></>
             },
-            headerRight(props) {
+            headerRight() {
               return (
                 <HelpButton
                   onPress={() => Alert.alert('Help', 'Information here')}
                 />
               )
             },
-            headerLeft(props) {
+            headerLeft() {
               return <BackArrow onPress={() => router.back()} />
             },
 

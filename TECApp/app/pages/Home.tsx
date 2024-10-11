@@ -165,7 +165,7 @@ export default function Home() {
           }
           slidersRef={slidersRef}
           bauRef={bauRef}
-          regionalComparsionRef={regionalComparisonRef}
+          regionalComparisonRef={regionalComparisonRef}
           technologyComparisonRef={technologyComparisonRef}
         />
         <View style={mobileStyles.trackerWrapper}>

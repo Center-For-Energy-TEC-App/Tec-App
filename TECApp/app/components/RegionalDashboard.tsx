@@ -6,10 +6,12 @@ import {
   Platform,
   Dimensions,
   TouchableOpacity,
+  Modal,
 } from 'react-native'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { DefaultValues, GraphData, MinMaxValues } from '../api/requests'
+import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
 
 type RegionalDashboardProps = {
   currRegion: string
@@ -44,6 +46,8 @@ export const RegionalDashboard = ({
     'renewables',
   )
 
+  const [modal, setModal] = useState<boolean>(false)
+
   useEffect(() => {
     setActiveTab('renewables')
   }, [currRegion])
@@ -57,9 +61,38 @@ export const RegionalDashboard = ({
 
   const isIpad = deviceType() === 'ipad'
 
+  const renderTooltip = (text: string) => (
+    <Modal
+      transparent={true}
+      visible={modal}
+      onRequestClose={() => setModal(false)}
+    >
+      <View style={styles.tooltipOverlay}>
+        <View style={styles.tooltip}>
+          <Text style={styles.tooltipText}>{text}</Text>
+          <TouchableOpacity
+            style={styles.tooltipCloseButton}
+            onPress={() => setModal(false)}
+          >
+            <Text style={styles.tooltipCloseButtonText}>X</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  )
+
   return (
     <View style={styles.regionInfoContainer}>
-      <Text style={styles.regionName}>{currRegion}</Text>
+      <TouchableOpacity
+        style={styles.regionHeader}
+        onPress={() => setModal(true)}
+      >
+        {renderTooltip(
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        )}
+        <Text style={styles.regionName}>{currRegion}</Text>
+        <ToolTipIcon header />
+      </TouchableOpacity>
       <View style={styles.tabContainer}>
         <TouchableOpacity onPress={() => setActiveTab('renewables')}>
           <View
@@ -128,12 +161,19 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'flex-start',
   },
+  regionHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingBottom: 4,
+  },
   regionName: {
     color: '#000',
     fontSize: 28,
     fontFamily: 'Brix Sans',
     fontWeight: '400',
-    paddingBottom: 10,
+    paddingBottom: 6,
   },
   tabContainer: {
     flexDirection: 'row',
@@ -165,5 +205,35 @@ const styles = StyleSheet.create({
   },
   iPadText: {
     fontSize: 18,
+  },
+  tooltipOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  tooltip: {
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    position: 'relative',
+  },
+  tooltipText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  tooltipCloseButton: {
+    position: 'absolute',
+    top: 10,
+    right: 5,
+    display: 'flex',
+    alignItems: 'center',
+    width: 20,
+    height: 20,
+  },
+  tooltipCloseButtonText: {
+    fontSize: 16,
+    color: '#000',
   },
 })
