@@ -158,3 +158,17 @@ export async function getRegionCalculationData(region: string) {
   const response = await fetch(BASE_URL + `/calc/${region}`, { method: 'GET' })
   return (await response.json()) as CalculationData
 }
+
+export async function insertFeedback(feedback: string) {
+  try {
+    const body = JSON.stringify({ feedback: feedback })
+    const response = await fetch(BASE_URL + '/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: body,
+    })
+    return { success: true, value: response }
+  } catch (error) {
+    return { success: false, value: error }
+  }
+}

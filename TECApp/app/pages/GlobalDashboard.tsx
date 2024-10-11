@@ -7,10 +7,10 @@ import { DataPoint } from '../components/DataVisualizations/BAUComparison'
 import DataVisualizations from '../components/DataVisualizations/DataVisualizations'
 import { RegionData } from '../api/requests'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { ExportButton } from '../SVGs/ExportButton'
 import { FeedbackButton } from '../SVGs/FeedbackButton'
 import { LearnMoreButton } from '../SVGs/LearnMoreButton'
 import { getData } from '../util/Caching'
+import { router } from 'expo-router'
 
 export default function GlobalDashboard() {
   const [initialGraphData, setInitialGraphData] = useState<RegionData>()
@@ -101,14 +101,9 @@ export default function GlobalDashboard() {
             </>
           )}
         <View style={styles.bottomButtons}>
-          <ExportButton
-            onPress={() => {
-              alert('Export')
-            }}
-          />
           <FeedbackButton
             onPress={() => {
-              alert('Feedback')
+              router.push('pages/Feedback')
             }}
           />
           <LearnMoreButton
@@ -157,7 +152,7 @@ const styles = StyleSheet.create({
   bottomButtons: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-evenly',
     width: '100%',
     marginBottom: 50,
   },
