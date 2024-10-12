@@ -26,10 +26,7 @@ import { storeData } from '../util/Caching'
 export interface BottomSheetProps {
   selectedRegion: string
   passGlobalToHome: (energy: number) => void
-  passTemperatureToHome: (temperature: {
-    yearAtDegree: number[]
-    degreeAtYear: number[]
-  }) => void
+  passTemperatureToHome: (temperature: { yearAtDegree: number[] }) => void
   slidersRef: React.RefObject<View>
   bauRef: React.RefObject<View>
   regionalComparisonRef: React.RefObject<View>
@@ -201,7 +198,7 @@ export const BottomSheet = ({
               slidersRef={slidersRef}
               bauRef={bauRef}
               regionalComparisonRef={regionalComparisonRef}
-              technologyCmparisonRef={technologyComparisonRef}
+              technologyComparisonRef={technologyComparisonRef}
               currRegion={selectedRegion}
               onSliderChange={(val, technologyChanged) => {
                 //on slider change for a region, store changes here to preserve each region changes
@@ -329,5 +326,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
+    zIndex: 3,
   },
 })

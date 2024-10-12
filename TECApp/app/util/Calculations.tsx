@@ -161,7 +161,6 @@ export const calculateCarbonCurve = (
 
 export type TemperatureData = {
   yearAtDegree: number[]
-  degreeAtYear: number[]
 }
 
 export const calculateTemperature = (fossilData: DataPoint[]) => {
@@ -197,41 +196,8 @@ export const calculateTemperature = (fossilData: DataPoint[]) => {
   }
   if (!twoPointZeroYear) twoPointZeroYear = 2060
 
-  const IPCC50thPercentile = [
-    150, 350, 500, 650, 850, 1000, 1200, 1350, 1500, 1700, 1850, 2050,
-  ]
-  const IPCC83rdPercentile = [
-    50, 200, 300, 400, 550, 650, 800, 900, 1050, 1150, 1250, 1400,
-  ]
-  let lowerBound2035 = 0
-  let upperBound2035 = 0
-  const constant2035 = 200 + cumulativeEmmissions2025To2060[2035]
-  let lowerBound2050 = 0
-  let upperBound2050 = 0
-  const constant2050 = 200 + cumulativeEmmissions2025To2060[2050]
-  for (let i = 0; i < 12; i++) {
-    if (IPCC50thPercentile[i] - constant2035 > 0 && !lowerBound2035) {
-      lowerBound2035 = 1.3 + i / 10
-    }
-    if (IPCC83rdPercentile[i] - constant2035 > 0 && !upperBound2035) {
-      upperBound2035 = 1.3 + i / 10
-    }
-    if (IPCC50thPercentile[i] - constant2050 > 0 && !lowerBound2050) {
-      lowerBound2050 = 1.3 + i / 10
-    }
-    if (IPCC83rdPercentile[i] - constant2050 > 0 && !upperBound2050) {
-      upperBound2050 = 1.3 + i / 10
-    }
-  }
-
   return {
     yearAtDegree: [onePointFiveYear, onePointEightYear, twoPointZeroYear],
-    degreeAtYear: [
-      lowerBound2035,
-      upperBound2035,
-      lowerBound2050,
-      upperBound2050,
-    ],
   }
 }
 

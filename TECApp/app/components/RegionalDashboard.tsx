@@ -40,7 +40,7 @@ export const RegionalDashboard = ({
   slidersRef,
   bauRef,
   regionalComparisonRef,
-  technologyComparisonRef
+  technologyComparisonRef,
 }: RegionalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
@@ -136,13 +136,13 @@ export const RegionalDashboard = ({
       <View style={styles.horizontalLine} />
       {activeTab === 'renewables' ? (
         <View ref={slidersRef} collapsable={false}>
-        <DistributeRenewables
-          values={sliderValues}
-          minMaxValues={minMaxValues}
-          onSliderChange={onSliderChange}
-          onReset={onReset}
-          disabled={sliderDisabled}
-        />
+          <DistributeRenewables
+            values={sliderValues}
+            minMaxValues={minMaxValues}
+            onSliderChange={onSliderChange}
+            onReset={onReset}
+            disabled={sliderDisabled}
+          />
         </View>
       ) : (
         <DataVisualizations
