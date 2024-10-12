@@ -2,7 +2,10 @@ import { router, Stack } from 'expo-router'
 import React, { Alert, Platform, Pressable, Text } from 'react-native'
 import { HelpButton } from './SVGs/HelpButton'
 import { BackArrow } from './SVGs/BackArrow'
-import { GestureHandlerRootView, TapGestureHandler } from 'react-native-gesture-handler'
+import {
+  GestureHandlerRootView,
+  TapGestureHandler,
+} from 'react-native-gesture-handler'
 
 const RootLayout = () => {
   return (

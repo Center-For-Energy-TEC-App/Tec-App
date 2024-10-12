@@ -8,7 +8,7 @@ type TrackerProps = {
   type: 'temperature' | 'renewable'
   dashboard?: boolean
   totalGlobalEnergy?: number
-  temperatureData?: { yearAtDegree: number[]; degreeAtYear: number[] }
+  temperatureData?: { yearAtDegree: number[] }
 }
 
 export const Tracker = ({
@@ -17,12 +17,13 @@ export const Tracker = ({
   totalGlobalEnergy,
   temperatureData,
 }: TrackerProps) => {
-  const [temperatureVersion, setTemperatureVersion] = useState<boolean>(true)
+  const [temperatureVersion, setTemperatureVersion] = useState<number>(0)
+  const [energyVersion, setEnergyVersion] = useState<number>(0)
   return (
     <>
       {type === 'temperature' ? (
         <TouchableOpacity
-          onPress={() => setTemperatureVersion(!temperatureVersion)}
+          onPress={() => setTemperatureVersion((temperatureVersion + 1) % 3)}
         >
           <View
             style={
@@ -32,61 +33,31 @@ export const Tracker = ({
             {temperatureData && (
               <View style={mobileStyles.iconRow}>
                 <TemperatureIcon dashboard={dashboard} />
-                {temperatureVersion ? (
+                {temperatureVersion == 0 ? (
                   <View style={mobileStyles.dataColumn}>
-                    <Text
-                      style={
-                        dashboard
-                          ? mobileStyles.dashboardLabel
-                          : mobileStyles.label
-                      }
-                    >
-                      {'+1.5°C by: ' +
+                    <Text style={mobileStyles.dashboardLabel}>{'+1.5°C'}</Text>
+                    <Text style={mobileStyles.dashboardLabel}>
+                      {'by ' +
                         temperatureData.yearAtDegree[0] +
                         (temperatureData.yearAtDegree[0] == 2060 ? '+' : '')}
                     </Text>
-                    <Text
-                      style={
-                        dashboard
-                          ? mobileStyles.dashboardLabel
-                          : mobileStyles.label
-                      }
-                    >
-                      {'+1.8°C by: ' +
+                  </View>
+                ) : temperatureVersion == 1 ? (
+                  <View style={mobileStyles.dataColumn}>
+                    <Text style={mobileStyles.dashboardLabel}>{'+1.8°C'}</Text>
+                    <Text style={mobileStyles.dashboardLabel}>
+                      {'by ' +
                         temperatureData.yearAtDegree[1] +
                         (temperatureData.yearAtDegree[1] == 2060 ? '+' : '')}
-                    </Text>
-                    <Text
-                      style={
-                        dashboard
-                          ? mobileStyles.dashboardLabel
-                          : mobileStyles.label
-                      }
-                    >
-                      {'+2.0°C by: ' +
-                        temperatureData.yearAtDegree[2] +
-                        (temperatureData.yearAtDegree[2] == 2060 ? '+' : '')}
                     </Text>
                   </View>
                 ) : (
                   <View style={mobileStyles.dataColumn}>
-                    <Text
-                      style={
-                        dashboard
-                          ? mobileStyles.dashboardLabel
-                          : mobileStyles.label
-                      }
-                    >
-                      {`By 2035: +${temperatureData.degreeAtYear[0].toFixed(1)}°C to +${temperatureData.degreeAtYear[1].toFixed(1)}°C`}
-                    </Text>
-                    <Text
-                      style={
-                        dashboard
-                          ? mobileStyles.dashboardLabel
-                          : mobileStyles.label
-                      }
-                    >
-                      {`By 2050: +${temperatureData.degreeAtYear[2].toFixed(1)}°C to +${temperatureData.degreeAtYear[3].toFixed(1)}°C`}
+                    <Text style={mobileStyles.dashboardLabel}>{'+2.0°C'}</Text>
+                    <Text style={mobileStyles.dashboardLabel}>
+                      {'by ' +
+                        temperatureData.yearAtDegree[2] +
+                        (temperatureData.yearAtDegree[2] == 2060 ? '+' : '')}
                     </Text>
                   </View>
                 )}
@@ -95,37 +66,72 @@ export const Tracker = ({
           </View>
         </TouchableOpacity>
       ) : (
-        <View
-          style={
-            dashboard ? mobileStyles.dashboardWrapper : mobileStyles.wrapper
-          }
+        <TouchableOpacity
+          onPress={() => setEnergyVersion((energyVersion + 1) % 2)}
         >
-          <View style={mobileStyles.iconRow}>
-            <RenewableIcon dashboard={dashboard} />
-            {/* Replace with database value */}
-            <Text
+          {energyVersion == 0 ? (
+            <View
               style={
-                dashboard ? mobileStyles.dashboardHeader : mobileStyles.header
+                dashboard ? mobileStyles.dashboardWrapper : mobileStyles.wrapper
               }
             >
-              {(totalGlobalEnergy / 1000).toFixed(1)}
-            </Text>
-            <Text
+              <View style={mobileStyles.iconRow}>
+                <RenewableIcon dashboard={dashboard} />
+                <Text
+                  style={
+                    dashboard
+                      ? mobileStyles.dashboardHeader
+                      : mobileStyles.header
+                  }
+                >
+                  {(totalGlobalEnergy / 1000).toFixed(1)}
+                </Text>
+                <Text
+                  style={
+                    dashboard
+                      ? mobileStyles.dashboardSmallHeader
+                      : mobileStyles.smallHeader
+                  }
+                >
+                  TW
+                </Text>
+              </View>
+              <Text
+                style={
+                  dashboard ? mobileStyles.dashboardLabel : mobileStyles.label
+                }
+              >
+                of power by 2030
+              </Text>
+            </View>
+          ) : (
+            <View
               style={
-                dashboard
-                  ? mobileStyles.dashboardSmallHeader
-                  : mobileStyles.smallHeader
+                dashboard ? mobileStyles.dashboardWrapper : mobileStyles.wrapper
               }
             >
-              TW
-            </Text>
-          </View>
-          <Text
-            style={dashboard ? mobileStyles.dashboardLabel : mobileStyles.label}
-          >
-            of renewable capacity
-          </Text>
-        </View>
+              <View style={mobileStyles.iconRow}>
+                <RenewableIcon dashboard={dashboard} />
+                <Text
+                  style={
+                    dashboard
+                      ? mobileStyles.dashboardHeader
+                      : mobileStyles.header
+                  }
+                >
+                  {((totalGlobalEnergy / 1000 / 12) * 100).toFixed(0) + '%'}
+                </Text>
+              </View>
+              <Text
+                style={
+                  dashboard ? mobileStyles.dashboardLabel : mobileStyles.label
+                }
+              >
+                of 12 TW Goal
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
       )}
     </>
   )
