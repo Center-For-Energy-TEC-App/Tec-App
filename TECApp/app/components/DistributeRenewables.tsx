@@ -22,6 +22,7 @@ import Svg, { Path, Rect } from 'react-native-svg'
 import { getEnergyAbbrv, getTechnologyColor } from '../util/ValueDictionaries'
 import { DefaultValues, MinMaxValues } from '../api/requests'
 import { NativeViewGestureHandler } from 'react-native-gesture-handler'
+import { SliderIndicator } from '../SVGs/SliderIndicator'
 
 export type TechnologyProportions = {
   solar: number
@@ -102,7 +103,12 @@ const DistributeRenewables = ({
   const renderTrackMark = (index: number, mark: string) => (
     <View style={styles.trackMarkContainer} key={index}>
       <View style={styles.trackMark} />
-      <Text style={styles.trackMarkLabel}>{mark}</Text>
+      {mark==="2025"?(
+        <SliderIndicator color="#6DB6FB"></SliderIndicator>
+      ):(
+        <SliderIndicator color="#F05B4A"></SliderIndicator>
+      )
+      }
     </View>
   )
 
@@ -166,11 +172,11 @@ const DistributeRenewables = ({
             minimumTrackTintColor={getTechnologyColor(label)}
             maximumTrackTintColor="#B5B1AA"
             trackMarks={[
-              values[0][getEnergyAbbrv(label.toLowerCase())] - //subtract by slight offset because the trackmark div is wider than the trackmark itself
-                0.0425 *
+              values[0][getEnergyAbbrv(label.toLowerCase())] + //add slight offset because the trackmark div is wider than the trackmark itself
+                0.0275 *
                   (parseFloat(minMaxValues.max[label.toLowerCase()]) -
                     parseFloat(minMaxValues.min[label.toLowerCase()])),
-              values[1][getEnergyAbbrv(label.toLowerCase())] -
+              values[1][getEnergyAbbrv(label.toLowerCase())] +
                 0.0275 *
                   (parseFloat(minMaxValues.max[label.toLowerCase()]) -
                     parseFloat(minMaxValues.min[label.toLowerCase()])),
@@ -180,8 +186,8 @@ const DistributeRenewables = ({
                 index,
                 values[0][getEnergyAbbrv(label.toLowerCase())] < //ordering based on which value (2024 or bau) is higher
                   values[1][getEnergyAbbrv(label.toLowerCase())]
-                  ? ['2024', 'BAU'][index]
-                  : ['BAU', '2024'][index],
+                  ? ['2025', '2030'][index]
+                  : ['2030', '2025'][index],
               )
             }
             onSlidingStart={() => {
@@ -386,6 +392,16 @@ const DistributeRenewables = ({
           <></>
         )}
       </View>
+      <View style={styles.sliderIndicatorRow}>
+        <View style={styles.sliderIndicator}>
+          <SliderIndicator color="#6DB6FB"/>
+          <Text style={{fontSize: 12}}>2025</Text>
+        </View>
+        <View style={styles.sliderIndicator}>
+          <SliderIndicator color="#F05B4A"/>
+          <Text style={{fontSize: 12}}>2030 Forecast</Text>
+        </View>
+      </View>
       {/* </View> */}
       {renderSlider(
         'Wind',
@@ -515,7 +531,6 @@ const styles = StyleSheet.create({
     maxWidth: '50%',
     paddingBottom: 10,
     gap: 8,
-    // backgroundColor: "red"
   },
   label: {
     color: '#000',
@@ -575,7 +590,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   spacer: {
-    marginTop: 46,
+    marginTop: 100,
   },
   nuclearNote: {
     color: '#757678',
@@ -600,19 +615,33 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   trackMarkContainer: {
-    paddingTop: 20,
+    paddingTop: 10,
+    gap: 4,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   trackMark: {
     width: 1,
-    height: 21,
+    height: 25,
     backgroundColor: '#B5B1AA',
   },
   trackMarkLabel: {
+    marginTop: 3,
     color: '#B5B1AA',
     fontSize: 17,
   },
+  sliderIndicatorRow: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 20,
+    gap: 14
+  },
+  sliderIndicator:{
+    display: "flex",
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center"
+  }
 })
 
 export default DistributeRenewables

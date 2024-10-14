@@ -22,7 +22,6 @@ export default function GlobalDashboard() {
   const [globalEnergy, setGlobalEnergy] = useState<number>()
   const [temperatureData, setTemperatureData] = useState<{
     yearAtDegree: number[]
-    degreeAtYear: number[]
   }>()
 
   const [scrollEnabled, setScrollEnabled] = useState<boolean>(true)
