@@ -104,9 +104,9 @@ const DistributeRenewables = ({
     <View style={styles.trackMarkContainer} key={index}>
       <View style={styles.trackMark} />
       {mark==="2025"?(
-        <SliderIndicator color="#6DB6FB"></SliderIndicator>
-      ):(
         <SliderIndicator color="#F05B4A"></SliderIndicator>
+      ):(
+        <SliderIndicator color="#6DB6FB"></SliderIndicator>
       )
       }
     </View>
@@ -394,11 +394,11 @@ const DistributeRenewables = ({
       </View>
       <View style={styles.sliderIndicatorRow}>
         <View style={styles.sliderIndicator}>
-          <SliderIndicator color="#6DB6FB"/>
+          <SliderIndicator color="#F05B4A"/>
           <Text style={{fontSize: 12}}>2025</Text>
         </View>
         <View style={styles.sliderIndicator}>
-          <SliderIndicator color="#F05B4A"/>
+          <SliderIndicator color="#6DB6FB"/>
           <Text style={{fontSize: 12}}>2030 Forecast</Text>
         </View>
       </View>
