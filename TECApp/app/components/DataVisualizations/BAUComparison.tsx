@@ -17,7 +17,7 @@ const graphHeight = 190
 const graphWidth = vw * 0.8
 const leftMargin = 65
 
-const xMin = 2024
+const xMin = 2025
 const xMax = 2030
 
 export type DataPoint = {
@@ -45,8 +45,8 @@ export const BAUComparison = ({
   BAUData,
   dynamicData,
 }: BAUComparisonProps) => {
-  const BAU_data = BAUData.total
-  const altered_data = dynamicData.total
+  const BAU_data = BAUData.total.slice(1)
+  const altered_data = dynamicData.total.slice(1)
 
   //min of both datasets
   const yMin = Math.min(
@@ -92,20 +92,20 @@ export const BAUComparison = ({
 
   return (
     <View style={{ width: '100%' }}>
-      <Text style={styles.header}>B.A.U. Comparison</Text>
+      <Text style={styles.header}>Forecast Comparison</Text>
       <Text style={[styles.body, isIpad && styles.iPadText]}>
-        See how your manipulated data compares to the business-as-usual (BAU)
+        See how your manipulated data compares to the forecast business-as-usual (BAU)
         data. The BAU data represents the projected renewable capacity levels
         from now to 2030 without any interventions.
       </Text>
       <View style={styles.graphHeader}>
         <Text style={styles.bold}>{region + ':'}</Text>
-        <Text style={styles.body}>Altered vs. BAU Renewables</Text>
+        <Text style={styles.body}>My Plan vs. Current Forecast</Text>
       </View>
       <View style={styles.graphContainer}>
         <View style={styles.graphInnerContainer}>
-          <GraphKey label="ALTERED RENEWABLES" color="#C66AAA" />
-          <GraphKey label="BUSINESS-AS-USUAL" color="#58C4D4" />
+          <GraphKey label="MY PLAN" color="#C66AAA" />
+          <GraphKey label="FORECAST" color="#58C4D4" />
           <LineGraph
             yMin={yMin}
             yMax={yMax}
