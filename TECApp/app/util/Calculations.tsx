@@ -160,7 +160,9 @@ export const calculateCarbonCurve = (
 }
 
 export type TemperatureData = {
-  yearAtDegree: number[]
+  '1.5Year': number
+  '1.8Year': number
+  '2.0Year': number
 }
 
 export const calculateTemperature = (fossilData: DataPoint[]) => {
@@ -197,7 +199,9 @@ export const calculateTemperature = (fossilData: DataPoint[]) => {
   if (!twoPointZeroYear) twoPointZeroYear = 2060
 
   return {
-    yearAtDegree: [onePointFiveYear, onePointEightYear, twoPointZeroYear],
+    '1.5Year': onePointFiveYear,
+    '1.8Year': onePointEightYear,
+    '2.0Year': twoPointZeroYear,
   }
 }
 

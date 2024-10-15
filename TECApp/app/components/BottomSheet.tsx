@@ -14,6 +14,7 @@ import {
 } from '../api/requests'
 import { getAbbrv, getEnergyAbbrv } from '../util/ValueDictionaries'
 import {
+  TemperatureData,
   calculateCarbonCurve,
   calculateCarbonReductions,
   calculateEnergyCurve,
@@ -26,7 +27,7 @@ import { storeData } from '../util/Caching'
 export interface BottomSheetProps {
   selectedRegion: string
   passGlobalToHome: (energy: number) => void
-  passTemperatureToHome: (temperature: { yearAtDegree: number[] }) => void
+  passTemperatureToHome: (temperature: TemperatureData) => void
   slidersRef: React.RefObject<View>
   bauRef: React.RefObject<View>
   regionalComparisonRef: React.RefObject<View>

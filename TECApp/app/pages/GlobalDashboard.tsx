@@ -11,6 +11,7 @@ import { FeedbackButton } from '../SVGs/FeedbackButton'
 import { LearnMoreButton } from '../SVGs/LearnMoreButton'
 import { getData } from '../util/Caching'
 import { router } from 'expo-router'
+import { TemperatureData } from '../util/Calculations'
 
 export default function GlobalDashboard() {
   const [initialGraphData, setInitialGraphData] = useState<RegionData>()
@@ -20,9 +21,7 @@ export default function GlobalDashboard() {
   const [dynamicFossilData, setDynamicFossilData] = useState<DataPoint[]>()
 
   const [globalEnergy, setGlobalEnergy] = useState<number>()
-  const [temperatureData, setTemperatureData] = useState<{
-    yearAtDegree: number[]
-  }>()
+  const [temperatureData, setTemperatureData] = useState<TemperatureData>()
 
   const [scrollEnabled, setScrollEnabled] = useState<boolean>(true)
 

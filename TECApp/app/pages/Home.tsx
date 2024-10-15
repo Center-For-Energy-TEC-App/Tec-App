@@ -20,6 +20,7 @@ import { captureRef } from 'react-native-view-shot'
 import * as Print from 'expo-print'
 import * as FileSystem from 'expo-file-system'
 import { Host, Portal } from 'react-native-portalize'
+import { TemperatureData } from '../util/Calculations'
 
 const vw = Dimensions.get('window').width
 const vh = Dimensions.get('window').height
@@ -27,9 +28,7 @@ const vh = Dimensions.get('window').height
 export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState<string>('Global')
   const [totalGlobalEnergy, setTotalGlobalEnergy] = useState<number>(0)
-  const [temperatureData, setTemperatureData] = useState<{
-    yearAtDegree: number[]
-  }>()
+  const [temperatureData, setTemperatureData] = useState<TemperatureData>()
 
   const [refreshTutorial, setRefreshTutorial] = useState<boolean>(true)
   const [tutorialState, setTutorialState] = useState<number>(0)

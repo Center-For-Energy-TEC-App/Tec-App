@@ -59,69 +59,68 @@ export const Tutorial = ({ refresh, state }: TutorialProps) => {
                           Welcome to the Triton Energy Climate app!
                         </Text>
                         <Text style={mobileStyles.body}>
-                          In this app, you can explore how various regions’
-                          renewable energy levels contribute to reaching global
-                          climate goals in 2030.
-                        </Text>
-                        <Text style={mobileStyles.body}>
-                          Let’s take a look at how to do this!
+                          We’re excited that you’re here. In this app you can
+                          explore scenarios and make your own plan for achieving
+                          the global climate goal of tripling renewable energy
+                          by 2030.
                         </Text>
                       </View>
                     )}
                     {tutorialState == 1 && (
                       <View style={mobileStyles.textWrapper}>
                         <Text style={mobileStyles.header}>
-                          Understand the world’s total global climate goals.
+                          Where are we now?
                         </Text>
                         <Text style={mobileStyles.body}>
-                          Increasing the world’s renewable energy capacity to 12
-                          TW will help keep global warming under 2°C by 2030.
-                        </Text>
-                        <Text style={mobileStyles.body}>
-                          Track your progress on the top left or via the global
-                          climate goals dashboard on the bottom.
+                          Global renewable energy capacity today is 4 TW
+                          (terawatts). 1 TW equals 1 trillion watts, enough to
+                          power roughly 48 billion lightbulbs! Reaching 12 TW by
+                          2030 is the goal.
                         </Text>
                       </View>
                     )}
                     {tutorialState == 2 && (
                       <View style={mobileStyles.textWrapper}>
                         <Text style={mobileStyles.header}>
-                          Set default values across 10 global regions.
+                          Is the goal possible?
                         </Text>
                         <Text style={mobileStyles.body}>
-                          In the global climate dashboard, set default values
-                          for each region to start with in reaching 12 TW
-                          renewable capacity.
+                          Absolutely! Renewable energy is the fastest growing
+                          source of new energy on the planet and we’re already
+                          on track to double renewables by 2030. But we can do
+                          better and this app lets you develop a plan to do it.
                         </Text>
                       </View>
                     )}
                     {tutorialState == 3 && (
                       <View style={mobileStyles.textWrapper}>
                         <Text style={mobileStyles.header}>
-                          Make changes to specific regions.
+                          Will 12 TW by 2030 solve climate change?
                         </Text>
                         <Text style={mobileStyles.body}>
-                          Click on a region of the map to view and manipulate
-                          renewable energy sources specifically in that area.
-                        </Text>
-                        <Text style={mobileStyles.body}>
-                          You can override default values to explore more ways
-                          to reach global climate goals.
+                          As you make your 12 TW plan on the app you’ll see the
+                          difference it makes. We need to keep future warming to
+                          less than 2° Celsius (C) and stay as close to 1.5°C as
+                          possible. The difference might seem minor but even
+                          half a degree will have enormous impacts on weather,
+                          sea levels, biodiversity, food production, and human
+                          health.
                         </Text>
                       </View>
                     )}
                     {tutorialState == 4 && (
                       <View style={mobileStyles.textWrapper}>
                         <Text style={mobileStyles.header}>
-                          Compare current energy levels to what is needed.
+                          Share your Energy and Climate Plan!
                         </Text>
                         <Text style={mobileStyles.body}>
-                          For each region and globally, you can compare your
-                          manipulated data to business-as-usual data.
+                          You’ll have the option to send your plan to global
+                          leaders at COP 29, the annual United Nation Climate
+                          Change Conference happening from Nov 11-22, 2024 in
+                          Azerbaijan.
                         </Text>
                         <Text style={mobileStyles.body}>
-                          Click between various graphs to see different
-                          representations of your data.
+                          Ready to get started?
                         </Text>
                       </View>
                     )}

@@ -103,12 +103,11 @@ const DistributeRenewables = ({
   const renderTrackMark = (index: number, mark: string) => (
     <View style={styles.trackMarkContainer} key={index}>
       <View style={styles.trackMark} />
-      {mark==="2025"?(
+      {mark === '2025' ? (
         <SliderIndicator color="#F05B4A"></SliderIndicator>
-      ):(
+      ) : (
         <SliderIndicator color="#6DB6FB"></SliderIndicator>
-      )
-      }
+      )}
     </View>
   )
 
@@ -394,12 +393,12 @@ const DistributeRenewables = ({
       </View>
       <View style={styles.sliderIndicatorRow}>
         <View style={styles.sliderIndicator}>
-          <SliderIndicator color="#F05B4A"/>
-          <Text style={{fontSize: 12}}>2025</Text>
+          <SliderIndicator color="#F05B4A" />
+          <Text style={{ fontSize: 12 }}>2025</Text>
         </View>
         <View style={styles.sliderIndicator}>
-          <SliderIndicator color="#6DB6FB"/>
-          <Text style={{fontSize: 12}}>2030 Forecast</Text>
+          <SliderIndicator color="#6DB6FB" />
+          <Text style={{ fontSize: 12 }}>2030 Forecast</Text>
         </View>
       </View>
       {/* </View> */}
@@ -630,18 +629,18 @@ const styles = StyleSheet.create({
     fontSize: 17,
   },
   sliderIndicatorRow: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-end",
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
     marginTop: 20,
-    gap: 14
+    gap: 14,
   },
-  sliderIndicator:{
-    display: "flex",
-    flexDirection: "row",
+  sliderIndicator: {
+    display: 'flex',
+    flexDirection: 'row',
     gap: 8,
-    alignItems: "center"
-  }
+    alignItems: 'center',
+  },
 })
 
 export default DistributeRenewables

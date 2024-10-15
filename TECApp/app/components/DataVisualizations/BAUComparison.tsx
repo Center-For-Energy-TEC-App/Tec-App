@@ -94,9 +94,9 @@ export const BAUComparison = ({
     <View style={{ width: '100%' }}>
       <Text style={styles.header}>Forecast Comparison</Text>
       <Text style={[styles.body, isIpad && styles.iPadText]}>
-        See how your manipulated data compares to the forecast business-as-usual (BAU)
-        data. The BAU data represents the projected renewable capacity levels
-        from now to 2030 without any interventions.
+        See how your manipulated data compares to the forecast business-as-usual
+        (BAU) data. The BAU data represents the projected renewable capacity
+        levels from now to 2030 without any interventions.
       </Text>
       <View style={styles.graphHeader}>
         <Text style={styles.bold}>{region + ':'}</Text>
