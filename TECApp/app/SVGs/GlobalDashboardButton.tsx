@@ -4,13 +4,20 @@ import Svg, { Path, Rect } from 'react-native-svg'
 
 type GlobalDashboardButtonProps = {
   onPress: () => void
+  glow: boolean
 }
 
 export const GlobalDashboardButton = ({
   onPress,
+  glow,
 }: GlobalDashboardButtonProps) => {
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={
+        glow && { shadowColor: '#779448', shadowRadius: 30, shadowOpacity: 1 }
+      }
+    >
       <Svg width="64" height="64" viewBox="0 0 64 64" fill="none">
         <Rect x="2" y="2" width="60" height="60" rx="30" fill="white" />
         <Rect

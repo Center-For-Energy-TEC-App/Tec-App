@@ -121,29 +121,27 @@ export const CarbonBudget = ({
     .curve(d3.curveMonotoneX)(dynamicData)
 
   const separationHeight = findYbyX(
-    calculateX(temperatureData.yearAtDegree[2]),
+    calculateX(temperatureData['2.0Year']),
     full_curve,
   )
   const separationPoint = {
-    year: temperatureData.yearAtDegree[2],
+    year: temperatureData['2.0Year'],
     value: yMax - (separationHeight / graphHeight) * yRange,
   }
   //separate data based on 2 degree limit
   let data1 = [],
     data2 = []
   if (separationPoint.year % 5 == 0) {
-    data1 = dynamicData.filter(
-      (val) => val.year <= temperatureData.yearAtDegree[2],
-    )
+    data1 = dynamicData.filter((val) => val.year <= temperatureData['2.0Year'])
     data2 = [separationPoint].concat(
-      dynamicData.filter((val) => val.year > temperatureData.yearAtDegree[2]),
+      dynamicData.filter((val) => val.year > temperatureData['2.0Year']),
     )
   } else {
     data1 = dynamicData
-      .filter((val) => val.year <= temperatureData.yearAtDegree[2])
+      .filter((val) => val.year <= temperatureData['2.0Year'])
       .concat([separationPoint])
     data2 = [separationPoint].concat(
-      dynamicData.filter((val) => val.year > temperatureData.yearAtDegree[2]),
+      dynamicData.filter((val) => val.year > temperatureData['2.0Year']),
     )
   }
 
@@ -380,7 +378,7 @@ export const CarbonBudget = ({
               </G>
             )}
             <Circle
-              x={calculateX(temperatureData.yearAtDegree[0])}
+              x={calculateX(temperatureData['1.5Year'])}
               y={graphHeight}
               r={4}
               fill="white"
@@ -388,28 +386,26 @@ export const CarbonBudget = ({
               strokeWidth={2.362}
             />
             <Circle
-              x={calculateX(temperatureData.yearAtDegree[2])}
+              x={calculateX(temperatureData['2.0Year'])}
               y={graphHeight}
               r={4}
               fill="white"
               stroke="#266297"
               strokeWidth={2.362}
             />
-            {Math.abs(
-              currPosition - calculateX(temperatureData.yearAtDegree[0]),
-            ) < 5 && (
+            {Math.abs(currPosition - calculateX(temperatureData['1.5Year'])) <
+              5 && (
               <G
-                x={calculateX(temperatureData.yearAtDegree[0]) - 33}
+                x={calculateX(temperatureData['1.5Year']) - 33}
                 y={graphHeight - 37}
               >
                 <AlteredCurvePopup label="1.5˚C LIMIT" />
               </G>
             )}
-            {Math.abs(
-              currPosition - calculateX(temperatureData.yearAtDegree[2]),
-            ) < 5 && (
+            {Math.abs(currPosition - calculateX(temperatureData['2.0Year'])) <
+              5 && (
               <G
-                x={calculateX(temperatureData.yearAtDegree[2]) - 33}
+                x={calculateX(temperatureData['2.0Year']) - 33}
                 y={graphHeight - 37}
               >
                 <AlteredCurvePopup label="2.0˚C LIMIT" />

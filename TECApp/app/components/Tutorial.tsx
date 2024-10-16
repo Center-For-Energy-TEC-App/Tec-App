@@ -14,167 +14,138 @@ import { getData, storeData } from '../util/Caching'
 type TutorialProps = {
   refresh: boolean
   state: number
+  sendStateHome: (state: number) => void
 }
 
 const vh = Dimensions.get('window').height
 
-export const Tutorial = ({ refresh, state }: TutorialProps) => {
+export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
   //states 0-4 represent 5 slides; state 5 represents popup to click on global dashboard, state 6 represents popup to click on a region
   const [tutorialState, setTutorialState] = useState(0)
-  const [render, setRender] = useState<boolean>(true)
 
   useEffect(() => {
     getData('tutorial').then((value) => {
-      if (value && value == 'complete') {
-        setRender(false)
+      if (value && value === 'complete') {
+        setTutorialState(11)
+        sendStateHome(11)
       } else {
-        setRender(true)
+        setTutorialState(state)
+      }
+      if (state === 11) {
+        storeData('tutorial', 'complete').then(() => {
+          console.log('tutorial complete')
+        })
       }
     })
-    setTutorialState(state)
-    if (state == 7) {
-      storeData('tutorial', 'complete').then(() => {
-        setRender(false)
-      })
-    }
   }, [refresh, state])
 
   return (
     <>
-      {render && (
+      {tutorialState < 5 && (
         <>
-          {tutorialState < 5 && (
-            <>
-              <View style={mobileStyles.popupOverlay} />
-              <View style={mobileStyles.popupColumn}>
-                <View style={mobileStyles.popupRow}>
-                  <LeftArrow
-                    onPress={() => setTutorialState(tutorialState - 1)}
-                    render={tutorialState != 0}
-                  />
-                  <View style={mobileStyles.modal}>
-                    {tutorialState == 0 && (
-                      <View style={mobileStyles.textWrapper}>
-                        <Text style={mobileStyles.header}>
-                          Welcome to the Triton Energy Climate app!
-                        </Text>
-                        <Text style={mobileStyles.body}>
-                          We’re excited that you’re here. In this app you can
-                          explore scenarios and make your own plan for achieving
-                          the global climate goal of tripling renewable energy
-                          by 2030.
-                        </Text>
-                      </View>
-                    )}
-                    {tutorialState == 1 && (
-                      <View style={mobileStyles.textWrapper}>
-                        <Text style={mobileStyles.header}>
-                          Where are we now?
-                        </Text>
-                        <Text style={mobileStyles.body}>
-                          Global renewable energy capacity today is 4 TW
-                          (terawatts). 1 TW equals 1 trillion watts, enough to
-                          power roughly 48 billion lightbulbs! Reaching 12 TW by
-                          2030 is the goal.
-                        </Text>
-                      </View>
-                    )}
-                    {tutorialState == 2 && (
-                      <View style={mobileStyles.textWrapper}>
-                        <Text style={mobileStyles.header}>
-                          Is the goal possible?
-                        </Text>
-                        <Text style={mobileStyles.body}>
-                          Absolutely! Renewable energy is the fastest growing
-                          source of new energy on the planet and we’re already
-                          on track to double renewables by 2030. But we can do
-                          better and this app lets you develop a plan to do it.
-                        </Text>
-                      </View>
-                    )}
-                    {tutorialState == 3 && (
-                      <View style={mobileStyles.textWrapper}>
-                        <Text style={mobileStyles.header}>
-                          Will 12 TW by 2030 solve climate change?
-                        </Text>
-                        <Text style={mobileStyles.body}>
-                          As you make your 12 TW plan on the app you’ll see the
-                          difference it makes. We need to keep future warming to
-                          less than 2° Celsius (C) and stay as close to 1.5°C as
-                          possible. The difference might seem minor but even
-                          half a degree will have enormous impacts on weather,
-                          sea levels, biodiversity, food production, and human
-                          health.
-                        </Text>
-                      </View>
-                    )}
-                    {tutorialState == 4 && (
-                      <View style={mobileStyles.textWrapper}>
-                        <Text style={mobileStyles.header}>
-                          Share your Energy and Climate Plan!
-                        </Text>
-                        <Text style={mobileStyles.body}>
-                          You’ll have the option to send your plan to global
-                          leaders at COP 29, the annual United Nation Climate
-                          Change Conference happening from Nov 11-22, 2024 in
-                          Azerbaijan.
-                        </Text>
-                        <Text style={mobileStyles.body}>
-                          Ready to get started?
-                        </Text>
-                      </View>
-                    )}
+          <View style={mobileStyles.popupOverlay} />
+          <View style={mobileStyles.popupColumn}>
+            <View style={mobileStyles.popupRow}>
+              <LeftArrow
+                onPress={() => setTutorialState(tutorialState - 1)}
+                render={tutorialState != 0}
+              />
+              <View style={mobileStyles.modal}>
+                {tutorialState == 0 && (
+                  <View style={mobileStyles.textWrapper}>
+                    <Text style={mobileStyles.header}>
+                      Welcome to the Triton Energy Climate app!
+                    </Text>
+                    <Text style={mobileStyles.body}>
+                      We’re excited that you’re here. In this app you can
+                      explore scenarios and make your own plan for achieving the
+                      global climate goal of tripling renewable energy by 2030.
+                    </Text>
                   </View>
-                  <RightArrow
-                    onPress={() => setTutorialState(tutorialState + 1)}
-                    render={tutorialState != 4}
-                  />
-                </View>
-                <View style={mobileStyles.paginationRow}>
-                  <PaginationCircle filled={tutorialState == 0} />
-                  <PaginationCircle filled={tutorialState == 1} />
-                  <PaginationCircle filled={tutorialState == 2} />
-                  <PaginationCircle filled={tutorialState == 3} />
-                  <PaginationCircle filled={tutorialState == 4} />
-                </View>
-                <TouchableOpacity
-                  onPress={() => {
-                    //if they made it to the last slide, they probably want to see the rest of the tutorial
-                    if (tutorialState == 4) {
-                      setTutorialState(5)
-                    } else {
-                      setRender(false)
-                      storeData('tutorial', 'complete')
-                    }
-                  }}
-                  style={mobileStyles.skipButton}
-                >
-                  <Text style={{ color: '#FFF', fontSize: 16 }}>
-                    {tutorialState == 4 ? "Let's Begin!" : 'Skip Tutorial'}
-                  </Text>
-                </TouchableOpacity>
+                )}
+                {tutorialState == 1 && (
+                  <View style={mobileStyles.textWrapper}>
+                    <Text style={mobileStyles.header}>Where are we now?</Text>
+                    <Text style={mobileStyles.body}>
+                      Global renewable energy capacity today is 4 TW
+                      (terawatts). 1 TW equals 1 trillion watts, enough to power
+                      roughly 48 billion lightbulbs! Reaching 12 TW by 2030 is
+                      the goal.
+                    </Text>
+                  </View>
+                )}
+                {tutorialState == 2 && (
+                  <View style={mobileStyles.textWrapper}>
+                    <Text style={mobileStyles.header}>
+                      Is the goal possible?
+                    </Text>
+                    <Text style={mobileStyles.body}>
+                      Absolutely! Renewable energy is the fastest growing source
+                      of new energy on the planet and we’re already on track to
+                      double renewables by 2030. But we can do better and this
+                      app lets you develop a plan to do it.
+                    </Text>
+                  </View>
+                )}
+                {tutorialState == 3 && (
+                  <View style={mobileStyles.textWrapper}>
+                    <Text style={mobileStyles.header}>
+                      Will 12 TW by 2030 solve climate change?
+                    </Text>
+                    <Text style={mobileStyles.body}>
+                      As you make your 12 TW plan on the app you’ll see the
+                      difference it makes. We need to keep future warming to
+                      less than 2° Celsius (C) and stay as close to 1.5°C as
+                      possible. The difference might seem minor but even half a
+                      degree will have enormous impacts on weather, sea levels,
+                      biodiversity, food production, and human health.
+                    </Text>
+                  </View>
+                )}
+                {tutorialState == 4 && (
+                  <View style={mobileStyles.textWrapper}>
+                    <Text style={mobileStyles.header}>
+                      Share your Energy and Climate Plan!
+                    </Text>
+                    <Text style={mobileStyles.body}>
+                      You’ll have the option to send your plan to global leaders
+                      at COP 29, the annual United Nation Climate Change
+                      Conference happening from Nov 11-22, 2024 in Azerbaijan.
+                    </Text>
+                    <Text style={mobileStyles.body}>Ready to get started?</Text>
+                  </View>
+                )}
               </View>
-            </>
-          )}
-          {tutorialState == 5 && (
-            <View style={mobileStyles.guideOverlay}>
-              <View style={mobileStyles.state5Popup}>
-                <Text>
-                  First, click the Globe icon on the top right of your screen to
-                  view the Global Dashboard, which tracks the global effects of
-                  all your regional changes.
-                </Text>
-              </View>
+              <RightArrow
+                onPress={() => setTutorialState(tutorialState + 1)}
+                render={tutorialState != 4}
+              />
             </View>
-          )}
-          {tutorialState == 6 && (
-            <View style={mobileStyles.state6Popup}>
-              <Text>
-                Now click on any of the colored regions you see on the map to
-                make your own adjustments and see regional effects!
+            <View style={mobileStyles.paginationRow}>
+              <PaginationCircle filled={tutorialState == 0} />
+              <PaginationCircle filled={tutorialState == 1} />
+              <PaginationCircle filled={tutorialState == 2} />
+              <PaginationCircle filled={tutorialState == 3} />
+              <PaginationCircle filled={tutorialState == 4} />
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                //if they made it to the last slide, they probably want to see the rest of the tutorial
+                if (tutorialState == 4) {
+                  sendStateHome(5)
+                  setTutorialState(5)
+                } else {
+                  setTutorialState(11)
+                  storeData('tutorial', 'complete')
+                }
+              }}
+              style={mobileStyles.skipButton}
+            >
+              <Text style={{ color: '#FFF', fontSize: 16 }}>
+                {tutorialState == 4 ? "Let's Begin!" : 'Skip Tutorial'}
               </Text>
-            </View>
-          )}
+            </TouchableOpacity>
+          </View>
         </>
       )}
     </>

@@ -23,6 +23,7 @@ import { getEnergyAbbrv, getTechnologyColor } from '../util/ValueDictionaries'
 import { DefaultValues, MinMaxValues } from '../api/requests'
 import { NativeViewGestureHandler } from 'react-native-gesture-handler'
 import { SliderIndicator } from '../SVGs/SliderIndicator'
+import { Tooltip5 } from '../SVGs/TutorialPopups/Tooltip5'
 
 export type TechnologyProportions = {
   solar: number
@@ -39,6 +40,8 @@ type DistributeRenewablesProps = {
   onSliderChange: (val: DefaultValues, technologyChanged: string) => void
   onReset: () => void
   disabled: boolean
+  tutorialState: number
+  setTutorialState: (state: number) => void
 }
 
 const DistributeRenewables = ({
@@ -47,9 +50,13 @@ const DistributeRenewables = ({
   onSliderChange,
   onReset,
   disabled,
+  tutorialState,
+  setTutorialState,
 }: DistributeRenewablesProps) => {
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
+
+  const [renderTutorial, setRenderTutorial] = useState<boolean>()
 
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
@@ -71,6 +78,10 @@ const DistributeRenewables = ({
 
   useEffect(() => {
     setSliderValues(values[2])
+    console.log(tutorialState)
+    if (tutorialState === 9) {
+      setRenderTutorial(true)
+    }
   }, [values])
 
   //calculate proportion bar values on every slider change
@@ -412,6 +423,26 @@ const DistributeRenewables = ({
           rotate when wind passes through them.
         </Text>,
       )}
+      {renderTutorial && (
+        <>
+          <View
+            style={{ shadowColor: 'gray', shadowRadius: 5, shadowOpacity: 0.5 }}
+          >
+            <Tooltip5 />
+          </View>
+          <View style={styles.onBoardingButtonWrapper}>
+            <TouchableOpacity
+              style={styles.onboardingButton}
+              onPress={() => {
+                setRenderTutorial(false)
+                setTutorialState(10)
+              }}
+            >
+              <Text style={styles.onboardingButtonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
       {renderSlider(
         'Solar',
         SolarIcon,
@@ -640,6 +671,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     alignItems: 'center',
+  },
+  onBoardingButtonWrapper: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    // backgroundColor: 'red',
+    width: 240,
+    marginBottom: 10,
+  },
+
+  onboardingButton: {
+    backgroundColor: '#266297',
+    borderColor: '#1C2B47',
+    borderWidth: 1,
+    borderRadius: 4,
+    width: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 4,
+  },
+
+  onboardingButtonText: {
+    fontFamily: 'Brix Sans',
+    color: 'white',
+    fontSize: 16,
   },
 })
 

@@ -91,7 +91,7 @@ export const Tracker = ({
                       ? '+1.5°C'
                       : temperatureVersion == 1
                         ? '+1.8°C'
-                        : '2.0°C'}
+                        : '+2.0°C'}
                   </Text>
                   <Text
                     style={
@@ -152,7 +152,7 @@ export const Tracker = ({
                 dashboard ? mobileStyles.dashboardLabel : mobileStyles.label
               }
             >
-              of 12 TW Goal
+              {energyVersion == 0 ? 'of power by 2030' : 'of 12 TW Goal'}
             </Text>
           </View>
         </TouchableOpacity>
