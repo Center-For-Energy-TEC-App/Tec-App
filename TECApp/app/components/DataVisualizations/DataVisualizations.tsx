@@ -36,13 +36,13 @@ const DataVisualizations = ({
     region === 'Global' ? 'Carbon Budget' : 'Forecast Comparison',
   )
   const [scrollEnabled, setScrollEnabled] = useState<boolean>(true)
-  const scrollViewRef = useRef(null);
+  const scrollViewRef = useRef(null)
 
   useEffect(() => {
     setTimeout(function () {
-        scrollViewRef.current?.flashScrollIndicators();
-    }, 500);
-}, [activeButton]);
+      scrollViewRef.current?.flashScrollIndicators()
+    }, 500)
+  }, [activeButton])
 
   return (
     <ScrollView
@@ -51,11 +51,12 @@ const DataVisualizations = ({
       scrollEnabled={scrollEnabled}
     >
       <View style={styles.buttonsWrapper}>
-        <ScrollView horizontal={true} 
-          showsHorizontalScrollIndicator={true} 
+        <ScrollView
+          horizontal={true}
+          showsHorizontalScrollIndicator={true}
           persistentScrollbar={true}
           ref={scrollViewRef}
-    >
+        >
           {region === 'Global' && (
             <TouchableOpacity
               onPress={() => setActiveButton('Carbon Budget')}

@@ -9,7 +9,7 @@ import {
 import { WorldMap } from '../components/WorldMap'
 import { BottomSheet } from '../components/BottomSheet'
 import { Tutorial } from '../components/Tutorial'
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Tracker } from '../components/Tracker'
 import { GlobalDashboardButton } from '../SVGs/GlobalDashboardButton'
@@ -20,6 +20,10 @@ import { captureRef } from 'react-native-view-shot'
 import * as Print from 'expo-print'
 import * as FileSystem from 'expo-file-system'
 import { Host, Portal } from 'react-native-portalize'
+import { TemperatureData } from '../util/Calculations'
+import { Tooltip1 } from '../SVGs/TutorialPopups/Tooltip1'
+import { Tooltip4 } from '../SVGs/TutorialPopups/Tooltip4'
+import { Tooltip6 } from '../SVGs/TutorialPopups/Tooltip6'
 
 const vw = Dimensions.get('window').width
 const vh = Dimensions.get('window').height
@@ -27,16 +31,14 @@ const vh = Dimensions.get('window').height
 export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState<string>('Global')
   const [totalGlobalEnergy, setTotalGlobalEnergy] = useState<number>(0)
-  const [temperatureData, setTemperatureData] = useState<{
-    yearAtDegree: number[]
-  }>()
+  const [temperatureData, setTemperatureData] = useState<TemperatureData>()
 
   const [refreshTutorial, setRefreshTutorial] = useState<boolean>(true)
-  const [tutorialState, setTutorialState] = useState<number>(0)
+  const [tutorialState, setTutorialState] = useState<number>()
 
   const handleRegionSelect = (region: string) => {
     setSelectedRegion(region)
-    setTutorialState(7)
+    if (tutorialState == 8) setTutorialState(9)
   }
 
   const slidersRef = useRef<View>(null)
@@ -169,7 +171,11 @@ export default function Home() {
     <GestureHandlerRootView style={mobileStyles.gestureHandler}>
       <Host>
         <View style={mobileStyles.appWrapper}>
-          <Tutorial refresh={refreshTutorial} state={tutorialState} />
+          <Tutorial
+            refresh={refreshTutorial}
+            state={tutorialState}
+            sendStateHome={setTutorialState}
+          />
           <WorldMap onSelectCountry={handleRegionSelect} />
           <Portal>
             <BottomSheet
@@ -178,6 +184,8 @@ export default function Home() {
               passTemperatureToHome={(temperature) =>
                 setTemperatureData(temperature)
               }
+              tutorialState={tutorialState}
+              setTutorialState={setTutorialState}
               slidersRef={slidersRef}
               bauRef={bauRef}
               regionalComparisonRef={regionalComparisonRef}
@@ -190,16 +198,25 @@ export default function Home() {
           </View>
           <View style={mobileStyles.dashboardButton}>
             <GlobalDashboardButton
+              glow={tutorialState == 5}
               onPress={() => {
                 router.push('/pages/GlobalDashboard')
-                setTutorialState(6)
+                setTimeout(() => {
+                  if (tutorialState == 5) setTutorialState(8)
+                }, 1000)
               }}
-            />
+            ></GlobalDashboardButton>
+            {tutorialState == 5 && (
+              <View style={{ position: 'absolute', top: 75, left: -150 }}>
+                <Tooltip1 />
+              </View>
+            )}
           </View>
           <TouchableOpacity
             onPress={() => {
               removeData('tutorial').then(() => {
                 setTutorialState(0)
+                setSelectedRegion("Global")
                 setRefreshTutorial(!refreshTutorial)
               })
             }}
@@ -207,6 +224,24 @@ export default function Home() {
           >
             <Text>View Tutorial</Text>
           </TouchableOpacity>
+          {tutorialState == 8 && (
+            <View style={{ position: 'absolute', top: vh * 0.5 }}>
+              <Tooltip4 />
+            </View>
+          )}
+          {tutorialState == 10 && (
+            <View
+              style={{ position: 'absolute', bottom: vh * 0.03 + 50, right: 27.5 }}
+            >
+              <Tooltip6 />
+              <TouchableOpacity
+                onPress={() => setTutorialState(11)}
+                style={mobileStyles.onboardingButton}
+              >
+                <Text style={mobileStyles.onboardingButtonText}>Finish</Text>
+              </TouchableOpacity>
+            </View>
+          )}
           <View style={mobileStyles.exportButton}>
             <ExportButton onPress={() => alert('export')} />
           </View>
@@ -243,6 +278,7 @@ const mobileStyles = StyleSheet.create({
     position: 'absolute',
     top: '6.5%',
     right: '5%',
+
     // right: 0,
   },
   resetTutorial: {
@@ -258,5 +294,24 @@ const mobileStyles = StyleSheet.create({
     position: 'absolute',
     right: '3%',
     bottom: '3%',
+  },
+  onboardingButton: {
+    position: 'relative',
+    top: 10,
+    left: 50,
+    backgroundColor: '#266297',
+    borderColor: '#1C2B47',
+    borderWidth: 1,
+    borderRadius: 4,
+    width: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 4,
+  },
+
+  onboardingButtonText: {
+    fontFamily: 'Brix Sans',
+    color: 'white',
+    fontSize: 16,
   },
 })

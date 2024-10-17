@@ -26,6 +26,8 @@ type RegionalDashboardProps = {
   bauRef: React.RefObject<View>
   regionalComparisonRef: React.RefObject<View>
   technologyComparisonRef: React.RefObject<View>
+  tutorialState: number
+  setTutorialState: (state: number) => void
 }
 
 export const RegionalDashboard = ({
@@ -41,6 +43,8 @@ export const RegionalDashboard = ({
   bauRef,
   regionalComparisonRef,
   technologyComparisonRef,
+  tutorialState,
+  setTutorialState,
 }: RegionalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
@@ -142,6 +146,8 @@ export const RegionalDashboard = ({
             onSliderChange={onSliderChange}
             onReset={onReset}
             disabled={sliderDisabled}
+            tutorialState={tutorialState}
+            setTutorialState={setTutorialState}
           />
         </View>
       ) : (

@@ -54,7 +54,7 @@ export const LineGraph = ({
     yMin + yRange * 0.8,
     yMax,
   ]
-  const horizontalAxis = [2025, 2026, 2027, 2028, 2029,2030]
+  const horizontalAxis = [2025, 2026, 2027, 2028, 2029, 2030]
 
   //helper method for calculating y coordinate based on graph value
   //calculated as proportion of graph height from the top

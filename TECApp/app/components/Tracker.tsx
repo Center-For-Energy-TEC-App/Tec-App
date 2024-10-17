@@ -1,14 +1,15 @@
 import React, { StyleSheet, View, Text } from 'react-native'
 import { TemperatureIcon } from '../SVGs/TemperatureIcon'
 import { RenewableIcon } from '../SVGs/RenewableIcon'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { TemperatureData } from '../util/Calculations'
 
 type TrackerProps = {
   type: 'temperature' | 'renewable'
   dashboard?: boolean
   totalGlobalEnergy?: number
-  temperatureData?: { yearAtDegree: number[] }
+  temperatureData?: TemperatureData
 }
 
 export const Tracker = ({
@@ -19,6 +20,57 @@ export const Tracker = ({
 }: TrackerProps) => {
   const [temperatureVersion, setTemperatureVersion] = useState<number>(0)
   const [energyVersion, setEnergyVersion] = useState<number>(0)
+
+  const [currTemperatureData, setCurrTemperatureData] =
+    useState<TemperatureData>()
+
+  const [temperatureHighlight, setTemperatureHighlight] =
+    useState<boolean>(false)
+
+  const flashYear = () => {
+    setTemperatureHighlight(true)
+    const timeout = setTimeout(() => {
+      setTemperatureHighlight(false)
+    }, 1000)
+    return () => clearTimeout(timeout)
+  }
+
+  useEffect(() => {
+    if (!currTemperatureData && temperatureData) {
+      setCurrTemperatureData(temperatureData)
+    }
+
+    if (temperatureData && currTemperatureData) {
+      if (temperatureData['1.5Year'] !== currTemperatureData['1.5Year']) {
+        setCurrTemperatureData({
+          ...temperatureData,
+          '1.5Year': temperatureData['1.5Year'],
+        })
+        if (temperatureVersion === 0) {
+          flashYear()
+        }
+      }
+      if (temperatureData['1.8Year'] !== currTemperatureData['1.8Year']) {
+        setCurrTemperatureData({
+          ...temperatureData,
+          '1.8Year': temperatureData['1.8Year'],
+        })
+        if (temperatureVersion === 1) {
+          flashYear()
+        }
+      }
+      if (temperatureData['2.0Year'] !== currTemperatureData['2.0Year']) {
+        setCurrTemperatureData({
+          ...temperatureData,
+          '2.0Year': temperatureData['2.0Year'],
+        })
+        if (temperatureVersion === 2) {
+          flashYear()
+        }
+      }
+    }
+  }, [temperatureData])
+
   return (
     <>
       {type === 'temperature' ? (
@@ -33,34 +85,34 @@ export const Tracker = ({
             {temperatureData && (
               <View style={mobileStyles.iconRow}>
                 <TemperatureIcon dashboard={dashboard} />
-                {temperatureVersion == 0 ? (
-                  <View style={mobileStyles.dataColumn}>
-                    <Text style={mobileStyles.dashboardLabel}>{'+1.5°C'}</Text>
-                    <Text style={mobileStyles.dashboardLabel}>
-                      {'by ' +
-                        temperatureData.yearAtDegree[0] +
-                        (temperatureData.yearAtDegree[0] == 2060 ? '+' : '')}
-                    </Text>
-                  </View>
-                ) : temperatureVersion == 1 ? (
-                  <View style={mobileStyles.dataColumn}>
-                    <Text style={mobileStyles.dashboardLabel}>{'+1.8°C'}</Text>
-                    <Text style={mobileStyles.dashboardLabel}>
-                      {'by ' +
-                        temperatureData.yearAtDegree[1] +
-                        (temperatureData.yearAtDegree[1] == 2060 ? '+' : '')}
-                    </Text>
-                  </View>
-                ) : (
-                  <View style={mobileStyles.dataColumn}>
-                    <Text style={mobileStyles.dashboardLabel}>{'+2.0°C'}</Text>
-                    <Text style={mobileStyles.dashboardLabel}>
-                      {'by ' +
-                        temperatureData.yearAtDegree[2] +
-                        (temperatureData.yearAtDegree[2] == 2060 ? '+' : '')}
-                    </Text>
-                  </View>
-                )}
+                <View style={mobileStyles.dataColumn}>
+                  <Text style={mobileStyles.dashboardLabel}>
+                    {temperatureVersion == 0
+                      ? '+1.5°C'
+                      : temperatureVersion == 1
+                        ? '+1.8°C'
+                        : '+2.0°C'}
+                  </Text>
+                  <Text
+                    style={
+                      temperatureHighlight
+                        ? mobileStyles.flashLabel
+                        : mobileStyles.dashboardLabel
+                    }
+                  >
+                    {temperatureVersion == 0
+                      ? 'by ' +
+                        temperatureData['1.5Year'] +
+                        (temperatureData['1.5Year'] == 2060 ? '+' : '')
+                      : temperatureVersion == 1
+                        ? 'by ' +
+                          temperatureData['1.8Year'] +
+                          (temperatureData['1.8Year'] == 2060 ? '+' : '')
+                        : 'by ' +
+                          temperatureData['2.0Year'] +
+                          (temperatureData['2.0Year'] == 2060 ? '+' : '')}
+                  </Text>
+                </View>
               </View>
             )}
           </View>
@@ -69,68 +121,40 @@ export const Tracker = ({
         <TouchableOpacity
           onPress={() => setEnergyVersion((energyVersion + 1) % 2)}
         >
-          {energyVersion == 0 ? (
-            <View
-              style={
-                dashboard ? mobileStyles.dashboardWrapper : mobileStyles.wrapper
-              }
-            >
-              <View style={mobileStyles.iconRow}>
-                <RenewableIcon dashboard={dashboard} />
-                <Text
-                  style={
-                    dashboard
-                      ? mobileStyles.dashboardHeader
-                      : mobileStyles.header
-                  }
-                >
-                  {(totalGlobalEnergy / 1000).toFixed(1)}
-                </Text>
-                <Text
-                  style={
-                    dashboard
-                      ? mobileStyles.dashboardSmallHeader
-                      : mobileStyles.smallHeader
-                  }
-                >
-                  TW
-                </Text>
-              </View>
+          <View
+            style={
+              dashboard ? mobileStyles.dashboardWrapper : mobileStyles.wrapper
+            }
+          >
+            <View style={mobileStyles.iconRow}>
+              <RenewableIcon dashboard={dashboard} />
               <Text
                 style={
-                  dashboard ? mobileStyles.dashboardLabel : mobileStyles.label
+                  dashboard ? mobileStyles.dashboardHeader : mobileStyles.header
                 }
               >
-                of power by 2030
+                {energyVersion == 0
+                  ? (totalGlobalEnergy / 1000).toFixed(1)
+                  : ((totalGlobalEnergy / 1000 / 12) * 100).toFixed(0) + '%'}
               </Text>
-            </View>
-          ) : (
-            <View
-              style={
-                dashboard ? mobileStyles.dashboardWrapper : mobileStyles.wrapper
-              }
-            >
-              <View style={mobileStyles.iconRow}>
-                <RenewableIcon dashboard={dashboard} />
-                <Text
-                  style={
-                    dashboard
-                      ? mobileStyles.dashboardHeader
-                      : mobileStyles.header
-                  }
-                >
-                  {((totalGlobalEnergy / 1000 / 12) * 100).toFixed(0) + '%'}
-                </Text>
-              </View>
               <Text
                 style={
-                  dashboard ? mobileStyles.dashboardLabel : mobileStyles.label
+                  dashboard
+                    ? mobileStyles.dashboardSmallHeader
+                    : mobileStyles.smallHeader
                 }
               >
-                of 12 TW Goal
+                {energyVersion == 0 && 'TW'}
               </Text>
             </View>
-          )}
+            <Text
+              style={
+                dashboard ? mobileStyles.dashboardLabel : mobileStyles.label
+              }
+            >
+              {energyVersion == 0 ? 'of power by 2030' : 'of 12 TW Goal'}
+            </Text>
+          </View>
         </TouchableOpacity>
       )}
     </>
@@ -213,5 +237,13 @@ const mobileStyles = StyleSheet.create({
   dashboardLabel: {
     fontFamily: 'Brix Sans',
     fontSize: 15.5,
+  },
+
+  flashLabel: {
+    fontFamily: 'Brix Sans',
+    fontSize: 15.5,
+    textShadowRadius: 8.5,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowColor: 'green',
   },
 })
