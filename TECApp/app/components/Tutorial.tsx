@@ -136,6 +136,7 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                   setTutorialState(5)
                 } else {
                   setTutorialState(11)
+                  sendStateHome(11)
                   storeData('tutorial', 'complete')
                 }
               }}

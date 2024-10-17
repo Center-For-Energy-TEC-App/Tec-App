@@ -152,7 +152,7 @@ export default function GlobalDashboard() {
                   />
                   <LearnMoreButton
                     onPress={() => {
-                      alert('Learn More')
+                      router.push('pages/LearnMore')
                     }}
                   />
                 </View>
