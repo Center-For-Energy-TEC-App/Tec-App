@@ -4,16 +4,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  Alert,
 } from 'react-native'
 import { WorldMap } from '../components/WorldMap'
 import { BottomSheet } from '../components/BottomSheet'
 import { Tutorial } from '../components/Tutorial'
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Tracker } from '../components/Tracker'
 import { GlobalDashboardButton } from '../SVGs/GlobalDashboardButton'
 import { router } from 'expo-router'
 import { removeData } from '../util/Caching'
+import { ExportButton } from '../SVGs/ExportButton'
 
 const vw = Dimensions.get('window').width
 const vh = Dimensions.get('window').height
@@ -69,6 +71,14 @@ export default function Home() {
         >
           <Text>View Tutorial</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={mobileStyles.exportButton}>
+
+        <ExportButton
+          onPress={() => {
+            router.push('/pages/GlobalDashboard?export=true') // Navigate to the dashboard page with export flag
+          }}
+        />
+         </TouchableOpacity>
       </View>
     </GestureHandlerRootView>
   )
@@ -112,4 +122,9 @@ const mobileStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
+  exportButton: {
+    position: 'absolute',
+    bottom: '0.5%',
+    right: '-3%'
+  }
 })

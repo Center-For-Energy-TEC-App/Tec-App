@@ -1,4 +1,5 @@
-import React, { Text, StyleSheet, Dimensions, View } from 'react-native'
+import { Text, StyleSheet, Dimensions, View } from 'react-native'
+import React from 'react'
 import * as d3 from 'd3'
 import { GraphKey } from './GraphKey'
 import { LineGraph } from './LineGraph'
@@ -22,8 +23,9 @@ export type DataPoint = {
 
 type TechnologyComparisonProps = {
   data: RegionData
+  technologyRef: React.RefObject<View>
 }
-export const TechnologyComparison = ({ data }: TechnologyComparisonProps) => {
+export const TechnologyComparison = ({ data, technologyRef }: TechnologyComparisonProps) => {
   const solar_data = data.solar
   const wind_data = data.wind
   const hydro_data = data.hydropower
@@ -101,7 +103,7 @@ export const TechnologyComparison = ({ data }: TechnologyComparisonProps) => {
         See how different energy-generating technologies compare to each other
         based on your custom changes.
       </Text>
-      <View style={styles.graphContainer}>
+      <View style={styles.graphContainer} ref={technologyRef}>
         <View style={styles.graphInnerContainer}>
           <GraphKey label="SOLAR" color={getTechnologyColor('Solar')} />
           <GraphKey label="WIND" color={getTechnologyColor('Wind')} />

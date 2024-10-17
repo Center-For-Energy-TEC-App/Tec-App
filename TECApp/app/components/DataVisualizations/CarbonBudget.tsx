@@ -27,7 +27,7 @@ const offset = 20
 const graphWidth = vw * 0.9
 const leftMargin = 60
 const rightMargin = 35
-const contentWidth = graphWidth-rightMargin
+const contentWidth = graphWidth - rightMargin
 
 const xMin = 2025
 const xMax = 2060
@@ -42,6 +42,7 @@ type CarbonBudgetProps = {
   dynamicData: DataPoint[]
   temperatureData: TemperatureData
   isInteracting: (interacting: boolean) => void
+  carbonRef: React.RefObject<View>
 }
 
 export const CarbonBudget = ({
@@ -49,10 +50,11 @@ export const CarbonBudget = ({
   dynamicData,
   temperatureData,
   isInteracting,
+  carbonRef,
 }: CarbonBudgetProps) => {
   const [currPosition, setCurrPosition] = useState<number>(null)
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log(currPosition)
   }, [currPosition])
 
@@ -102,7 +104,7 @@ export const CarbonBudget = ({
     }
     return point.y
   }
-    //calculate graph y pixel value based off actual y-axis value
+  //calculate graph y pixel value based off actual y-axis value
   //calculated as proportion of graph height from the top
   const calculateY = (val: number) => {
     return (graphHeight * (yMax - val)) / yRange
@@ -120,21 +122,36 @@ export const CarbonBudget = ({
     .range([leftMargin, contentWidth])
 
   const full_curve = d3
-  .line<DataPoint>()
-  .x((d) => x(d.year))
-  .y((d) => y(d.value))
-  .curve(d3.curveMonotoneX)(dynamicData)
+    .line<DataPoint>()
+    .x((d) => x(d.year))
+    .y((d) => y(d.value))
+    .curve(d3.curveMonotoneX)(dynamicData)
 
-  const separationHeight = findYbyX(calculateX(temperatureData.yearAtDegree[2]), full_curve)
-  const separationPoint = {year: temperatureData.yearAtDegree[2], value: yMax-((separationHeight)/graphHeight)*yRange}
+  const separationHeight = findYbyX(
+    calculateX(temperatureData.yearAtDegree[2]),
+    full_curve,
+  )
+  const separationPoint = {
+    year: temperatureData.yearAtDegree[2],
+    value: yMax - (separationHeight / graphHeight) * yRange,
+  }
   //separate data based on 2 degree limit
-  let data1 = [], data2 = []
-  if(separationPoint.year%5==0){
-     data1 = dynamicData.filter((val) => val.year <= temperatureData.yearAtDegree[2])
-     data2 = [separationPoint].concat(dynamicData.filter((val) => val.year > temperatureData.yearAtDegree[2]))
-  }else{
-    data1 = dynamicData.filter((val) => val.year <= temperatureData.yearAtDegree[2]).concat([separationPoint])
-    data2 = [separationPoint].concat(dynamicData.filter((val) => val.year > temperatureData.yearAtDegree[2]))
+  let data1 = [],
+    data2 = []
+  if (separationPoint.year % 5 == 0) {
+    data1 = dynamicData.filter(
+      (val) => val.year <= temperatureData.yearAtDegree[2],
+    )
+    data2 = [separationPoint].concat(
+      dynamicData.filter((val) => val.year > temperatureData.yearAtDegree[2]),
+    )
+  } else {
+    data1 = dynamicData
+      .filter((val) => val.year <= temperatureData.yearAtDegree[2])
+      .concat([separationPoint])
+    data2 = [separationPoint].concat(
+      dynamicData.filter((val) => val.year > temperatureData.yearAtDegree[2]),
+    )
   }
 
   const carbon_gradient1 = d3
@@ -178,27 +195,41 @@ export const CarbonBudget = ({
         the amount of emissions you’re allowed to emit before exceeding the
         global temperature threshold.
       </Text>
-      <View style={styles.graphContainer}
-      onStartShouldSetResponder={() => true}
-      onMoveShouldSetResponder={() => true}
-      onResponderTerminationRequest={() => false}
-      onResponderStart={(evt) => {
-        isInteracting(true)
-        setCurrPosition(evt.nativeEvent.locationX)
-      }}
-      onResponderMove={(evt) => setCurrPosition(evt.nativeEvent.locationX)}
-      onResponderRelease={(evt) => {
-        isInteracting(false)
-        setCurrPosition(null)
-      }}>
-        <View style={styles.graphTopRow}>
-          {currPosition!==null && currPosition>=60 && currPosition<contentWidth?
-        <Text style={{color: "#757678", fontSize: 12}}>{Math.round(((currPosition-leftMargin)/(contentWidth-leftMargin))*xRange+xMin)}</Text>:<Text></Text>}
-         <View style={styles.keyContainer}>
-         <GraphKey label="ALTERED CARBON EMISSIONS" color="#266297" />
-          <GraphKey label="PROJECTED CARBON EMISSIONS" color="#757678" />
-        </View>
-       </View>
+      <View
+        style={styles.graphContainer}
+        onStartShouldSetResponder={() => true}
+        onMoveShouldSetResponder={() => true}
+        onResponderTerminationRequest={() => false}
+        onResponderStart={(evt) => {
+          isInteracting(true)
+          setCurrPosition(evt.nativeEvent.locationX)
+        }}
+        onResponderMove={(evt) => setCurrPosition(evt.nativeEvent.locationX)}
+        onResponderRelease={(evt) => {
+          isInteracting(false)
+          setCurrPosition(null)
+        }}
+      >
+        <View ref={carbonRef}>
+          <View style={styles.graphTopRow}>
+            {currPosition !== null &&
+            currPosition >= 60 &&
+            currPosition < contentWidth ? (
+              <Text style={{ color: '#757678', fontSize: 12 }}>
+                {Math.round(
+                  ((currPosition - leftMargin) / (contentWidth - leftMargin)) *
+                    xRange +
+                    xMin,
+                )}
+              </Text>
+            ) : (
+              <Text></Text>
+            )}
+            <View style={styles.keyContainer}>
+              <GraphKey label="ALTERED CARBON EMISSIONS" color="#266297" />
+              <GraphKey label="PROJECTED CARBON EMISSIONS" color="#757678" />
+            </View>
+          </View>
           <Svg width={graphWidth} height={svgHeight}>
             <Defs>
               <LinearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
@@ -311,17 +342,19 @@ export const CarbonBudget = ({
             </G>
             {/* Temperature Limits & Labels */}
             <G y={offset}>
-              {currPosition !== null && currPosition > 60 && currPosition<contentWidth+5 && (
-                <Line
-                  stroke="#1C2B47"
-                  strokeWidth={1.57}
-                  fill="#1C2B47"
-                  x1={currPosition}
-                  x2={currPosition}
-                  y1={0}
-                  y2={190}
-                />
-              )}
+              {currPosition !== null &&
+                currPosition > 60 &&
+                currPosition < contentWidth + 5 && (
+                  <Line
+                    stroke="#1C2B47"
+                    strokeWidth={1.57}
+                    fill="#1C2B47"
+                    x1={currPosition}
+                    x2={currPosition}
+                    y1={0}
+                    y2={190}
+                  />
+                )}
               <Circle
                 x={calculateX(BAU1Point5Year)}
                 y={findYbyX(calculateX(BAU1Point5Year), BAU_curve)}
@@ -370,24 +403,29 @@ export const CarbonBudget = ({
                 stroke="#266297"
                 strokeWidth={2.362}
               />
-              {Math.abs(currPosition - calculateX(temperatureData.yearAtDegree[0])) < 5 && (
+              {Math.abs(
+                currPosition - calculateX(temperatureData.yearAtDegree[0]),
+              ) < 5 && (
                 <G
                   x={calculateX(temperatureData.yearAtDegree[0]) - 33}
-                  y={graphHeight-37}
+                  y={graphHeight - 37}
                 >
                   <AlteredCurvePopup label="1.5˚C LIMIT" />
                 </G>
               )}
-              {Math.abs(currPosition - calculateX(temperatureData.yearAtDegree[2])) < 5 && (
+              {Math.abs(
+                currPosition - calculateX(temperatureData.yearAtDegree[2]),
+              ) < 5 && (
                 <G
                   x={calculateX(temperatureData.yearAtDegree[2]) - 33}
-                  y={graphHeight-37}
+                  y={graphHeight - 37}
                 >
                   <AlteredCurvePopup label="2.0˚C LIMIT" />
                 </G>
               )}
             </G>
           </Svg>
+        </View>
       </View>
     </View>
   )
@@ -404,22 +442,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   graphContainer: {
-    width: vw*0.9,
+    width: vw * 0.9,
     display: 'flex',
     marginTop: 20,
-    gap: 4
+    gap: 4,
   },
   graphTopRow: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingRight: 30,
-    paddingLeft: 60
+    paddingLeft: 60,
   },
   keyContainer: {
-    display: "flex",
-    flexDirection: "column",
+    display: 'flex',
+    flexDirection: 'column',
     gap: 4,
-    alignItems: "flex-start"
-  }
+    alignItems: 'flex-start',
+  },
 })
