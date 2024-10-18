@@ -12,6 +12,7 @@ import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { DefaultValues, GraphData, MinMaxValues } from '../api/requests'
 import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
+import { getRegionSummary } from '../util/RegionDescriptions'
 
 type RegionalDashboardProps = {
   currRegion: string
@@ -91,9 +92,7 @@ export const RegionalDashboard = ({
         style={styles.regionHeader}
         onPress={() => setModal(true)}
       >
-        {renderTooltip(
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-        )}
+        {renderTooltip(getRegionSummary(currRegion))}
         <Text style={styles.regionName}>{currRegion}</Text>
         <ToolTipIcon header />
       </TouchableOpacity>
@@ -141,6 +140,7 @@ export const RegionalDashboard = ({
       {activeTab === 'renewables' ? (
         <View ref={slidersRef} collapsable={false}>
           <DistributeRenewables
+            currRegion={currRegion}
             values={sliderValues}
             minMaxValues={minMaxValues}
             onSliderChange={onSliderChange}
