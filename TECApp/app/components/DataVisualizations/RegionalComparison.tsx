@@ -54,12 +54,28 @@ export const RegionalComparison = ({
       selected: false,
       data: data.mea.total.slice(1),
     },
-    { region: 'Sub-Saharan Africa', selected: false, data: data.ssa.total.slice(1) },
-    { region: 'North East Eurasia', selected: false, data: data.nee.total.slice(1) },
-    { region: 'South East Asia', selected: false, data: data.sea.total.slice(1) },
+    {
+      region: 'Sub-Saharan Africa',
+      selected: false,
+      data: data.ssa.total.slice(1),
+    },
+    {
+      region: 'North East Eurasia',
+      selected: false,
+      data: data.nee.total.slice(1),
+    },
+    {
+      region: 'South East Asia',
+      selected: false,
+      data: data.sea.total.slice(1),
+    },
     { region: 'OECD Pacific', selected: false, data: data.opa.total.slice(1) },
     { region: 'Greater China', selected: false, data: data.chn.total.slice(1) },
-    { region: 'Indian Subcontinent', selected: false, data: data.ind.total.slice(1) },
+    {
+      region: 'Indian Subcontinent',
+      selected: false,
+      data: data.ind.total.slice(1),
+    },
   ]) //keeps track of state of every checkbox
   const [numSelected, setNumSelected] = useState<number>(0) //easier way to keep track than parsing above state every time
 

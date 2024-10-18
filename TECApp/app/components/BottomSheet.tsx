@@ -14,6 +14,7 @@ import {
 } from '../api/requests'
 import { getAbbrv, getEnergyAbbrv } from '../util/ValueDictionaries'
 import {
+  TemperatureData,
   calculateCarbonCurve,
   calculateCarbonReductions,
   calculateEnergyCurve,
@@ -22,15 +23,18 @@ import {
 } from '../util/Calculations'
 import { DataPoint } from './DataVisualizations/BAUComparison'
 import { storeData } from '../util/Caching'
+import { RandomNumberGenerationSource } from 'd3'
 
 export interface BottomSheetProps {
   selectedRegion: string
   passGlobalToHome: (energy: number) => void
-  passTemperatureToHome: (temperature: { yearAtDegree: number[] }) => void
+  passTemperatureToHome: (temperature: TemperatureData) => void
   slidersRef: React.RefObject<View>
   bauRef: React.RefObject<View>
   regionalComparisonRef: React.RefObject<View>
   technologyComparisonRef: React.RefObject<View>
+  tutorialState: number
+  setTutorialState: (state: number) => void
 }
 
 export type FossilReductionData = {
@@ -70,6 +74,8 @@ export const BottomSheet = ({
   bauRef,
   regionalComparisonRef,
   technologyComparisonRef,
+  tutorialState,
+  setTutorialState,
 }: BottomSheetProps) => {
   const snapPoints = useMemo(() => ['12.5%', '25%', '50%', '80%'], [])
   const bottomSheetRef = useRef<BottomSheetTemplate>(null)
@@ -199,6 +205,8 @@ export const BottomSheet = ({
               bauRef={bauRef}
               regionalComparisonRef={regionalComparisonRef}
               technologyComparisonRef={technologyComparisonRef}
+              tutorialState={tutorialState}
+              setTutorialState={setTutorialState}
               currRegion={selectedRegion}
               onSliderChange={(val, technologyChanged) => {
                 //on slider change for a region, store changes here to preserve each region changes

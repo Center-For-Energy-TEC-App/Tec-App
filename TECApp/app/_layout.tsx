@@ -64,6 +64,24 @@ const RootLayout = () => {
             },
           }}
         />
+        <Stack.Screen
+          name="pages/LearnMore"
+          options={{
+            headerShown: true,
+            headerBackVisible: false,
+            headerBackTitleVisible: false,
+            headerShadowVisible: false,
+            headerTitle() {
+              return <></>
+            },
+            headerLeft() {
+              return <BackArrow onPress={() => router.back()} />
+            },
+            contentStyle: {
+              backgroundColor: '#FFF',
+            },
+          }}
+        />
       </Stack>
     </GestureHandlerRootView>
   )

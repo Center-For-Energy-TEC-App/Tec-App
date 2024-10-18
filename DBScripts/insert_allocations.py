@@ -81,6 +81,14 @@ def insert_min_max_vals():
             else:                   # inserting min values
                 cursor.execute(f"INSERT INTO min_max_values VALUES ('min','{line[0].lower()}',{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]},{line[8]},{line[9]},{line[10]},{line[11]},{line[12]})")
 
+def insert_new_max_vals():
+    cursor.execute(f"DELETE FROM min_max_values WHERE category='max'")
+    with open(f"DBScripts/Data/DefaultAllocations/New_MinMax_Values.csv", mode="r") as csvfile:
+        reader = csv.reader(csvfile)
+        for line in reader:
+            cursor.execute(f"INSERT INTO min_max_values VALUES ('max','{line[0].lower()}',0,{line[2]},{line[3]},{line[4]},{line[5]},{line[6]},{line[7]},{line[8]},{line[9]},{line[10]},{line[11]})")
+
+
 # full sheet insert
 def insert():
     # insert_global()
@@ -98,7 +106,8 @@ def empty_database():
         cursor.execute(f"DROP TABLE allocation_defaults_{i.lower()}")
     cursor.execute("DROP TABLE min_max_values")
 
-insert()
+# insert()
+insert_new_max_vals()
 
 # empty_database()
 
