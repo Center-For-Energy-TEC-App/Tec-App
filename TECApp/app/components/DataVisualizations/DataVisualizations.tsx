@@ -204,7 +204,7 @@ const DataVisualizations = ({
 
           <View>
             <TechnologyComparison
-              technologyRef = {technologyRef}
+              technologyRef={technologyRef}
               data={
                 dynamicGlobalData
                   ? dynamicGlobalData
