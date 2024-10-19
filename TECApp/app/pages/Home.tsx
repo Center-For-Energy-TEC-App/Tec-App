@@ -216,7 +216,7 @@ export default function Home() {
             onPress={() => {
               removeData('tutorial').then(() => {
                 setTutorialState(0)
-                setSelectedRegion("Global")
+                setSelectedRegion('Global')
                 setRefreshTutorial(!refreshTutorial)
               })
             }}
@@ -231,7 +231,11 @@ export default function Home() {
           )}
           {tutorialState == 10 && (
             <View
-              style={{ position: 'absolute', bottom: vh * 0.03 + 50, right: 27.5 }}
+              style={{
+                position: 'absolute',
+                bottom: vh * 0.03 + 50,
+                right: 27.5,
+              }}
             >
               <Tooltip6 />
               <TouchableOpacity
