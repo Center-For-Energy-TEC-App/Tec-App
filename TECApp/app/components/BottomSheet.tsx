@@ -182,6 +182,7 @@ export const BottomSheet = ({
       enableHandlePanningGesture
       enableContentPanningGesture
       enablePanDownToClose
+      style={styles.bottomSheetContainer}
     >
       {dynamicFossilData &&
         calculationData && //don't render regional sheet until all values load

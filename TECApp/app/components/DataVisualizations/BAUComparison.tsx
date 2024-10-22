@@ -106,7 +106,7 @@ export const BAUComparison = ({
         <Text style={styles.bold}>{region + ':'}</Text>
         <Text style={styles.body}>Altered vs. BAU Renewables</Text>
       </View>
-      <View style={styles.graphContainer} ref={bauRef}>
+      <View style={styles.graphContainer} ref={bauRef} collapsable={false}>
         <View style={styles.graphInnerContainer}>
           <GraphKey label="ALTERED RENEWABLES" color="#C66AAA" />
           <GraphKey label="BUSINESS-AS-USUAL" color="#58C4D4" />

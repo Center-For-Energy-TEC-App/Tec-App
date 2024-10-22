@@ -172,7 +172,7 @@ export default function Home() {
         from: uri,
         to: filePath,
       })
-      console.log('PDF successfully saved to:', filePath)
+      // console.log('PDF successfully saved to:', filePath)
       Alert.alert(`PDF exported successfully to ${filePath}`)
 
       // Opens the file in a viewer / allow share option
@@ -201,6 +201,11 @@ export default function Home() {
         <Tutorial refresh={refreshTutorial} state={tutorialState} />
 
         <WorldMap onSelectCountry={handleRegionSelect} />
+        <View>
+        <TouchableOpacity style={mobileStyles.exportButton}>
+          <ExportButton onPress={handleExport} />
+        </TouchableOpacity>
+        </View>
         <BottomSheet
           selectedRegion={selectedRegion}
           passGlobalToHome={(energy) => setTotalGlobalEnergy(energy)}
@@ -208,7 +213,7 @@ export default function Home() {
             setTemperatureData(temperature)
           }
         />
-        <View style={mobileStyles.trackerWrapper} ref={trackerRef}>
+        <View style={mobileStyles.trackerWrapper} ref={trackerRef} collapsable={false}>
           <Tracker type="temperature" temperatureData={temperatureData} />
           <Tracker type="renewable" totalGlobalEnergy={totalGlobalEnergy} />
         </View>
@@ -230,9 +235,6 @@ export default function Home() {
           style={mobileStyles.resetTutorial}
         >
           <Text>View Tutorial</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={mobileStyles.exportButton}>
-          <ExportButton onPress={handleExport} />
         </TouchableOpacity>
 
         {initialGraphData &&

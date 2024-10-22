@@ -103,7 +103,7 @@ export const TechnologyComparison = ({ data, technologyRef }: TechnologyComparis
         See how different energy-generating technologies compare to each other
         based on your custom changes.
       </Text>
-      <View style={styles.graphContainer} ref={technologyRef}>
+      <View style={styles.graphContainer} ref={technologyRef} collapsable={false}>
         <View style={styles.graphInnerContainer}>
           <GraphKey label="SOLAR" color={getTechnologyColor('Solar')} />
           <GraphKey label="WIND" color={getTechnologyColor('Wind')} />

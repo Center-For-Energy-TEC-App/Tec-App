@@ -210,7 +210,7 @@ export const CarbonBudget = ({
           setCurrPosition(null)
         }}
       >
-        <View ref={carbonRef}>
+        <View ref={carbonRef} collapsable={false}>
           <View style={styles.graphTopRow}>
             {currPosition !== null &&
             currPosition >= 60 &&
