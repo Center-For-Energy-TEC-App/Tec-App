@@ -25,11 +25,11 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
 
   useEffect(() => {
     getData('tutorial').then((value) => {
-      if (value && value === 'complete') {
+      if (value === 'complete') {
         setTutorialState(11)
         sendStateHome(11)
       } else {
-        setTutorialState(state)
+        state==0 && setTutorialState(state)
       }
       if (state === 11) {
         storeData('tutorial', 'complete').then(() => {
@@ -41,7 +41,7 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
 
   return (
     <>
-      {tutorialState < 5 && (
+      {tutorialState < 5 ? (
         <>
           <View style={mobileStyles.popupOverlay} />
           <View style={mobileStyles.popupColumn}>
@@ -51,7 +51,7 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                 render={tutorialState != 0}
               />
               <View style={mobileStyles.modal}>
-                {tutorialState == 0 && (
+                {tutorialState == 0 ? (
                   <View style={mobileStyles.textWrapper}>
                     <Text style={mobileStyles.header}>
                       Welcome to the Triton Energy Climate app!
@@ -62,8 +62,8 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                       global climate goal of tripling renewable energy by 2030.
                     </Text>
                   </View>
-                )}
-                {tutorialState == 1 && (
+                ):<></>}
+                {tutorialState == 1 ? (
                   <View style={mobileStyles.textWrapper}>
                     <Text style={mobileStyles.header}>Where are we now?</Text>
                     <Text style={mobileStyles.body}>
@@ -73,8 +73,8 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                       the goal.
                     </Text>
                   </View>
-                )}
-                {tutorialState == 2 && (
+                ):<></>}
+                {tutorialState == 2 ? (
                   <View style={mobileStyles.textWrapper}>
                     <Text style={mobileStyles.header}>
                       Is the goal possible?
@@ -86,8 +86,8 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                       app lets you develop a plan to do it.
                     </Text>
                   </View>
-                )}
-                {tutorialState == 3 && (
+                ):<></>}
+                {tutorialState == 3 ? (
                   <View style={mobileStyles.textWrapper}>
                     <Text style={mobileStyles.header}>
                       Will 12 TW by 2030 solve climate change?
@@ -101,8 +101,8 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                       biodiversity, food production, and human health.
                     </Text>
                   </View>
-                )}
-                {tutorialState == 4 && (
+                ):<></>}
+                {tutorialState == 4 ? (
                   <View style={mobileStyles.textWrapper}>
                     <Text style={mobileStyles.header}>
                       Share your Energy and Climate Plan!
@@ -114,7 +114,7 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                     </Text>
                     <Text style={mobileStyles.body}>Ready to get started?</Text>
                   </View>
-                )}
+                ):<></>}
               </View>
               <RightArrow
                 onPress={() => setTutorialState(tutorialState + 1)}
@@ -148,7 +148,7 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
             </TouchableOpacity>
           </View>
         </>
-      )}
+      ):<></>}
     </>
   )
 }
@@ -187,7 +187,7 @@ const mobileStyles = StyleSheet.create({
   },
 
   modal: {
-    maxHeight: 300,
+    maxHeight: 1000,
     width: 297,
     borderRadius: 20,
     backgroundColor: 'white',

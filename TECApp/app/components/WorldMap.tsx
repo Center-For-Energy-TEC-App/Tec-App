@@ -28,7 +28,7 @@ export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
   return (
     <ReactNativeZoomableView
       onMoveShouldSetPanResponderCapture={() => true}
-      minZoom={1.5}
+      minZoom={0.5}
       initialZoom={1.5}
       maxZoom={3}
       bindToBorders={true}

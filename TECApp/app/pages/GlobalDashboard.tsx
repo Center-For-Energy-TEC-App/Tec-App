@@ -77,7 +77,7 @@ export default function GlobalDashboard() {
         contentContainerStyle={{ alignItems: 'flex-start' }}
         scrollEnabled={scrollEnabled}
       >
-        {temperatureData && (
+        {temperatureData ? (
           <>
             <Text style={styles.regionName}>Global Progress</Text>
 
@@ -97,7 +97,7 @@ export default function GlobalDashboard() {
                 dashboard
                 totalGlobalEnergy={globalEnergy}
               />
-              {tutorialState == 6 && (
+              {tutorialState == 6 ? (
                 <View style={{ position: 'absolute', top: 90, left: 20 }}>
                   <Tooltip2 />
                   <View style={styles.onBoardingButtonWrapper}>
@@ -109,8 +109,8 @@ export default function GlobalDashboard() {
                     </TouchableOpacity>
                   </View>
                 </View>
-              )}
-              {tutorialState == 7 && (
+              ):<></>} 
+             {tutorialState == 7 ? ( 
                 <View style={{ position: 'absolute', top: 90, right: -10 }}>
                   <Tooltip3 />
                   <View style={styles.onBoardingButtonWrapper}>
@@ -128,9 +128,9 @@ export default function GlobalDashboard() {
                     </TouchableOpacity>
                   </View>
                 </View>
-              )}
+               ):<></>} 
             </View>
-            {tutorialState == 11 && (
+            {tutorialState == 11 ? (
               <>
                 <DataVisualizations
                   initialGlobalData={initialGraphData}
@@ -157,9 +157,9 @@ export default function GlobalDashboard() {
                   />
                 </View>
               </>
-            )}
+            ):<View style={{marginTop: 1000}}></View>}
           </>
-        )}
+        ):<></>}
       </ScrollView>
     </GestureHandlerRootView>
   )
@@ -219,10 +219,11 @@ const styles = StyleSheet.create({
     borderColor: '#1C2B47',
     borderWidth: 1,
     borderRadius: 4,
-    width: 50,
+    maxWidth: 100,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
 
   onboardingButtonText: {

@@ -14,7 +14,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Tracker } from '../components/Tracker'
 import { GlobalDashboardButton } from '../SVGs/GlobalDashboardButton'
 import { router } from 'expo-router'
-import { removeData } from '../util/Caching'
+import { getData, removeData } from '../util/Caching'
 import { ExportButton } from '../SVGs/ExportButton'
 import { captureRef } from 'react-native-view-shot'
 import * as Print from 'expo-print'
@@ -34,7 +34,7 @@ export default function Home() {
   const [temperatureData, setTemperatureData] = useState<TemperatureData>()
 
   const [refreshTutorial, setRefreshTutorial] = useState<boolean>(true)
-  const [tutorialState, setTutorialState] = useState<number>()
+  const [tutorialState, setTutorialState] = useState<number>(0)
 
   const handleRegionSelect = (region: string) => {
     setSelectedRegion(region)
@@ -167,6 +167,16 @@ export default function Home() {
     }
   }
 
+  useEffect(()=>{
+    getData('tutorial').then((value) => {
+      if(value!=="complete"){
+        setTutorialState(0)
+        setSelectedRegion('Global')
+        setRefreshTutorial(!refreshTutorial)
+      }
+    })
+  }, [])
+
   return (
     <GestureHandlerRootView style={mobileStyles.gestureHandler}>
       <Host>
@@ -190,6 +200,7 @@ export default function Home() {
               bauRef={bauRef}
               regionalComparisonRef={regionalComparisonRef}
               technologyComparisonRef={technologyComparisonRef}
+              onSwipeDown={()=>setSelectedRegion('Global')}
             />
           </Portal>
           <View style={mobileStyles.trackerWrapper}>
@@ -206,11 +217,11 @@ export default function Home() {
                 }, 1000)
               }}
             ></GlobalDashboardButton>
-            {tutorialState == 5 && (
+            {tutorialState == 5 ? (
               <View style={{ position: 'absolute', top: 75, left: -150 }}>
                 <Tooltip1 />
               </View>
-            )}
+            ):<></>}
           </View>
           <TouchableOpacity
             onPress={() => {
@@ -224,12 +235,12 @@ export default function Home() {
           >
             <Text>View Tutorial</Text>
           </TouchableOpacity>
-          {tutorialState == 8 && (
+          {tutorialState == 8 ? (
             <View style={{ position: 'absolute', top: vh * 0.5 }}>
               <Tooltip4 />
             </View>
-          )}
-          {tutorialState == 10 && (
+          ):<></>}
+          {tutorialState == 10 ? (
             <View
               style={{
                 position: 'absolute',
@@ -245,7 +256,7 @@ export default function Home() {
                 <Text style={mobileStyles.onboardingButtonText}>Finish</Text>
               </TouchableOpacity>
             </View>
-          )}
+          ):<></>}
           <View style={mobileStyles.exportButton}>
             <ExportButton onPress={() => alert('export')} />
           </View>
@@ -307,11 +318,11 @@ const mobileStyles = StyleSheet.create({
     borderColor: '#1C2B47',
     borderWidth: 1,
     borderRadius: 4,
-    width: 50,
+    maxWidth: 100,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 4,
-  },
+    paddingHorizontal: 10,
+    paddingVertical: 4,  },
 
   onboardingButtonText: {
     fontFamily: 'Brix Sans',

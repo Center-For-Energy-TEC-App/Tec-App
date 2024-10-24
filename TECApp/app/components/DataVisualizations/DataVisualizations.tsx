@@ -57,7 +57,7 @@ const DataVisualizations = ({
           persistentScrollbar={true}
           ref={scrollViewRef}
         >
-          {region === 'Global' && (
+          {region === 'Global' ? (
             <TouchableOpacity
               onPress={() => setActiveButton('Carbon Budget')}
               style={
@@ -76,7 +76,7 @@ const DataVisualizations = ({
                 Carbon Budget
               </Text>
             </TouchableOpacity>
-          )}
+          ):<></>}
           <TouchableOpacity
             onPress={() => setActiveButton('Forecast Comparison')}
             style={
@@ -95,7 +95,7 @@ const DataVisualizations = ({
               Forecast Comparison
             </Text>
           </TouchableOpacity>
-          {region !== 'Global' && (
+          {region !== 'Global' ? (
             <TouchableOpacity
               onPress={() => setActiveButton('Regional Comparison')}
               style={
@@ -114,7 +114,7 @@ const DataVisualizations = ({
                 Regional Comparison
               </Text>
             </TouchableOpacity>
-          )}
+          ):<></>}
           <TouchableOpacity
             onPress={() => setActiveButton('Technology Comparison')}
             style={

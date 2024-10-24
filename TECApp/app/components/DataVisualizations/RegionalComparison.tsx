@@ -203,7 +203,7 @@ export const RegionalComparison = ({
               <SelectBarArrow />
             </View>
           </View>
-          {dropdown && (
+          {dropdown ? (
             <View style={styles.dropdown}>
               {dropdownOptions.map(
                 (regionObject, key) =>
@@ -228,10 +228,10 @@ export const RegionalComparison = ({
                   ),
               )}
             </View>
-          )}
+          ):<></>}
         </View>
       </View>
-      {currGradientCurve && currLineCurves && (
+      {currGradientCurve && currLineCurves ? (
         <View style={styles.graphContainer}>
           <View style={styles.graphInnerContainer}>
             <GraphKey
@@ -256,7 +256,7 @@ export const RegionalComparison = ({
             />
           </View>
         </View>
-      )}
+      ):<></>}
       <View style={{ height: 50 }} />
     </Pressable>
   )
