@@ -54,7 +54,7 @@ export const LineGraph = ({
     yMin + yRange * 0.8,
     yMax,
   ]
-  const horizontalAxis = [2024, 2026, 2028, 2030]
+  const horizontalAxis = [2025, 2026, 2027, 2028, 2029, 2030]
 
   //helper method for calculating y coordinate based on graph value
   //calculated as proportion of graph height from the top
@@ -125,7 +125,7 @@ export const LineGraph = ({
         {horizontalAxis.map((e, key) => (
           <TextSvg
             key={key}
-            x={graphWidth * (-(2024 - e) / 8.6) + leftMargin}
+            x={graphWidth * (-(2025 - e) / 7.2) + leftMargin}
             y={graphHeight + 25}
             strokeWidth={0.1}
             fontWeight={700}

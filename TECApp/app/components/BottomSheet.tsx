@@ -14,6 +14,7 @@ import {
 } from '../api/requests'
 import { getAbbrv, getEnergyAbbrv } from '../util/ValueDictionaries'
 import {
+  TemperatureData,
   calculateCarbonCurve,
   calculateCarbonReductions,
   calculateEnergyCurve,
@@ -22,14 +23,14 @@ import {
 } from '../util/Calculations'
 import { DataPoint } from './DataVisualizations/BAUComparison'
 import { storeData } from '../util/Caching'
+import { RandomNumberGenerationSource } from 'd3'
 
 export interface BottomSheetProps {
   selectedRegion: string
   passGlobalToHome: (energy: number) => void
-  passTemperatureToHome: (temperature: {
-    yearAtDegree: number[]
-    degreeAtYear: number[]
-  }) => void
+  passTemperatureToHome: (temperature: TemperatureData) => void
+  tutorialState: number
+  setTutorialState: (state: number) => void
 }
 
 export type FossilReductionData = {
@@ -65,6 +66,8 @@ export const BottomSheet = ({
   selectedRegion,
   passGlobalToHome,
   passTemperatureToHome,
+  tutorialState,
+  setTutorialState,
 }: BottomSheetProps) => {
   const snapPoints = useMemo(() => ['12.5%', '25%', '50%', '80%'], [])
   const bottomSheetRef = useRef<BottomSheetTemplate>(null)
@@ -182,7 +185,6 @@ export const BottomSheet = ({
       enableHandlePanningGesture
       enableContentPanningGesture
       enablePanDownToClose
-      style={styles.bottomSheetContainer}
     >
       {dynamicFossilData &&
         calculationData && //don't render regional sheet until all values load
@@ -191,6 +193,8 @@ export const BottomSheet = ({
             <RegionalDashboard
               minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
               sliderValues={dynamicSliderValues[getAbbrv(selectedRegion)]}
+              tutorialState={tutorialState}
+              setTutorialState={setTutorialState}
               currRegion={selectedRegion}
               onSliderChange={(val, technologyChanged) => {
                 //on slider change for a region, store changes here to preserve each region changes
@@ -318,5 +322,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
+    zIndex: 3,
   },
 })

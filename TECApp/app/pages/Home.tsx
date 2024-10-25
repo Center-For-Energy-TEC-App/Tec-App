@@ -16,6 +16,7 @@ import { GlobalDashboardButton } from '../SVGs/GlobalDashboardButton'
 import { router } from 'expo-router'
 import { removeData } from '../util/Caching'
 import { ExportButton } from '../SVGs/ExportButton'
+//@ts-ignore
 import CERLogo from '../../assets/CERLogo.png'
 import { Asset } from 'expo-asset';
 
@@ -28,6 +29,11 @@ import * as FileSystem from 'expo-file-system'
 import * as Sharing from 'expo-sharing'
 import { RegionData } from '../api/requests'
 import { DataPoint } from '../components/DataVisualizations/BAUComparison'
+import { Host, Portal } from 'react-native-portalize'
+import { TemperatureData } from '../util/Calculations'
+import { Tooltip1 } from '../SVGs/TutorialPopups/Tooltip1'
+import { Tooltip4 } from '../SVGs/TutorialPopups/Tooltip4'
+import { Tooltip6 } from '../SVGs/TutorialPopups/Tooltip6'
 
 const vw = Dimensions.get('window').width
 const vh = Dimensions.get('window').height
@@ -35,13 +41,10 @@ const vh = Dimensions.get('window').height
 export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState<string>('Global')
   const [totalGlobalEnergy, setTotalGlobalEnergy] = useState<number>(0)
-  const [temperatureData, setTemperatureData] = useState<{
-    yearAtDegree: number[]
-    degreeAtYear: number[]
-  }>()
+  const [temperatureData, setTemperatureData] = useState<TemperatureData>()
 
   const [refreshTutorial, setRefreshTutorial] = useState<boolean>(true)
-  const [tutorialState, setTutorialState] = useState<number>(0)
+  const [tutorialState, setTutorialState] = useState<number>()
 
   const [initialGraphData, setInitialGraphData] = useState<RegionData>()
   const [dynamicGraphData, setDynamicGraphData] = useState<RegionData>()
@@ -189,53 +192,87 @@ export default function Home() {
 
   const handleRegionSelect = (region: string) => {
     setSelectedRegion(region)
-    setTutorialState(7)
+    if (tutorialState == 8) setTutorialState(9)
   }
 
   return (
     <GestureHandlerRootView style={mobileStyles.gestureHandler}>
-      <View
-        style={mobileStyles.appWrapper}
-        onLayout={() => setIsRendered(true)}
-      >
-        <Tutorial refresh={refreshTutorial} state={tutorialState} />
-
-        <WorldMap onSelectCountry={handleRegionSelect} />
-        <View>
-        <TouchableOpacity style={mobileStyles.exportButton}>
-          <ExportButton onPress={handleExport} />
-        </TouchableOpacity>
-        </View>
-        <BottomSheet
-          selectedRegion={selectedRegion}
-          passGlobalToHome={(energy) => setTotalGlobalEnergy(energy)}
-          passTemperatureToHome={(temperature) =>
-            setTemperatureData(temperature)
-          }
-        />
-        <View style={mobileStyles.trackerWrapper} ref={trackerRef} collapsable={false}>
-          <Tracker type="temperature" temperatureData={temperatureData} />
-          <Tracker type="renewable" totalGlobalEnergy={totalGlobalEnergy} />
-        </View>
-        <View style={mobileStyles.dashboardButton}>
-          <GlobalDashboardButton
-            onPress={() => {
-              router.push('/pages/GlobalDashboard')
-              setTutorialState(6)
-            }}
+      <Host>
+        <View style={mobileStyles.appWrapper} onLayout={()=>setIsRendered(true)}>
+          <Tutorial
+            refresh={refreshTutorial}
+            state={tutorialState}
+            sendStateHome={setTutorialState}
           />
-        </View>
-        <TouchableOpacity
-          onPress={() => {
-            removeData('tutorial').then(() => {
-              setTutorialState(0)
-              setRefreshTutorial(!refreshTutorial)
-            })
-          }}
-          style={mobileStyles.resetTutorial}
-        >
-          <Text>View Tutorial</Text>
-        </TouchableOpacity>
+          <WorldMap onSelectCountry={handleRegionSelect} />
+          <Portal>
+            <BottomSheet
+              selectedRegion={selectedRegion}
+              passGlobalToHome={(energy) => setTotalGlobalEnergy(energy)}
+              passTemperatureToHome={(temperature) =>
+                setTemperatureData(temperature)
+              }
+              tutorialState={tutorialState}
+              setTutorialState={setTutorialState}
+            />
+          </Portal>
+          <View style={mobileStyles.trackerWrapper} ref={trackerRef} collapsable={false}>
+            <Tracker type="temperature" temperatureData={temperatureData} />
+            <Tracker type="renewable" totalGlobalEnergy={totalGlobalEnergy} />
+          </View>
+          <View style={mobileStyles.dashboardButton}>
+            <GlobalDashboardButton
+              glow={tutorialState == 5}
+              onPress={() => {
+                router.push('/pages/GlobalDashboard')
+                setTimeout(() => {
+                  if (tutorialState == 5) setTutorialState(8)
+                }, 1000)
+              }}
+            ></GlobalDashboardButton>
+            {tutorialState == 5 && (
+              <View style={{ position: 'absolute', top: 75, left: -150 }}>
+                <Tooltip1 />
+              </View>
+            )}
+          </View>
+          <TouchableOpacity
+            onPress={() => {
+              removeData('tutorial').then(() => {
+                setTutorialState(0)
+                setSelectedRegion('Global')
+                setRefreshTutorial(!refreshTutorial)
+              })
+            }}
+            style={mobileStyles.resetTutorial}
+          >
+            <Text>View Tutorial</Text>
+          </TouchableOpacity>
+          {tutorialState == 8 && (
+            <View style={{ position: 'absolute', top: vh * 0.5 }}>
+              <Tooltip4 />
+            </View>
+          )}
+          {tutorialState == 10 && (
+            <View
+              style={{
+                position: 'absolute',
+                bottom: vh * 0.03 + 50,
+                right: 27.5,
+              }}
+            >
+              <Tooltip6 />
+              <TouchableOpacity
+                onPress={() => setTutorialState(11)}
+                style={mobileStyles.onboardingButton}
+              >
+                <Text style={mobileStyles.onboardingButtonText}>Finish</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          <View style={mobileStyles.exportButton}>
+            <ExportButton onPress={handleExport} />
+          </View>
 
         {initialGraphData &&
           dynamicGraphData &&
@@ -258,6 +295,7 @@ export default function Home() {
             </View>
           )}
       </View>
+      </Host>
     </GestureHandlerRootView>
   )
 }
@@ -289,11 +327,12 @@ const mobileStyles = StyleSheet.create({
     position: 'absolute',
     top: '6.5%',
     right: '5%',
+
     // right: 0,
   },
   resetTutorial: {
     position: 'absolute',
-    top: '16%',
+    top: vh * 0.07 + 75,
     left: '3%',
     backgroundColor: 'white',
     borderRadius: 4,
@@ -302,12 +341,33 @@ const mobileStyles = StyleSheet.create({
   },
   exportButton: {
     position: 'absolute',
-    bottom: '0.5%',
-    right: '-3%',
+    right: '3%',
+    bottom: '3%',
   },
+  
   hidden: {
     position: 'absolute',
     top: -9999,
     left: -9999,
+  },
+
+  onboardingButton: {
+    position: 'relative',
+    top: 10,
+    left: 50,
+    backgroundColor: '#266297',
+    borderColor: '#1C2B47',
+    borderWidth: 1,
+    borderRadius: 4,
+    width: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 4,
+  },
+
+  onboardingButtonText: {
+    fontFamily: 'Brix Sans',
+    color: 'white',
+    fontSize: 16,
   },
 })

@@ -6,10 +6,13 @@ import {
   Platform,
   Dimensions,
   TouchableOpacity,
+  Modal,
 } from 'react-native'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
 import { DefaultValues, GraphData, MinMaxValues } from '../api/requests'
+import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
+import { getRegionSummary } from '../util/RegionDescriptions'
 
 type RegionalDashboardProps = {
   currRegion: string
@@ -20,6 +23,8 @@ type RegionalDashboardProps = {
   initialGraphData: GraphData
   dynamicGraphData: GraphData
   sliderDisabled: boolean
+  tutorialState: number
+  setTutorialState: (state: number) => void
 }
 
 export const RegionalDashboard = ({
@@ -31,10 +36,14 @@ export const RegionalDashboard = ({
   initialGraphData,
   dynamicGraphData,
   sliderDisabled,
+  tutorialState,
+  setTutorialState,
 }: RegionalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
   )
+
+  const [modal, setModal] = useState<boolean>(false)
 
   useEffect(() => {
     setActiveTab('renewables')
@@ -49,9 +58,36 @@ export const RegionalDashboard = ({
 
   const isIpad = deviceType() === 'ipad'
 
+  const renderTooltip = (text: string) => (
+    <Modal
+      transparent={true}
+      visible={modal}
+      onRequestClose={() => setModal(false)}
+    >
+      <View style={styles.tooltipOverlay}>
+        <View style={styles.tooltip}>
+          <Text style={styles.tooltipText}>{text}</Text>
+          <TouchableOpacity
+            style={styles.tooltipCloseButton}
+            onPress={() => setModal(false)}
+          >
+            <Text style={styles.tooltipCloseButtonText}>X</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  )
+
   return (
     <View style={styles.regionInfoContainer}>
-      <Text style={styles.regionName}>{currRegion}</Text>
+      <TouchableOpacity
+        style={styles.regionHeader}
+        onPress={() => setModal(true)}
+      >
+        {renderTooltip(getRegionSummary(currRegion))}
+        <Text style={styles.regionName}>{currRegion}</Text>
+        <ToolTipIcon header />
+      </TouchableOpacity>
       <View style={styles.tabContainer}>
         <TouchableOpacity onPress={() => setActiveTab('renewables')}>
           <View
@@ -94,13 +130,16 @@ export const RegionalDashboard = ({
       </View>
       <View style={styles.horizontalLine} />
       {activeTab === 'renewables' ? (
-        <DistributeRenewables
-          values={sliderValues}
-          minMaxValues={minMaxValues}
-          onSliderChange={onSliderChange}
-          onReset={onReset}
-          disabled={sliderDisabled}
-        />
+          <DistributeRenewables
+            currRegion={currRegion}
+            values={sliderValues}
+            minMaxValues={minMaxValues}
+            onSliderChange={onSliderChange}
+            onReset={onReset}
+            disabled={sliderDisabled}
+            tutorialState={tutorialState}
+            setTutorialState={setTutorialState}
+          />
       ) : (
         <DataVisualizations
           initialData={initialGraphData}
@@ -118,12 +157,19 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'flex-start',
   },
+  regionHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingBottom: 4,
+  },
   regionName: {
     color: '#000',
     fontSize: 28,
     fontFamily: 'Brix Sans',
     fontWeight: '400',
-    paddingBottom: 10,
+    paddingBottom: 6,
   },
   tabContainer: {
     flexDirection: 'row',
@@ -155,5 +201,35 @@ const styles = StyleSheet.create({
   },
   iPadText: {
     fontSize: 18,
+  },
+  tooltipOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  tooltip: {
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    position: 'relative',
+  },
+  tooltipText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  tooltipCloseButton: {
+    position: 'absolute',
+    top: 10,
+    right: 5,
+    display: 'flex',
+    alignItems: 'center',
+    width: 20,
+    height: 20,
+  },
+  tooltipCloseButtonText: {
+    fontSize: 16,
+    color: '#000',
   },
 })

@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { View, Text, StyleSheet, Dimensions } from 'react-native'
 import Svg, {
   Circle,
@@ -8,7 +8,6 @@ import Svg, {
   Line,
   LinearGradient,
   Path,
-  Rect,
   Stop,
   Text as TextSvg,
 } from 'react-native-svg'
@@ -54,12 +53,8 @@ export const CarbonBudget = ({
 }: CarbonBudgetProps) => {
   const [currPosition, setCurrPosition] = useState<number>(null)
 
-  useEffect(() => {
-    console.log(currPosition)
-  }, [currPosition])
-
-  let BAU1Point5Year = 2029
-  let BAU2Point0Year = 2054
+  const BAU1Point5Year = 2029
+  const BAU2Point0Year = 2054
 
   const yMin = 0
   const yMax = Math.max(
@@ -82,14 +77,14 @@ export const CarbonBudget = ({
 
   //find y value on a curve from x value
   const findYbyX = (x: number, curve: string) => {
-    let path = new svgPathProperties(curve)
+    const path = new svgPathProperties(curve)
     let length_start = 0,
       length_end = path.getTotalLength(),
       point = path.getPointAtLength((length_end + length_start) / 2),
       bisection_iterations_max = 20,
       bisection_iterations = 0
 
-    let error = 0.01
+    const error = 0.01
 
     while (x < point.x - error || x > point.x + error) {
       point = path.getPointAtLength((length_end + length_start) / 2)
@@ -128,29 +123,27 @@ export const CarbonBudget = ({
     .curve(d3.curveMonotoneX)(dynamicData)
 
   const separationHeight = findYbyX(
-    calculateX(temperatureData.yearAtDegree[2]),
+    calculateX(temperatureData['2.0Year']),
     full_curve,
   )
   const separationPoint = {
-    year: temperatureData.yearAtDegree[2],
+    year: temperatureData['2.0Year'],
     value: yMax - (separationHeight / graphHeight) * yRange,
   }
   //separate data based on 2 degree limit
   let data1 = [],
     data2 = []
   if (separationPoint.year % 5 == 0) {
-    data1 = dynamicData.filter(
-      (val) => val.year <= temperatureData.yearAtDegree[2],
-    )
+    data1 = dynamicData.filter((val) => val.year <= temperatureData['2.0Year'])
     data2 = [separationPoint].concat(
-      dynamicData.filter((val) => val.year > temperatureData.yearAtDegree[2]),
+      dynamicData.filter((val) => val.year > temperatureData['2.0Year']),
     )
   } else {
     data1 = dynamicData
-      .filter((val) => val.year <= temperatureData.yearAtDegree[2])
+      .filter((val) => val.year <= temperatureData['2.0Year'])
       .concat([separationPoint])
     data2 = [separationPoint].concat(
-      dynamicData.filter((val) => val.year > temperatureData.yearAtDegree[2]),
+      dynamicData.filter((val) => val.year > temperatureData['2.0Year']),
     )
   }
 
@@ -205,82 +198,95 @@ export const CarbonBudget = ({
           setCurrPosition(evt.nativeEvent.locationX)
         }}
         onResponderMove={(evt) => setCurrPosition(evt.nativeEvent.locationX)}
-        onResponderRelease={(evt) => {
+        onResponderRelease={() => {
           isInteracting(false)
           setCurrPosition(null)
         }}
       >
         <View ref={carbonRef} collapsable={false}>
-          <View style={styles.graphTopRow}>
-            {currPosition !== null &&
-            currPosition >= 60 &&
-            currPosition < contentWidth ? (
-              <Text style={{ color: '#757678', fontSize: 12 }}>
-                {Math.round(
-                  ((currPosition - leftMargin) / (contentWidth - leftMargin)) *
-                    xRange +
-                    xMin,
-                )}
-              </Text>
-            ) : (
-              <Text></Text>
-            )}
-            <View style={styles.keyContainer}>
-              <GraphKey label="ALTERED CARBON EMISSIONS" color="#266297" />
-              <GraphKey label="PROJECTED CARBON EMISSIONS" color="#757678" />
-            </View>
+        <View style={styles.graphTopRow}>
+          {currPosition !== null &&
+          currPosition >= 60 &&
+          currPosition < contentWidth ? (
+            <Text style={{ color: '#757678', fontSize: 12 }}>
+              {Math.round(
+                ((currPosition - leftMargin) / (contentWidth - leftMargin)) *
+                  xRange +
+                  xMin,
+              )}
+            </Text>
+          ) : (
+            <Text></Text>
+          )}
+          <View style={styles.keyContainer}>
+            <GraphKey label="ALTERED CARBON EMISSIONS" color="#266297" />
+            <GraphKey label="PROJECTED CARBON EMISSIONS" color="#757678" />
           </View>
-          <Svg width={graphWidth} height={svgHeight}>
-            <Defs>
-              <LinearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
-                <Stop stopColor="#266297" stopOpacity={0.85} />
-                <Stop offset="1" stopColor="#266297" stopOpacity={0.2} />
-              </LinearGradient>
-              <LinearGradient id="grad2" x1="0" y1="0" x2="0" y2="1">
-                <Stop stopColor="#9E9FA7" stopOpacity={0.5} />
-                <Stop offset="1" stopColor="#9E9FA7" stopOpacity={0} />
-              </LinearGradient>
-            </Defs>
-            {/* Graph frame */}
-            <G y={offset}>
-              {verticalAxis.map((e, key) => (
-                <G key={key}>
-                  <Line
-                    key={key}
-                    x1={leftMargin}
-                    x2={contentWidth}
-                    y1={calculateY(e)}
-                    y2={calculateY(e)}
-                    stroke="#E9E9E9"
-                    strokeWidth={2}
-                  />
-                  <TextSvg
-                    strokeWidth={0.1}
-                    y={calculateY(e) + 3.5}
-                    x={e >= 10 ? leftMargin - 25 : leftMargin - 20}
-                    fontSize={10}
-                    fill="#9E9FA7"
-                    stroke="#9E9FA7"
-                  >
-                    {e.toFixed(1)}
-                  </TextSvg>
-                </G>
-              ))}
+        </View>
+        <Svg width={graphWidth} height={svgHeight}>
+          <Defs>
+            <LinearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
+              <Stop stopColor="#266297" stopOpacity={0.85} />
+              <Stop offset="1" stopColor="#266297" stopOpacity={0.2} />
+            </LinearGradient>
+            <LinearGradient id="grad2" x1="0" y1="0" x2="0" y2="1">
+              <Stop stopColor="#9E9FA7" stopOpacity={0.5} />
+              <Stop offset="1" stopColor="#9E9FA7" stopOpacity={0} />
+            </LinearGradient>
+          </Defs>
+          {/* Graph frame */}
+          <G y={offset}>
+            {verticalAxis.map((e, key) => (
+              <G key={key}>
+                <Line
+                  key={key}
+                  x1={leftMargin}
+                  x2={contentWidth}
+                  y1={calculateY(e)}
+                  y2={calculateY(e)}
+                  stroke="#E9E9E9"
+                  strokeWidth={2}
+                />
+                <TextSvg
+                  strokeWidth={0.1}
+                  y={calculateY(e) + 3.5}
+                  x={e >= 10 ? leftMargin - 25 : leftMargin - 20}
+                  fontSize={10}
+                  fill="#9E9FA7"
+                  stroke="#9E9FA7"
+                >
+                  {e.toFixed(1)}
+                </TextSvg>
+              </G>
+            ))}
+            <TextSvg
+              transform="rotate(270)"
+              stroke="#000"
+              fill="#000"
+              strokeWidth={0.05}
+              fontWeight={400}
+              fontFamily="Roboto"
+              fontSize={14}
+              x={-(graphHeight - 50)}
+              y={15}
+            >
+              Emissions (GT)
+            </TextSvg>
+            <TextSvg
+              x={leftMargin - 5}
+              y={graphHeight + 25}
+              strokeWidth={0.1}
+              fontWeight={700}
+              fontSize={10}
+              fill="#9E9FA7"
+              stroke="#9E9FA7"
+            >
+              2025
+            </TextSvg>
+            {horizontalAxis.map((e, key) => (
               <TextSvg
-                transform="rotate(270)"
-                stroke="#000"
-                fill="#000"
-                strokeWidth={0.05}
-                fontWeight={400}
-                fontFamily="Roboto"
-                fontSize={14}
-                x={-(graphHeight - 50)}
-                y={15}
-              >
-                Emissions (GT)
-              </TextSvg>
-              <TextSvg
-                x={leftMargin - 5}
+                key={key}
+                x={graphWidth * ((e - 2030) / 50) + leftMargin + 35}
                 y={graphHeight + 25}
                 strokeWidth={0.1}
                 fontWeight={700}
@@ -288,144 +294,129 @@ export const CarbonBudget = ({
                 fill="#9E9FA7"
                 stroke="#9E9FA7"
               >
-                2025
+                {e}
               </TextSvg>
-              {horizontalAxis.map((e, key) => (
-                <TextSvg
-                  key={key}
-                  x={graphWidth * ((e - 2030) / 50) + leftMargin + 35}
-                  y={graphHeight + 25}
-                  strokeWidth={0.1}
-                  fontWeight={700}
-                  fontSize={10}
-                  fill="#9E9FA7"
-                  stroke="#9E9FA7"
-                >
-                  {e}
-                </TextSvg>
-              ))}
-              <TextSvg
-                stroke="#000"
-                fill="#000"
-                strokeWidth={0.05}
-                fontWeight={400}
-                fontFamily="Roboto"
-                fontSize={14}
-                x={graphWidth / 2}
-                y={graphHeight + 50}
+            ))}
+            <TextSvg
+              stroke="#000"
+              fill="#000"
+              strokeWidth={0.05}
+              fontWeight={400}
+              fontFamily="Roboto"
+              fontSize={14}
+              x={graphWidth / 2}
+              y={graphHeight + 50}
+            >
+              Years
+            </TextSvg>
+          </G>
+          {/* Graph Curves */}
+          <G y={offset}>
+            <Path d={carbon_gradient1} strokeWidth={0} fill={'url(#grad1)'} />
+            <Path d={carbon_gradient2} strokeWidth={0} fill={'url(#grad2)'} />
+            <Path
+              d={carbon_curve1}
+              strokeWidth={1.575}
+              stroke="#266297"
+              fill="none"
+            />
+            <Path
+              d={carbon_curve2}
+              strokeWidth={1.575}
+              stroke="#266297"
+              fill="none"
+            />
+            <Path
+              d={BAU_curve}
+              strokeWidth={1.575}
+              stroke="#757678"
+              fill="none"
+            />
+          </G>
+          {/* Temperature Limits & Labels */}
+          <G y={offset}>
+            {currPosition !== null &&
+              currPosition > 60 &&
+              currPosition < contentWidth + 5 && (
+                <Line
+                  stroke="#1C2B47"
+                  strokeWidth={1.57}
+                  fill="#1C2B47"
+                  x1={currPosition}
+                  x2={currPosition}
+                  y1={0}
+                  y2={190}
+                />
+              )}
+            <Circle
+              x={calculateX(BAU1Point5Year)}
+              y={findYbyX(calculateX(BAU1Point5Year), BAU_curve)}
+              r={4}
+              fill="white"
+              stroke="#757678"
+              strokeWidth={2.362}
+            />
+            <Circle
+              x={calculateX(BAU2Point0Year)}
+              y={findYbyX(calculateX(BAU2Point0Year), BAU_curve)}
+              r={4}
+              fill="white"
+              stroke="#757678"
+              strokeWidth={2.362}
+            />
+            {Math.abs(currPosition - calculateX(BAU1Point5Year)) < 5 && (
+              <G
+                x={calculateX(BAU1Point5Year) - 44}
+                y={findYbyX(calculateX(BAU1Point5Year), BAU_curve) + 7}
               >
-                Years
-              </TextSvg>
-            </G>
-            {/* Graph Curves */}
-            <G y={offset}>
-              <Path d={carbon_gradient1} strokeWidth={0} fill={'url(#grad1)'} />
-              <Path d={carbon_gradient2} strokeWidth={0} fill={'url(#grad2)'} />
-              <Path
-                d={carbon_curve1}
-                strokeWidth={1.575}
-                stroke="#266297"
-                fill="none"
-              />
-              <Path
-                d={carbon_curve2}
-                strokeWidth={1.575}
-                stroke="#266297"
-                fill="none"
-              />
-              <Path
-                d={BAU_curve}
-                strokeWidth={1.575}
-                stroke="#757678"
-                fill="none"
-              />
-            </G>
-            {/* Temperature Limits & Labels */}
-            <G y={offset}>
-              {currPosition !== null &&
-                currPosition > 60 &&
-                currPosition < contentWidth + 5 && (
-                  <Line
-                    stroke="#1C2B47"
-                    strokeWidth={1.57}
-                    fill="#1C2B47"
-                    x1={currPosition}
-                    x2={currPosition}
-                    y1={0}
-                    y2={190}
-                  />
-                )}
-              <Circle
-                x={calculateX(BAU1Point5Year)}
-                y={findYbyX(calculateX(BAU1Point5Year), BAU_curve)}
-                r={4}
-                fill="white"
-                stroke="#757678"
-                strokeWidth={2.362}
-              />
-              <Circle
-                x={calculateX(BAU2Point0Year)}
-                y={findYbyX(calculateX(BAU2Point0Year), BAU_curve)}
-                r={4}
-                fill="white"
-                stroke="#757678"
-                strokeWidth={2.362}
-              />
-              {Math.abs(currPosition - calculateX(BAU1Point5Year)) < 5 && (
-                <G
-                  x={calculateX(BAU1Point5Year) - 44}
-                  y={findYbyX(calculateX(BAU1Point5Year), BAU_curve) + 7}
-                >
-                  <BAUCurvePopup label="BAU 1.5˚C LIMIT" />
-                </G>
-              )}
-              {Math.abs(currPosition - calculateX(BAU2Point0Year)) < 5 && (
-                <G
-                  x={calculateX(BAU2Point0Year) - 44}
-                  y={findYbyX(calculateX(BAU2Point0Year), BAU_curve) + 7}
-                >
-                  <BAUCurvePopup label="BAU 2.0˚C LIMIT" />
-                </G>
-              )}
-              <Circle
-                x={calculateX(temperatureData.yearAtDegree[0])}
-                y={graphHeight}
-                r={4}
-                fill="white"
-                stroke="#266297"
-                strokeWidth={2.362}
-              />
-              <Circle
-                x={calculateX(temperatureData.yearAtDegree[2])}
-                y={graphHeight}
-                r={4}
-                fill="white"
-                stroke="#266297"
-                strokeWidth={2.362}
-              />
-              {Math.abs(
-                currPosition - calculateX(temperatureData.yearAtDegree[0]),
-              ) < 5 && (
-                <G
-                  x={calculateX(temperatureData.yearAtDegree[0]) - 33}
-                  y={graphHeight - 37}
-                >
-                  <AlteredCurvePopup label="1.5˚C LIMIT" />
-                </G>
-              )}
-              {Math.abs(
-                currPosition - calculateX(temperatureData.yearAtDegree[2]),
-              ) < 5 && (
-                <G
-                  x={calculateX(temperatureData.yearAtDegree[2]) - 33}
-                  y={graphHeight - 37}
-                >
-                  <AlteredCurvePopup label="2.0˚C LIMIT" />
-                </G>
-              )}
-            </G>
-          </Svg>
-        </View>
+                <BAUCurvePopup label="BAU 1.5˚C LIMIT" />
+              </G>
+            )}
+            {Math.abs(currPosition - calculateX(BAU2Point0Year)) < 5 && (
+              <G
+                x={calculateX(BAU2Point0Year) - 44}
+                y={findYbyX(calculateX(BAU2Point0Year), BAU_curve) + 7}
+              >
+                <BAUCurvePopup label="BAU 2.0˚C LIMIT" />
+              </G>
+            )}
+            <Circle
+              x={calculateX(temperatureData['1.5Year'])}
+              y={graphHeight}
+              r={4}
+              fill="white"
+              stroke="#266297"
+              strokeWidth={2.362}
+            />
+            <Circle
+              x={calculateX(temperatureData['2.0Year'])}
+              y={graphHeight}
+              r={4}
+              fill="white"
+              stroke="#266297"
+              strokeWidth={2.362}
+            />
+            {Math.abs(currPosition - calculateX(temperatureData['1.5Year'])) <
+              5 && (
+              <G
+                x={calculateX(temperatureData['1.5Year']) - 33}
+                y={graphHeight - 37}
+              >
+                <AlteredCurvePopup label="1.5˚C LIMIT" />
+              </G>
+            )}
+            {Math.abs(currPosition - calculateX(temperatureData['2.0Year'])) <
+              5 && (
+              <G
+                x={calculateX(temperatureData['2.0Year']) - 33}
+                y={graphHeight - 37}
+              >
+                <AlteredCurvePopup label="2.0˚C LIMIT" />
+              </G>
+            )}
+          </G>
+        </Svg>
+      </View>
       </View>
     </View>
   )

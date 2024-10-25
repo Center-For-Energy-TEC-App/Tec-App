@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Text, StyleSheet, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { TouchableOpacity } from 'react-native-gesture-handler'
@@ -20,9 +20,9 @@ type DataVisualizationsProps = {
   dynamicFossilData?: DataPoint[]
   temperatureData?: TemperatureData
   isInteracting?: (interacting: boolean) => void
-  bauRef: React.RefObject<View>
-  carbonRef: React.RefObject<View>
-  technologyRef: React.RefObject<View>
+  bauRef?: React.RefObject<View>
+  carbonRef?: React.RefObject<View>
+  technologyRef?: React.RefObject<View>
 }
 const DataVisualizations = ({
   region,
@@ -39,9 +39,16 @@ const DataVisualizations = ({
   technologyRef,
 }: DataVisualizationsProps) => {
   const [activeButton, setActiveButton] = useState(
-    region === 'Global' ? 'Carbon Budget' : 'BAU Comparison',
+    region === 'Global' ? 'Carbon Budget' : 'Forecast Comparison',
   )
   const [scrollEnabled, setScrollEnabled] = useState<boolean>(true)
+  const scrollViewRef = useRef(null)
+
+  useEffect(() => {
+    setTimeout(function () {
+      scrollViewRef.current?.flashScrollIndicators()
+    }, 500)
+  }, [activeButton])
 
   return (
     <ScrollView
@@ -50,7 +57,12 @@ const DataVisualizations = ({
       scrollEnabled={scrollEnabled}
     >
       <View style={styles.buttonsWrapper}>
-        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+        <ScrollView
+          horizontal={true}
+          showsHorizontalScrollIndicator={true}
+          persistentScrollbar={true}
+          ref={scrollViewRef}
+        >
           {region === 'Global' && (
             <TouchableOpacity
               onPress={() => setActiveButton('Carbon Budget')}
@@ -72,21 +84,21 @@ const DataVisualizations = ({
             </TouchableOpacity>
           )}
           <TouchableOpacity
-            onPress={() => setActiveButton('BAU Comparison')}
+            onPress={() => setActiveButton('Forecast Comparison')}
             style={
-              activeButton === 'BAU Comparison'
+              activeButton === 'Forecast Comparison'
                 ? styles.activeButton
                 : styles.inactiveButton
             }
           >
             <Text
               style={
-                activeButton === 'BAU Comparison'
+                activeButton === 'Forecast Comparison'
                   ? styles.activeButtonText
                   : styles.inactiveButtonText
               }
             >
-              BAU Comparison
+              Forecast Comparison
             </Text>
           </TouchableOpacity>
 
@@ -130,8 +142,7 @@ const DataVisualizations = ({
           </TouchableOpacity>
         </ScrollView>
       </View>
-
-      {activeButton === 'BAU Comparison' ? (
+      {activeButton === 'Forecast Comparison' ? (
         <BAUComparison
           bauRef={bauRef}
           region={region}

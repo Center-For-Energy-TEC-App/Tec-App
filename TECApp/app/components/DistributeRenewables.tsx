@@ -21,11 +21,10 @@ import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
 import Svg, { Path, Rect } from 'react-native-svg'
 import { getEnergyAbbrv, getTechnologyColor } from '../util/ValueDictionaries'
 import { DefaultValues, MinMaxValues } from '../api/requests'
-import {
-  Gesture,
-  GestureDetector,
-  NativeViewGestureHandler,
-} from 'react-native-gesture-handler'
+import { NativeViewGestureHandler } from 'react-native-gesture-handler'
+import { SliderIndicator } from '../SVGs/SliderIndicator'
+import { Tooltip5 } from '../SVGs/TutorialPopups/Tooltip5'
+import { getRegionTechnologySummary } from '../util/RegionDescriptions'
 
 export type TechnologyProportions = {
   solar: number
@@ -37,22 +36,30 @@ export type TechnologyProportions = {
 }
 
 type DistributeRenewablesProps = {
+  currRegion: string
   values: DefaultValues
   minMaxValues: MinMaxValues
   onSliderChange: (val: DefaultValues, technologyChanged: string) => void
   onReset: () => void
   disabled: boolean
+  tutorialState: number
+  setTutorialState: (state: number) => void
 }
 
 const DistributeRenewables = ({
+  currRegion,
   values,
   minMaxValues,
   onSliderChange,
   onReset,
   disabled,
+  tutorialState,
+  setTutorialState,
 }: DistributeRenewablesProps) => {
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
+
+  const [renderTutorial, setRenderTutorial] = useState<boolean>()
 
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
@@ -70,8 +77,14 @@ const DistributeRenewables = ({
   const [technologyProportions, setTechnologyProportions] = //pixel width values of each technology for proportion bar
     useState<TechnologyProportions>(undefined)
 
+  const [globalEnergyProportion, setGlobalEnergyProportion] = useState<number>()
+
   useEffect(() => {
     setSliderValues(values[2])
+    console.log(tutorialState)
+    if (tutorialState === 9) {
+      setRenderTutorial(true)
+    }
   }, [values])
 
   //calculate proportion bar values on every slider change
@@ -96,13 +109,19 @@ const DistributeRenewables = ({
         nuclear:
           (sliderValues.nuclear_gw / sliderTotal) * (proportionBarWidth - 5),
       })
+
+      setGlobalEnergyProportion((sliderTotal / 12000) * proportionBarWidth)
     }
   }, [sliderValues, proportionBarWidth])
 
   const renderTrackMark = (index: number, mark: string) => (
     <View style={styles.trackMarkContainer} key={index}>
       <View style={styles.trackMark} />
-      <Text style={styles.trackMarkLabel}>{mark}</Text>
+      {mark === '2025' ? (
+        <SliderIndicator color="#F05B4A"></SliderIndicator>
+      ) : (
+        <SliderIndicator color="#6DB6FB"></SliderIndicator>
+      )}
     </View>
   )
 
@@ -166,11 +185,11 @@ const DistributeRenewables = ({
             minimumTrackTintColor={getTechnologyColor(label)}
             maximumTrackTintColor="#B5B1AA"
             trackMarks={[
-              values[0][getEnergyAbbrv(label.toLowerCase())] - //subtract by slight offset because the trackmark div is wider than the trackmark itself
-                0.0425 *
+              values[0][getEnergyAbbrv(label.toLowerCase())] + //add slight offset because the trackmark div is wider than the trackmark itself
+                0.0275 *
                   (parseFloat(minMaxValues.max[label.toLowerCase()]) -
                     parseFloat(minMaxValues.min[label.toLowerCase()])),
-              values[1][getEnergyAbbrv(label.toLowerCase())] -
+              values[1][getEnergyAbbrv(label.toLowerCase())] +
                 0.0275 *
                   (parseFloat(minMaxValues.max[label.toLowerCase()]) -
                     parseFloat(minMaxValues.min[label.toLowerCase()])),
@@ -180,8 +199,8 @@ const DistributeRenewables = ({
                 index,
                 values[0][getEnergyAbbrv(label.toLowerCase())] < //ordering based on which value (2024 or bau) is higher
                   values[1][getEnergyAbbrv(label.toLowerCase())]
-                  ? ['2024', 'BAU'][index]
-                  : ['BAU', '2024'][index],
+                  ? ['2025', '2030'][index]
+                  : ['2030', '2025'][index],
               )
             }
             onSlidingStart={() => {
@@ -219,13 +238,62 @@ const DistributeRenewables = ({
   return (
     <ScrollView
       contentContainerStyle={styles.container}
-      stickyHeaderIndices={[1]}
+      stickyHeaderIndices={[2]}
     >
       <Text style={[styles.description, isIpad && styles.iPadText]}>
         Using the sliders below, make region specific changes for each renewable
         energy source to reach 12 TW of renewable capacity. This will override
         default values set in the global dashboard.
       </Text>
+      <View style={styles.capacityProportionContainer}>
+        <Text style={styles.capacityProportionText}>
+          Region&apos;s Contribution to 12 TW Goal
+        </Text>
+        {proportionBarWidth && globalEnergyProportion ? (
+          <Svg height={20}>
+            <Rect
+              x={0}
+              y={0}
+              width={proportionBarWidth}
+              height={20}
+              fill="#DEDCD9"
+            />
+            <Rect
+              x={0}
+              y={0}
+              width={globalEnergyProportion}
+              height={20}
+              fill="#266297"
+            />
+            <Path
+              d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <Path
+              d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <Path
+              d={`M ${proportionBarWidth - 4} 0 Q ${proportionBarWidth - 0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`}
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <Path
+              d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth - 0.5} 19.5 ${proportionBarWidth - 4} 20 L ${proportionBarWidth} 20 z`}
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+          </Svg>
+        ) : (
+          <></>
+        )}
+      </View>
       <View
         style={styles.capacityProportionContainer}
         onLayout={(event) => {
@@ -235,7 +303,7 @@ const DistributeRenewables = ({
         <Text style={styles.capacityProportionText}>
           Renewable Capacity Proportions
         </Text>
-        {proportionBarWidth && technologyProportions && (
+        {proportionBarWidth && technologyProportions ? (
           <Svg height={20}>
             <Rect
               x={0}
@@ -333,60 +401,71 @@ const DistributeRenewables = ({
               fill="white"
             />
           </Svg>
+        ) : (
+          <></>
         )}
-        {/* <View style={styles.bar}></View> */}
       </View>
+      <View style={styles.sliderIndicatorRow}>
+        <View style={styles.sliderIndicator}>
+          <SliderIndicator color="#F05B4A" />
+          <Text style={{ fontSize: 12 }}>2025</Text>
+        </View>
+        <View style={styles.sliderIndicator}>
+          <SliderIndicator color="#6DB6FB" />
+          <Text style={{ fontSize: 12 }}>2030 Forecast</Text>
+        </View>
+      </View>
+      {/* </View> */}
       {renderSlider(
         'Wind',
         WindIcon,
-        <Text>
-          <Text style={{ fontWeight: 'bold' }}>Wind power</Text> involves using
-          wind turbines to convert moving air in the form of kinetic energy into
-          electrical energy. Wind power is captured through wind turbines that
-          rotate when wind passes through them.
-        </Text>,
+        <Text>{getRegionTechnologySummary(currRegion, 'Wind')}</Text>,
+      )}
+      {renderTutorial && (
+        <>
+          <View
+            style={{ shadowColor: 'gray', shadowRadius: 5, shadowOpacity: 0.5 }}
+          >
+            <Tooltip5 />
+          </View>
+          <View style={styles.onBoardingButtonWrapper}>
+            <TouchableOpacity
+              style={styles.onboardingButton}
+              onPress={() => {
+                setRenderTutorial(false)
+                setTutorialState(10)
+              }}
+            >
+              <Text style={styles.onboardingButtonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
+        </>
       )}
       {renderSlider(
         'Solar',
         SolarIcon,
-        <Text>
-          <Text style={{ fontWeight: 'bold' }}>Solar power</Text> converts
-          sunlight into electrical energy through photovoltaic panels. This
-          energy can be used to generate electricity or can be stored in
-          batteries.
-        </Text>,
+        <Text>{getRegionTechnologySummary(currRegion, 'Solar')}</Text>,
       )}
       {renderSlider(
         'Hydropower',
         HydroIcon,
-        <Text>
-          <Text style={{ fontWeight: 'bold' }}>Hydropower</Text> generates
-          electricity using the energy of water. This is harnessed by using
-          turbines and generators to convert the natural kinetic energy of water
-          into electricity.
-        </Text>,
+        <Text>{getRegionTechnologySummary(currRegion, 'Hydropower')}</Text>,
       )}
-{renderSlider(
-  'Biomass',
-  BiomassIcon,
-  <Text>
-    <Text>Most </Text><Text style={{ fontWeight: 'bold' }}>biomass power</Text> systems are generated by the direct combustion of organic materials such as crops and waste products, which are burned and produce steam that drives a generator.
-  </Text>
-)}
-{renderSlider(
-  'Geothermal',
-  GeothermalIcon,
-  <Text>
-    <Text style={{ fontWeight: 'bold' }}>Geothermal power</Text> is generated from heat within the Earth’s core. Geothermal wells and heat exchangers are used to tap into reservoirs of steam and hot water.
-  </Text>
-)}
-{renderSlider(
-  'Nuclear',
-  NuclearIcon,
-  <Text>
-    <Text style={{ fontWeight: 'bold' }}>Nuclear power</Text> is generated through nuclear reactions, typically involving the splitting of atoms to release energy. This is then harnessed to generate electricity.
-  </Text>
-)}
+      {renderSlider(
+        'Biomass',
+        BiomassIcon,
+        <Text>{getRegionTechnologySummary(currRegion, 'Biomass')}</Text>,
+      )}
+      {renderSlider(
+        'Geothermal',
+        GeothermalIcon,
+        <Text>{getRegionTechnologySummary(currRegion, 'Geothermal')}</Text>,
+      )}
+      {renderSlider(
+        'Nuclear',
+        NuclearIcon,
+        <Text>{getRegionTechnologySummary(currRegion, 'Nuclear')}</Text>,
+      )}
 
       <Text style={[styles.nuclearNote, isIpad && styles.iPadText]}>
         {' '}
@@ -425,7 +504,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingHorizontal: 10,
     paddingVertical: 16,
-    marginBottom: 32,
+    marginBottom: 16,
     gap: 10,
     alignSelf: 'stretch',
     borderRadius: 8,
@@ -456,7 +535,6 @@ const styles = StyleSheet.create({
     maxWidth: '50%',
     paddingBottom: 10,
     gap: 8,
-    // backgroundColor: "red"
   },
   label: {
     color: '#000',
@@ -516,7 +594,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   spacer: {
-    marginTop: 46,
+    marginTop: 100,
   },
   nuclearNote: {
     color: '#757678',
@@ -541,18 +619,57 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   trackMarkContainer: {
-    paddingTop: 20,
+    paddingTop: 10,
+    gap: 4,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   trackMark: {
     width: 1,
-    height: 21,
+    height: 25,
     backgroundColor: '#B5B1AA',
   },
   trackMarkLabel: {
+    marginTop: 3,
     color: '#B5B1AA',
     fontSize: 17,
+  },
+  sliderIndicatorRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 20,
+    gap: 14,
+  },
+  sliderIndicator: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  onBoardingButtonWrapper: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    // backgroundColor: 'red',
+    width: 240,
+    marginBottom: 10,
+  },
+
+  onboardingButton: {
+    backgroundColor: '#266297',
+    borderColor: '#1C2B47',
+    borderWidth: 1,
+    borderRadius: 4,
+    width: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 4,
+  },
+
+  onboardingButtonText: {
+    fontFamily: 'Brix Sans',
+    color: 'white',
+    fontSize: 16,
   },
 })
 
