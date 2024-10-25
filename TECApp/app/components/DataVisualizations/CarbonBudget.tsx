@@ -41,6 +41,7 @@ type CarbonBudgetProps = {
   dynamicData: DataPoint[]
   temperatureData: TemperatureData
   isInteracting: (interacting: boolean) => void
+  carbonRef: React.RefObject<View>
 }
 
 export const CarbonBudget = ({
@@ -48,6 +49,7 @@ export const CarbonBudget = ({
   dynamicData,
   temperatureData,
   isInteracting,
+  carbonRef,
 }: CarbonBudgetProps) => {
   const [currPosition, setCurrPosition] = useState<number>(null)
 
@@ -201,6 +203,7 @@ export const CarbonBudget = ({
           setCurrPosition(null)
         }}
       >
+        <View ref={carbonRef} collapsable={false}>
         <View style={styles.graphTopRow}>
           {currPosition !== null &&
           currPosition >= 60 &&
@@ -413,6 +416,7 @@ export const CarbonBudget = ({
             ):<></>}
           </G>
         </Svg>
+      </View>
       </View>
     </View>
   )

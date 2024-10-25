@@ -29,10 +29,6 @@ export interface BottomSheetProps {
   selectedRegion: string
   passGlobalToHome: (energy: number) => void
   passTemperatureToHome: (temperature: TemperatureData) => void
-  slidersRef: React.RefObject<View>
-  bauRef: React.RefObject<View>
-  regionalComparisonRef: React.RefObject<View>
-  technologyComparisonRef: React.RefObject<View>
   tutorialState: number
   setTutorialState: (state: number) => void
   onSwipeDown: ()=>void
@@ -71,10 +67,6 @@ export const BottomSheet = ({
   selectedRegion,
   passGlobalToHome,
   passTemperatureToHome,
-  slidersRef,
-  bauRef,
-  regionalComparisonRef,
-  technologyComparisonRef,
   tutorialState,
   setTutorialState,
   onSwipeDown,
@@ -204,10 +196,6 @@ export const BottomSheet = ({
             <RegionalDashboard
               minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
               sliderValues={dynamicSliderValues[getAbbrv(selectedRegion)]}
-              slidersRef={slidersRef}
-              bauRef={bauRef}
-              regionalComparisonRef={regionalComparisonRef}
-              technologyComparisonRef={technologyComparisonRef}
               tutorialState={tutorialState}
               setTutorialState={setTutorialState}
               currRegion={selectedRegion}

@@ -3,7 +3,7 @@ import React from 'react'
 
 export const Tooltip4 = () => {
   return (
-    <Svg width="343" height="132" viewBox="0 0 343 132" fill="none">
+    <Svg width="240" height="132" viewBox="0 0 240 132" fill="none">
       <Rect
         x="8.5"
         y="8.5"

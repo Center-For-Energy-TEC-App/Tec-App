@@ -1,6 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { StyleSheet, TouchableOpacity } from 'react-native'
-import { Dimensions, Platform, Text, View } from 'react-native'
+import {
+  Dimensions,
+  Platform,
+  Text,
+  View,
+} from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Tracker } from '../components/Tracker'
 import { DataPoint } from '../components/DataVisualizations/BAUComparison'
@@ -27,6 +32,11 @@ export default function GlobalDashboard() {
 
   const [scrollEnabled, setScrollEnabled] = useState<boolean>(true)
   const [tutorialState, setTutorialState] = useState<number>()
+
+  const carbonBudgetRef = useRef(null)
+  const bauComparisonRef = useRef(null)
+  const technologyComparisonRef = useRef(null)
+  const trackerRef = useRef(null)
 
   useEffect(() => {
     getData('bau-graph-data').then((value) => {
@@ -62,6 +72,8 @@ export default function GlobalDashboard() {
     })
   }, [])
 
+
+
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
     return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
@@ -70,6 +82,8 @@ export default function GlobalDashboard() {
   }
 
   const isIpad = deviceType() === 'ipad'
+  
+
   return (
     <GestureHandlerRootView>
       <ScrollView
@@ -86,7 +100,7 @@ export default function GlobalDashboard() {
               this through increasing our current renewable capacity from 8 to
               12 TW.
             </Text>
-            <View style={styles.trackersWrapper}>
+            <View ref={trackerRef} style={styles.trackersWrapper}>
               <Tracker
                 type="temperature"
                 dashboard
@@ -142,6 +156,9 @@ export default function GlobalDashboard() {
                     setScrollEnabled(!interacting)
                   }
                   region="Global"
+                  bauRef={bauComparisonRef}
+                  carbonRef={carbonBudgetRef}
+                  technologyRef={technologyComparisonRef}
                 />
 
                 <View style={styles.bottomButtons}>
