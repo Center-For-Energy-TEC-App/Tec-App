@@ -20,6 +20,9 @@ type DataVisualizationsProps = {
   dynamicFossilData?: DataPoint[]
   temperatureData?: TemperatureData
   isInteracting?: (interacting: boolean) => void
+  bauRef?: React.RefObject<View>
+  carbonRef?: React.RefObject<View>
+  technologyRef?: React.RefObject<View>
 }
 const DataVisualizations = ({
   region,
@@ -31,6 +34,9 @@ const DataVisualizations = ({
   dynamicFossilData,
   temperatureData,
   isInteracting,
+  bauRef,
+  carbonRef,
+  technologyRef,
 }: DataVisualizationsProps) => {
   const [activeButton, setActiveButton] = useState(
     region === 'Global' ? 'Carbon Budget' : 'Forecast Comparison',
@@ -95,6 +101,7 @@ const DataVisualizations = ({
               Forecast Comparison
             </Text>
           </TouchableOpacity>
+
           {region !== 'Global' && (
             <TouchableOpacity
               onPress={() => setActiveButton('Regional Comparison')}
@@ -137,6 +144,7 @@ const DataVisualizations = ({
       </View>
       {activeButton === 'Forecast Comparison' ? (
         <BAUComparison
+          bauRef={bauRef}
           region={region}
           BAUData={
             initialGlobalData
@@ -153,6 +161,7 @@ const DataVisualizations = ({
         <RegionalComparison region={region} data={dynamicData} />
       ) : activeButton === 'Carbon Budget' ? (
         <CarbonBudget
+          carbonRef={carbonRef}
           BAUData={initialFossilData}
           dynamicData={dynamicFossilData}
           temperatureData={temperatureData}
@@ -163,12 +172,58 @@ const DataVisualizations = ({
         />
       ) : (
         <TechnologyComparison
+          technologyRef={technologyRef}
           data={
             dynamicGlobalData
               ? dynamicGlobalData
               : dynamicData[getAbbrv(region)]
           }
         />
+      )}
+
+      {region === 'Global' && (
+        <View style={styles.hidden}>
+          <View>
+            <BAUComparison
+              bauRef={bauRef}
+              region={region}
+              BAUData={
+                initialGlobalData
+                  ? initialGlobalData
+                  : initialData[getAbbrv(region)]
+              }
+              dynamicData={
+                dynamicGlobalData
+                  ? dynamicGlobalData
+                  : dynamicData[getAbbrv(region)]
+              }
+            />
+          </View>
+
+          <View>
+            <CarbonBudget
+              carbonRef={carbonRef}
+              BAUData={initialFossilData}
+              dynamicData={dynamicFossilData}
+              temperatureData={temperatureData}
+              isInteracting={(interacting) => {
+                setScrollEnabled(!interacting)
+                isInteracting(interacting)
+              }}
+            />
+          </View>
+
+          <View>
+            <TechnologyComparison
+              technologyRef={technologyRef}
+              data={
+                dynamicGlobalData
+                  ? dynamicGlobalData
+                  : dynamicData[getAbbrv(region)]
+              }
+            />
+          </View>
+        </View>
       )}
     </ScrollView>
   )
@@ -218,6 +273,11 @@ const styles = StyleSheet.create({
     color: '#266297',
     fontFamily: 'Roboto',
     fontSize: 14,
+  },
+  hidden: {
+    position: 'absolute',
+    top: -9999,
+    left: -9999,
   },
 })
 

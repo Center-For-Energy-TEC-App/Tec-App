@@ -23,10 +23,6 @@ type RegionalDashboardProps = {
   initialGraphData: GraphData
   dynamicGraphData: GraphData
   sliderDisabled: boolean
-  slidersRef: React.RefObject<View>
-  bauRef: React.RefObject<View>
-  regionalComparisonRef: React.RefObject<View>
-  technologyComparisonRef: React.RefObject<View>
   tutorialState: number
   setTutorialState: (state: number) => void
 }
@@ -40,10 +36,6 @@ export const RegionalDashboard = ({
   initialGraphData,
   dynamicGraphData,
   sliderDisabled,
-  slidersRef,
-  bauRef,
-  regionalComparisonRef,
-  technologyComparisonRef,
   tutorialState,
   setTutorialState,
 }: RegionalDashboardProps) => {
@@ -138,7 +130,6 @@ export const RegionalDashboard = ({
       </View>
       <View style={styles.horizontalLine} />
       {activeTab === 'renewables' ? (
-        <View ref={slidersRef} collapsable={false}>
           <DistributeRenewables
             currRegion={currRegion}
             values={sliderValues}
@@ -149,7 +140,6 @@ export const RegionalDashboard = ({
             tutorialState={tutorialState}
             setTutorialState={setTutorialState}
           />
-        </View>
       ) : (
         <DataVisualizations
           initialData={initialGraphData}

@@ -1,10 +1,11 @@
-import React, {
+import{
   Text,
   StyleSheet,
   Dimensions,
   View,
   Platform,
 } from 'react-native'
+import React from 'react'
 import * as d3 from 'd3'
 import { GraphKey } from './GraphKey'
 import { LineGraph } from './LineGraph'
@@ -29,6 +30,7 @@ type BAUComparisonProps = {
   region: string
   BAUData: RegionData
   dynamicData: RegionData
+  bauRef: React.RefObject<View>
 }
 
 const deviceType = () => {
@@ -44,6 +46,7 @@ export const BAUComparison = ({
   region,
   BAUData,
   dynamicData,
+  bauRef
 }: BAUComparisonProps) => {
   const BAU_data = BAUData.total.slice(1)
   const altered_data = dynamicData.total.slice(1)
@@ -98,11 +101,12 @@ export const BAUComparison = ({
         (BAU) data. The BAU data represents the projected renewable capacity
         levels from now to 2030 without any interventions.
       </Text>
+      
       <View style={styles.graphHeader}>
         <Text style={styles.bold}>{region + ':'}</Text>
         <Text style={styles.body}>My Plan vs. Current Forecast</Text>
       </View>
-      <View style={styles.graphContainer}>
+      <View style={styles.graphContainer} ref={bauRef} collapsable={false}>
         <View style={styles.graphInnerContainer}>
           <GraphKey label="MY PLAN" color="#C66AAA" />
           <GraphKey label="FORECAST" color="#58C4D4" />
