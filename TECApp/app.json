@@ -16,7 +16,7 @@
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "com.CER.TECApp",
+      "bundleIdentifier": "com.CER.Tec-App",
       "supportsTablet": true
     },
     "android": {

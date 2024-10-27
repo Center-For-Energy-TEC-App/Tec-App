@@ -421,7 +421,7 @@ const DistributeRenewables = ({
         WindIcon,
         <Text>{getRegionTechnologySummary(currRegion, 'Wind')}</Text>,
       )}
-      {renderTutorial && (
+      {renderTutorial ? (
         <>
           <View
             style={{ shadowColor: 'gray', shadowRadius: 5, shadowOpacity: 0.5 }}
@@ -440,7 +440,7 @@ const DistributeRenewables = ({
             </TouchableOpacity>
           </View>
         </>
-      )}
+      ):<></>}
       {renderSlider(
         'Solar',
         SolarIcon,
@@ -660,11 +660,12 @@ const styles = StyleSheet.create({
     borderColor: '#1C2B47',
     borderWidth: 1,
     borderRadius: 4,
-    width: 50,
+    maxWidth: 100,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 4,
-  },
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    },
 
   onboardingButtonText: {
     fontFamily: 'Brix Sans',

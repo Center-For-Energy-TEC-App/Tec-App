@@ -82,7 +82,7 @@ export const Tracker = ({
               dashboard ? mobileStyles.dashboardWrapper : mobileStyles.wrapper
             }
           >
-            {temperatureData && (
+            {temperatureData ? (
               <View style={mobileStyles.iconRow}>
                 <TemperatureIcon dashboard={dashboard} />
                 <View style={mobileStyles.dataColumn}>
@@ -114,7 +114,7 @@ export const Tracker = ({
                   </Text>
                 </View>
               </View>
-            )}
+            ):<></>}
           </View>
         </TouchableOpacity>
       ) : (

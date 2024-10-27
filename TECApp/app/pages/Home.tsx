@@ -14,7 +14,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Tracker } from '../components/Tracker'
 import { GlobalDashboardButton } from '../SVGs/GlobalDashboardButton'
 import { router } from 'expo-router'
-import { removeData } from '../util/Caching'
+import { getData, removeData } from '../util/Caching'
 import { ExportButton } from '../SVGs/ExportButton'
 //@ts-ignore
 import CERLogo from '../../assets/CERLogo.png'
@@ -22,7 +22,6 @@ import { Asset } from 'expo-asset';
 
 // Export PDF
 import DataVisualizations from '../components/DataVisualizations/DataVisualizations'
-import { getData } from '../util/Caching'
 import { captureRef } from 'react-native-view-shot'
 import * as Print from 'expo-print'
 import * as FileSystem from 'expo-file-system'
@@ -44,7 +43,7 @@ export default function Home() {
   const [temperatureData, setTemperatureData] = useState<TemperatureData>()
 
   const [refreshTutorial, setRefreshTutorial] = useState<boolean>(true)
-  const [tutorialState, setTutorialState] = useState<number>()
+  const [tutorialState, setTutorialState] = useState<number>(0)
 
   const [initialGraphData, setInitialGraphData] = useState<RegionData>()
   const [dynamicGraphData, setDynamicGraphData] = useState<RegionData>()
@@ -214,6 +213,7 @@ export default function Home() {
               }
               tutorialState={tutorialState}
               setTutorialState={setTutorialState}
+              onSwipeDown={()=>setSelectedRegion('Global')}
             />
           </Portal>
           <View style={mobileStyles.trackerWrapper} ref={trackerRef} collapsable={false}>
@@ -230,11 +230,11 @@ export default function Home() {
                 }, 1000)
               }}
             ></GlobalDashboardButton>
-            {tutorialState == 5 && (
+            {tutorialState == 5 ? (
               <View style={{ position: 'absolute', top: 75, left: -150 }}>
                 <Tooltip1 />
               </View>
-            )}
+            ):<></>}
           </View>
           <TouchableOpacity
             onPress={() => {
@@ -248,12 +248,12 @@ export default function Home() {
           >
             <Text>View Tutorial</Text>
           </TouchableOpacity>
-          {tutorialState == 8 && (
+          {tutorialState == 8 ? (
             <View style={{ position: 'absolute', top: vh * 0.5 }}>
               <Tooltip4 />
             </View>
-          )}
-          {tutorialState == 10 && (
+          ):<></>}
+          {tutorialState == 10 ? (
             <View
               style={{
                 position: 'absolute',
@@ -269,7 +269,7 @@ export default function Home() {
                 <Text style={mobileStyles.onboardingButtonText}>Finish</Text>
               </TouchableOpacity>
             </View>
-          )}
+          ):<></>}
           <View style={mobileStyles.exportButton}>
             <ExportButton onPress={handleExport} />
           </View>
@@ -359,11 +359,11 @@ const mobileStyles = StyleSheet.create({
     borderColor: '#1C2B47',
     borderWidth: 1,
     borderRadius: 4,
-    width: 50,
+    maxWidth: 100,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 4,
-  },
+    paddingHorizontal: 10,
+    paddingVertical: 4,  },
 
   onboardingButtonText: {
     fontFamily: 'Brix Sans',

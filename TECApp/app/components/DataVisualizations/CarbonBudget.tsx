@@ -337,7 +337,7 @@ export const CarbonBudget = ({
           <G y={offset}>
             {currPosition !== null &&
               currPosition > 60 &&
-              currPosition < contentWidth + 5 && (
+              currPosition < contentWidth + 5 ? (
                 <Line
                   stroke="#1C2B47"
                   strokeWidth={1.57}
@@ -347,7 +347,7 @@ export const CarbonBudget = ({
                   y1={0}
                   y2={190}
                 />
-              )}
+              ):<></>}
             <Circle
               x={calculateX(BAU1Point5Year)}
               y={findYbyX(calculateX(BAU1Point5Year), BAU_curve)}
@@ -364,22 +364,22 @@ export const CarbonBudget = ({
               stroke="#757678"
               strokeWidth={2.362}
             />
-            {Math.abs(currPosition - calculateX(BAU1Point5Year)) < 5 && (
+            {Math.abs(currPosition - calculateX(BAU1Point5Year)) < 5 ? (
               <G
                 x={calculateX(BAU1Point5Year) - 44}
                 y={findYbyX(calculateX(BAU1Point5Year), BAU_curve) + 7}
               >
                 <BAUCurvePopup label="BAU 1.5˚C LIMIT" />
               </G>
-            )}
-            {Math.abs(currPosition - calculateX(BAU2Point0Year)) < 5 && (
+            ):<></>}
+            {Math.abs(currPosition - calculateX(BAU2Point0Year)) < 5 ? (
               <G
                 x={calculateX(BAU2Point0Year) - 44}
                 y={findYbyX(calculateX(BAU2Point0Year), BAU_curve) + 7}
               >
                 <BAUCurvePopup label="BAU 2.0˚C LIMIT" />
               </G>
-            )}
+            ):<></>}
             <Circle
               x={calculateX(temperatureData['1.5Year'])}
               y={graphHeight}
@@ -397,23 +397,23 @@ export const CarbonBudget = ({
               strokeWidth={2.362}
             />
             {Math.abs(currPosition - calculateX(temperatureData['1.5Year'])) <
-              5 && (
+              5 ? (
               <G
                 x={calculateX(temperatureData['1.5Year']) - 33}
                 y={graphHeight - 37}
               >
                 <AlteredCurvePopup label="1.5˚C LIMIT" />
               </G>
-            )}
+            ):<></>}
             {Math.abs(currPosition - calculateX(temperatureData['2.0Year'])) <
-              5 && (
+              5 ? (
               <G
                 x={calculateX(temperatureData['2.0Year']) - 33}
                 y={graphHeight - 37}
               >
                 <AlteredCurvePopup label="2.0˚C LIMIT" />
               </G>
-            )}
+            ):<></>}
           </G>
         </Svg>
       </View>

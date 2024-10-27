@@ -31,6 +31,7 @@ export interface BottomSheetProps {
   passTemperatureToHome: (temperature: TemperatureData) => void
   tutorialState: number
   setTutorialState: (state: number) => void
+  onSwipeDown: ()=>void
 }
 
 export type FossilReductionData = {
@@ -68,6 +69,7 @@ export const BottomSheet = ({
   passTemperatureToHome,
   tutorialState,
   setTutorialState,
+  onSwipeDown,
 }: BottomSheetProps) => {
   const snapPoints = useMemo(() => ['12.5%', '25%', '50%', '80%'], [])
   const bottomSheetRef = useRef<BottomSheetTemplate>(null)
@@ -185,10 +187,11 @@ export const BottomSheet = ({
       enableHandlePanningGesture
       enableContentPanningGesture
       enablePanDownToClose
+      onClose={onSwipeDown}
     >
       {dynamicFossilData &&
         calculationData && //don't render regional sheet until all values load
-        selectedRegion !== 'Global' && (
+        selectedRegion !== 'Global' ? (
           <View style={styles.contentContainer}>
             <RegionalDashboard
               minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
@@ -311,7 +314,7 @@ export const BottomSheet = ({
               }
             />
           </View>
-        )}
+        ):<></>}
     </BottomSheetTemplate>
   )
 }
