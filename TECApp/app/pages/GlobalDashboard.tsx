@@ -93,12 +93,10 @@ export default function GlobalDashboard() {
       >
         {temperatureData ? (
           <>
-            <Text style={styles.regionName}>Global Progress</Text>
+            <Text style={styles.regionName}>Global Impact</Text>
 
             <Text style={[styles.body, isIpad && styles.iPadText]}>
-              The world aims to keep global warming below 2°C by 2030. We can do
-              this through increasing our current renewable capacity from 8 to
-              12 TW.
+            The world aims to keep global warming below 2°C in this century. Tripling our renewable capacity by 2030 to 12 TW globally will make reaching this goal possible.
             </Text>
             <View ref={trackerRef} style={styles.trackersWrapper}>
               <Tracker

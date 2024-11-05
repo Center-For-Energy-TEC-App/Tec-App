@@ -54,6 +54,7 @@ export const CarbonBudget = ({
   const [currPosition, setCurrPosition] = useState<number>(null)
 
   const BAU1Point5Year = 2029
+  const BAU1Point8Year = 2042
   const BAU2Point0Year = 2054
 
   const yMin = 0
@@ -219,8 +220,8 @@ export const CarbonBudget = ({
             <Text></Text>
           )}
           <View style={styles.keyContainer}>
-            <GraphKey label="ALTERED CARBON EMISSIONS" color="#266297" />
-            <GraphKey label="PROJECTED CARBON EMISSIONS" color="#757678" />
+            <GraphKey label="FORECAST EMISSIONS" color="#b3551b" />
+            <GraphKey label="MY PLAN EMISSIONS" color="#266297" />
           </View>
         </View>
         <Svg width={graphWidth} height={svgHeight}>
@@ -270,7 +271,7 @@ export const CarbonBudget = ({
               x={-(graphHeight - 50)}
               y={15}
             >
-              Emissions (GT)
+              Annual CO2 (GT)
             </TextSvg>
             <TextSvg
               x={leftMargin - 5}
@@ -329,7 +330,7 @@ export const CarbonBudget = ({
             <Path
               d={BAU_curve}
               strokeWidth={1.575}
-              stroke="#757678"
+              stroke="#b3551b"
               fill="none"
             />
           </G>
@@ -353,7 +354,15 @@ export const CarbonBudget = ({
               y={findYbyX(calculateX(BAU1Point5Year), BAU_curve)}
               r={4}
               fill="white"
-              stroke="#757678"
+              stroke="#b3551b"
+              strokeWidth={2.362}
+            />
+            <Circle
+              x={calculateX(BAU1Point8Year)}
+              y={findYbyX(calculateX(BAU1Point8Year), BAU_curve)}
+              r={4}
+              fill="white"
+              stroke="#b3551b"
               strokeWidth={2.362}
             />
             <Circle
@@ -361,7 +370,7 @@ export const CarbonBudget = ({
               y={findYbyX(calculateX(BAU2Point0Year), BAU_curve)}
               r={4}
               fill="white"
-              stroke="#757678"
+              stroke="#b3551b"
               strokeWidth={2.362}
             />
             {Math.abs(currPosition - calculateX(BAU1Point5Year)) < 5 ? (
@@ -370,6 +379,14 @@ export const CarbonBudget = ({
                 y={findYbyX(calculateX(BAU1Point5Year), BAU_curve) + 7}
               >
                 <BAUCurvePopup label="BAU 1.5˚C LIMIT" />
+              </G>
+            ):<></>}
+             {Math.abs(currPosition - calculateX(BAU1Point8Year)) < 5 ? (
+              <G
+                x={calculateX(BAU1Point8Year) - 44}
+                y={findYbyX(calculateX(BAU1Point8Year), BAU_curve) + 7}
+              >
+                <BAUCurvePopup label="BAU 1.8˚C LIMIT" />
               </G>
             ):<></>}
             {Math.abs(currPosition - calculateX(BAU2Point0Year)) < 5 ? (
@@ -382,6 +399,14 @@ export const CarbonBudget = ({
             ):<></>}
             <Circle
               x={calculateX(temperatureData['1.5Year'])}
+              y={graphHeight}
+              r={4}
+              fill="white"
+              stroke="#266297"
+              strokeWidth={2.362}
+            />
+              <Circle
+              x={calculateX(temperatureData['1.8Year'])}
               y={graphHeight}
               r={4}
               fill="white"
@@ -403,6 +428,15 @@ export const CarbonBudget = ({
                 y={graphHeight - 37}
               >
                 <AlteredCurvePopup label="1.5˚C LIMIT" />
+              </G>
+            ):<></>}
+            {Math.abs(currPosition - calculateX(temperatureData['1.8Year'])) <
+              5 ? (
+              <G
+                x={calculateX(temperatureData['1.8Year']) - 33}
+                y={graphHeight - 37}
+              >
+                <AlteredCurvePopup label="1.8˚C LIMIT" />
               </G>
             ):<></>}
             {Math.abs(currPosition - calculateX(temperatureData['2.0Year'])) <

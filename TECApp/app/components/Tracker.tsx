@@ -18,8 +18,8 @@ export const Tracker = ({
   totalGlobalEnergy,
   temperatureData,
 }: TrackerProps) => {
-  const [temperatureVersion, setTemperatureVersion] = useState<number>(0)
-  const [energyVersion, setEnergyVersion] = useState<number>(0)
+  const [temperatureVersion, setTemperatureVersion] = useState<number>(1)
+  const [energyVersion, setEnergyVersion] = useState<number>(1)
 
   const [currTemperatureData, setCurrTemperatureData] =
     useState<TemperatureData>()

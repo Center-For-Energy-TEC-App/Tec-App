@@ -301,7 +301,7 @@ const DistributeRenewables = ({
         }}
       >
         <Text style={styles.capacityProportionText}>
-          Renewable Capacity Proportions
+          Renewable Capacity Mix
         </Text>
         {proportionBarWidth && technologyProportions ? (
           <Svg height={20}>
@@ -564,8 +564,9 @@ const styles = StyleSheet.create({
     right: 5,
     display: 'flex',
     alignItems: 'center',
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
+    paddingTop: 5,
   },
   tooltipCloseButtonText: {
     fontSize: 16,
