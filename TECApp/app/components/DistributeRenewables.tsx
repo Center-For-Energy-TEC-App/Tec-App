@@ -18,7 +18,7 @@ import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon'
 import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon'
 import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon'
 import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
-import Svg, { Path, Rect } from 'react-native-svg'
+import Svg, { Path, Rect, Text as TextSvg } from 'react-native-svg'
 import { getEnergyAbbrv, getTechnologyColor } from '../util/ValueDictionaries'
 import { DefaultValues, MinMaxValues } from '../api/requests'
 import { NativeViewGestureHandler } from 'react-native-gesture-handler'
@@ -33,6 +33,13 @@ export type TechnologyProportions = {
   biomass: number
   geothermal: number
   nuclear: number
+}
+
+export type ElectricityProportions = {
+  zeroCarbon: number
+  coal: number
+  gas: number
+  oil: number
 }
 
 type DistributeRenewablesProps = {
@@ -56,6 +63,11 @@ const DistributeRenewables = ({
   tutorialState,
   setTutorialState,
 }: DistributeRenewablesProps) => {
+
+  const coal = 100
+  const gas = 80
+  const oil = 30
+
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
 
@@ -77,11 +89,12 @@ const DistributeRenewables = ({
   const [technologyProportions, setTechnologyProportions] = //pixel width values of each technology for proportion bar
     useState<TechnologyProportions>(undefined)
 
-  const [globalEnergyProportion, setGlobalEnergyProportion] = useState<number>()
+  const [electricityProportions, setElectricityProportions] = useState<ElectricityProportions>()
+
+  const [carbonReductionProportions, setCarbonReductionProportions] = useState<number>()
 
   useEffect(() => {
     setSliderValues(values[2])
-    console.log(tutorialState)
     if (tutorialState === 9) {
       setRenderTutorial(true)
     }
@@ -110,7 +123,16 @@ const DistributeRenewables = ({
           (sliderValues.nuclear_gw / sliderTotal) * (proportionBarWidth - 5),
       })
 
-      setGlobalEnergyProportion((sliderTotal / 12000) * proportionBarWidth)
+      const electricityTotal = sliderTotal+coal+gas+oil
+      setElectricityProportions({
+        zeroCarbon: (sliderTotal/electricityTotal) * proportionBarWidth,
+        coal: (coal/electricityTotal) * proportionBarWidth,
+        oil: (oil/electricityTotal) * proportionBarWidth,
+        gas: (gas/electricityTotal) * proportionBarWidth 
+      })
+
+      const max = parseFloat(minMaxValues.max.solar)+parseFloat(minMaxValues.max.wind)+parseFloat(minMaxValues.max.hydropower)+parseFloat(minMaxValues.max.geothermal)+parseFloat(minMaxValues.max.biomass)+parseFloat(minMaxValues.max.nuclear)
+      setCarbonReductionProportions((sliderTotal/max)*(proportionBarWidth*0.7))
     }
   }, [sliderValues, proportionBarWidth])
 
@@ -238,32 +260,108 @@ const DistributeRenewables = ({
   return (
     <ScrollView
       contentContainerStyle={styles.container}
-      stickyHeaderIndices={[2]}
+      stickyHeaderIndices={[1]}
     >
       <Text style={[styles.description, isIpad && styles.iPadText]}>
         Using the sliders below, make region specific changes for each renewable
         energy source to reach 12 TW of renewable capacity. This will override
         default values set in the global dashboard.
       </Text>
-      <View style={styles.capacityProportionContainer}>
+      <View>
+      <View 
+        style={styles.capacityProportionContainer}>
         <Text style={styles.capacityProportionText}>
-          Region&apos;s Contribution to 12 TW Goal
+          Reduced CO2 by 2030
         </Text>
-        {proportionBarWidth && globalEnergyProportion ? (
+        {proportionBarWidth && carbonReductionProportions ? (
           <Svg height={20}>
             <Rect
               x={0}
               y={0}
-              width={proportionBarWidth}
+              width={carbonReductionProportions}
               height={20}
-              fill="#DEDCD9"
+              fill="#945E3C"
             />
+            <Rect
+              x={carbonReductionProportions}
+              y={0}
+              width={(proportionBarWidth*0.7-carbonReductionProportions)}
+              height={20}
+              fill="#EDEBE7"
+            />
+            <Path
+              d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <Path
+              d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <Path
+              d={`M ${proportionBarWidth*0.7 - 4} 0 Q ${proportionBarWidth*0.7 - 0.5} 0.5 ${proportionBarWidth*0.7} 4 L ${proportionBarWidth*0.7} 0 z`}
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <Path
+              d={`M ${proportionBarWidth*0.7} 16 Q ${proportionBarWidth*0.7 - 0.5} 19.5 ${proportionBarWidth*0.7 - 4} 20 L ${proportionBarWidth*0.7} 20 z`}
+              strokeWidth={0.1}
+              stroke="white"
+              fill="white"
+            />
+            <TextSvg x={proportionBarWidth*0.6 + 50} y={16} fill="black" stroke="black" fontSize={20}>
+              {sliderValues.wind_gw +
+            sliderValues.solar_gw +
+            sliderValues.hydro_gw +
+            sliderValues.bio_gw +
+            sliderValues.geo_gw +
+            sliderValues.nuclear_gw+" MT"}</TextSvg>
+          </Svg>
+        ) : (
+          <></>
+        )}
+      </View>
+      <View 
+        onLayout={(event) => {
+          setProportionBarWidth(event.nativeEvent.layout.width - 20)
+        }}
+        style={styles.capacityProportionContainer}>
+        <Text style={styles.capacityProportionText}>
+          Electricity Mix
+        </Text>
+        {proportionBarWidth && electricityProportions ? (
+          <Svg height={20}>
             <Rect
               x={0}
               y={0}
-              width={globalEnergyProportion}
+              width={electricityProportions.zeroCarbon}
               height={20}
               fill="#266297"
+            />
+            <Rect
+              x={electricityProportions.zeroCarbon}
+              y={0}
+              width={electricityProportions.coal}
+              height={20}
+              fill="#1C1C1C"
+            />
+            <Rect
+              x={electricityProportions.zeroCarbon+electricityProportions.coal}
+              y={0}
+              width={electricityProportions.gas}
+              height={20}
+              fill="#AFA59F"
+            />
+            <Rect
+              x={electricityProportions.zeroCarbon+electricityProportions.coal+electricityProportions.gas}
+              y={0}
+              width={electricityProportions.zeroCarbon+electricityProportions.oil}
+              height={20}
+              fill="#945E3C"
             />
             <Path
               d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
@@ -294,11 +392,9 @@ const DistributeRenewables = ({
           <></>
         )}
       </View>
+      
       <View
         style={styles.capacityProportionContainer}
-        onLayout={(event) => {
-          setProportionBarWidth(event.nativeEvent.layout.width - 20)
-        }}
       >
         <Text style={styles.capacityProportionText}>
           Renewable Capacity Mix
@@ -405,6 +501,7 @@ const DistributeRenewables = ({
           <></>
         )}
       </View>
+      </View>
       <View style={styles.sliderIndicatorRow}>
         <View style={styles.sliderIndicator}>
           <SliderIndicator color="#F05B4A" />
@@ -440,7 +537,9 @@ const DistributeRenewables = ({
             </TouchableOpacity>
           </View>
         </>
-      ):<></>}
+      ) : (
+        <></>
+      )}
       {renderSlider(
         'Solar',
         SolarIcon,
@@ -504,8 +603,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingHorizontal: 10,
     paddingVertical: 16,
-    marginBottom: 16,
-    gap: 10,
+    marginBottom: 6,
+    gap: 2,
     alignSelf: 'stretch',
     borderRadius: 8,
     backgroundColor: 'white',
@@ -666,7 +765,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 10,
     paddingVertical: 4,
-    },
+  },
 
   onboardingButtonText: {
     fontFamily: 'Brix Sans',

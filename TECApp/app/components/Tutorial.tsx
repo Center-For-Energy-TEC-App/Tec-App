@@ -29,7 +29,7 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
         setTutorialState(11)
         sendStateHome(11)
       } else {
-        state==0 && setTutorialState(state)
+        state == 0 && setTutorialState(state)
       }
       if (state === 11) {
         storeData('tutorial', 'complete').then(() => {
@@ -62,7 +62,9 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                       global climate goal of tripling renewable energy by 2030.
                     </Text>
                   </View>
-                ):<></>}
+                ) : (
+                  <></>
+                )}
                 {tutorialState == 1 ? (
                   <View style={mobileStyles.textWrapper}>
                     <Text style={mobileStyles.header}>Where are we now?</Text>
@@ -73,7 +75,9 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                       the goal.
                     </Text>
                   </View>
-                ):<></>}
+                ) : (
+                  <></>
+                )}
                 {tutorialState == 2 ? (
                   <View style={mobileStyles.textWrapper}>
                     <Text style={mobileStyles.header}>
@@ -86,7 +90,9 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                       app lets you develop a plan to do it.
                     </Text>
                   </View>
-                ):<></>}
+                ) : (
+                  <></>
+                )}
                 {tutorialState == 3 ? (
                   <View style={mobileStyles.textWrapper}>
                     <Text style={mobileStyles.header}>
@@ -101,7 +107,9 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                       biodiversity, food production, and human health.
                     </Text>
                   </View>
-                ):<></>}
+                ) : (
+                  <></>
+                )}
                 {tutorialState == 4 ? (
                   <View style={mobileStyles.textWrapper}>
                     <Text style={mobileStyles.header}>
@@ -114,7 +122,9 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                     </Text>
                     <Text style={mobileStyles.body}>Ready to get started?</Text>
                   </View>
-                ):<></>}
+                ) : (
+                  <></>
+                )}
               </View>
               <RightArrow
                 onPress={() => setTutorialState(tutorialState + 1)}
@@ -148,7 +158,9 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
             </TouchableOpacity>
           </View>
         </>
-      ):<></>}
+      ) : (
+        <></>
+      )}
     </>
   )
 }

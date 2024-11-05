@@ -31,7 +31,7 @@ export interface BottomSheetProps {
   passTemperatureToHome: (temperature: TemperatureData) => void
   tutorialState: number
   setTutorialState: (state: number) => void
-  onSwipeDown: ()=>void
+  onSwipeDown: () => void
 }
 
 export type FossilReductionData = {
@@ -190,131 +190,133 @@ export const BottomSheet = ({
       onClose={onSwipeDown}
     >
       {dynamicFossilData &&
-        calculationData && //don't render regional sheet until all values load
-        selectedRegion !== 'Global' ? (
-          <View style={styles.contentContainer}>
-            <RegionalDashboard
-              minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
-              sliderValues={dynamicSliderValues[getAbbrv(selectedRegion)]}
-              tutorialState={tutorialState}
-              setTutorialState={setTutorialState}
-              currRegion={selectedRegion}
-              onSliderChange={(val, technologyChanged) => {
-                //on slider change for a region, store changes here to preserve each region changes
-                const newSliderValues = {
-                  ...dynamicSliderValues,
-                  [getAbbrv(selectedRegion)]: [
-                    dynamicSliderValues[getAbbrv(selectedRegion)][0],
-                    dynamicSliderValues[getAbbrv(selectedRegion)][1],
-                    val,
-                  ],
-                }
-                setDynamicSliderValues(newSliderValues)
+      calculationData && //don't render regional sheet until all values load
+      selectedRegion !== 'Global' ? (
+        <View style={styles.contentContainer}>
+          <RegionalDashboard
+            minMaxValues={minMaxValues[getAbbrv(selectedRegion)]}
+            sliderValues={dynamicSliderValues[getAbbrv(selectedRegion)]}
+            tutorialState={tutorialState}
+            setTutorialState={setTutorialState}
+            currRegion={selectedRegion}
+            onSliderChange={(val, technologyChanged) => {
+              //on slider change for a region, store changes here to preserve each region changes
+              const newSliderValues = {
+                ...dynamicSliderValues,
+                [getAbbrv(selectedRegion)]: [
+                  dynamicSliderValues[getAbbrv(selectedRegion)][0],
+                  dynamicSliderValues[getAbbrv(selectedRegion)][1],
+                  val,
+                ],
+              }
+              setDynamicSliderValues(newSliderValues)
 
-                const newGlobalEnergy =
-                  calculateTotalGlobalEnergy(newSliderValues)
+              const newGlobalEnergy =
+                calculateTotalGlobalEnergy(newSliderValues)
 
-                passGlobalToHome(newGlobalEnergy)
-                storeData('global-energy', newGlobalEnergy.toString())
+              passGlobalToHome(newGlobalEnergy)
+              storeData('global-energy', newGlobalEnergy.toString())
 
-                const {
-                  regionalGraphData,
-                  globalGraphData,
-                } = //calculate new graph (excluding carbon budget) data for current region and global
-                  calculateEnergyCurve(
-                    val[getEnergyAbbrv(technologyChanged)],
-                    technologyChanged,
-                    dynamicGraphData[getAbbrv(selectedRegion)],
-                    dynamicGraphData.global,
-                    calculationData,
-                  )
-
-                setDynamicGraphData({
-                  ...dynamicGraphData,
-                  [getAbbrv(selectedRegion)]: regionalGraphData,
-                  global: globalGraphData,
-                })
-                storeData('dynamic-graph-data', JSON.stringify(globalGraphData))
-
-                const { newFossilReduction, newFossilData } =
-                  calculateCarbonReductions(
-                    //calculate new global carbon budget curve based on new graph data
-                    getAbbrv(selectedRegion),
-                    calculationData,
-                    regionalGraphData,
-                    fossilReductionData[getAbbrv(selectedRegion)],
-                    dynamicFossilData,
-                  )
-
-                setDynamicFossilData(newFossilData)
-
-                storeData('dynamic-fossil-data', JSON.stringify(newFossilData))
-
-                setFossilReductionData({
-                  ...fossilReductionData,
-                  [getAbbrv(selectedRegion)]: newFossilReduction,
-                })
-
-                const temperatureData = calculateTemperature(newFossilData)
-                passTemperatureToHome(temperatureData)
-                storeData('temperature-data', JSON.stringify(temperatureData))
-              }}
-              onReset={() => {
-                //when reset button is clicked within region
-                const newSliderValues = {
-                  ...dynamicSliderValues,
-                  [getAbbrv(selectedRegion)]:
-                    initialSliderValues[getAbbrv(selectedRegion)],
-                }
-                setDynamicSliderValues(newSliderValues)
-
-                const newGlobalEnergy =
-                  calculateTotalGlobalEnergy(newSliderValues)
-                passGlobalToHome(newGlobalEnergy)
-                storeData('global-energy', newGlobalEnergy.toString())
-
-                const newGlobalGraphData = calculateNewGlobalOnReset(
-                  initialGraphData[getAbbrv(selectedRegion)],
+              const {
+                regionalGraphData,
+                globalGraphData,
+              } = //calculate new graph (excluding carbon budget) data for current region and global
+                calculateEnergyCurve(
+                  val[getEnergyAbbrv(technologyChanged)],
+                  technologyChanged,
                   dynamicGraphData[getAbbrv(selectedRegion)],
                   dynamicGraphData.global,
-                )
-                setDynamicGraphData({
-                  ...dynamicGraphData,
-                  [getAbbrv(selectedRegion)]:
-                    initialGraphData[getAbbrv(selectedRegion)],
-                  global: newGlobalGraphData,
-                })
-                storeData(
-                  'dynamic-graph-data',
-                  JSON.stringify(newGlobalGraphData),
+                  calculationData,
                 )
 
-                const newFossilData = calculateCarbonCurve(
-                  0 - fossilReductionData[getAbbrv(selectedRegion)],
+              setDynamicGraphData({
+                ...dynamicGraphData,
+                [getAbbrv(selectedRegion)]: regionalGraphData,
+                global: globalGraphData,
+              })
+              storeData('dynamic-graph-data', JSON.stringify(globalGraphData))
+
+              const { newFossilReduction, newFossilData } =
+                calculateCarbonReductions(
+                  //calculate new global carbon budget curve based on new graph data
+                  getAbbrv(selectedRegion),
+                  calculationData,
+                  regionalGraphData,
+                  fossilReductionData[getAbbrv(selectedRegion)],
                   dynamicFossilData,
                 )
 
-                setDynamicFossilData(newFossilData)
+              setDynamicFossilData(newFossilData)
 
-                storeData('dynamic-fossil-data', JSON.stringify(newFossilData))
+              storeData('dynamic-fossil-data', JSON.stringify(newFossilData))
 
-                setFossilReductionData({
-                  ...fossilReductionData,
-                  [getAbbrv(selectedRegion)]: 0,
-                })
+              setFossilReductionData({
+                ...fossilReductionData,
+                [getAbbrv(selectedRegion)]: newFossilReduction,
+              })
 
-                const temperatureData = calculateTemperature(newFossilData)
-                passTemperatureToHome(temperatureData)
-                storeData('temperature-data', JSON.stringify(temperatureData))
-              }}
-              initialGraphData={initialGraphData}
-              dynamicGraphData={dynamicGraphData}
-              sliderDisabled={
-                calculationData.region !== getAbbrv(selectedRegion) //don't let sliders be changed until region calculation data is updated
+              const temperatureData = calculateTemperature(newFossilData)
+              passTemperatureToHome(temperatureData)
+              storeData('temperature-data', JSON.stringify(temperatureData))
+            }}
+            onReset={() => {
+              //when reset button is clicked within region
+              const newSliderValues = {
+                ...dynamicSliderValues,
+                [getAbbrv(selectedRegion)]:
+                  initialSliderValues[getAbbrv(selectedRegion)],
               }
-            />
-          </View>
-        ):<></>}
+              setDynamicSliderValues(newSliderValues)
+
+              const newGlobalEnergy =
+                calculateTotalGlobalEnergy(newSliderValues)
+              passGlobalToHome(newGlobalEnergy)
+              storeData('global-energy', newGlobalEnergy.toString())
+
+              const newGlobalGraphData = calculateNewGlobalOnReset(
+                initialGraphData[getAbbrv(selectedRegion)],
+                dynamicGraphData[getAbbrv(selectedRegion)],
+                dynamicGraphData.global,
+              )
+              setDynamicGraphData({
+                ...dynamicGraphData,
+                [getAbbrv(selectedRegion)]:
+                  initialGraphData[getAbbrv(selectedRegion)],
+                global: newGlobalGraphData,
+              })
+              storeData(
+                'dynamic-graph-data',
+                JSON.stringify(newGlobalGraphData),
+              )
+
+              const newFossilData = calculateCarbonCurve(
+                0 - fossilReductionData[getAbbrv(selectedRegion)],
+                dynamicFossilData,
+              )
+
+              setDynamicFossilData(newFossilData)
+
+              storeData('dynamic-fossil-data', JSON.stringify(newFossilData))
+
+              setFossilReductionData({
+                ...fossilReductionData,
+                [getAbbrv(selectedRegion)]: 0,
+              })
+
+              const temperatureData = calculateTemperature(newFossilData)
+              passTemperatureToHome(temperatureData)
+              storeData('temperature-data', JSON.stringify(temperatureData))
+            }}
+            initialGraphData={initialGraphData}
+            dynamicGraphData={dynamicGraphData}
+            sliderDisabled={
+              calculationData.region !== getAbbrv(selectedRegion) //don't let sliders be changed until region calculation data is updated
+            }
+          />
+        </View>
+      ) : (
+        <></>
+      )}
     </BottomSheetTemplate>
   )
 }

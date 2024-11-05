@@ -1,11 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { StyleSheet, TouchableOpacity } from 'react-native'
-import {
-  Dimensions,
-  Platform,
-  Text,
-  View,
-} from 'react-native'
+import { Dimensions, Platform, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Tracker } from '../components/Tracker'
 import { DataPoint } from '../components/DataVisualizations/BAUComparison'
@@ -72,8 +67,6 @@ export default function GlobalDashboard() {
     })
   }, [])
 
-
-
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
     return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
@@ -82,7 +75,6 @@ export default function GlobalDashboard() {
   }
 
   const isIpad = deviceType() === 'ipad'
-  
 
   return (
     <GestureHandlerRootView>
@@ -96,19 +88,13 @@ export default function GlobalDashboard() {
             <Text style={styles.regionName}>Global Impact</Text>
 
             <Text style={[styles.body, isIpad && styles.iPadText]}>
-            The world aims to keep global warming below 2°C in this century. Tripling our renewable capacity by 2030 to 12 TW globally will make reaching this goal possible.
+              The world aims to keep global warming below 2°C in this century.
+              Tripling our renewable capacity by 2030 to 12 TW globally will
+              make reaching this goal possible.
             </Text>
             <View ref={trackerRef} style={styles.trackersWrapper}>
-              <Tracker
-                type="temperature"
-                dashboard
-                temperatureData={temperatureData}
-              />
-              <Tracker
-                type="renewable"
-                dashboard
-                totalGlobalEnergy={globalEnergy}
-              />
+              <Tracker type="temperature" temperatureData={temperatureData} />
+              <Tracker type="renewable" totalGlobalEnergy={globalEnergy} />
               {tutorialState == 6 ? (
                 <View style={{ position: 'absolute', top: 90, left: 20 }}>
                   <Tooltip2 />
@@ -121,8 +107,10 @@ export default function GlobalDashboard() {
                     </TouchableOpacity>
                   </View>
                 </View>
-              ):<></>} 
-             {tutorialState == 7 ? ( 
+              ) : (
+                <></>
+              )}
+              {tutorialState == 7 ? (
                 <View style={{ position: 'absolute', top: 90, right: -10 }}>
                   <Tooltip3 />
                   <View style={styles.onBoardingButtonWrapper}>
@@ -140,7 +128,9 @@ export default function GlobalDashboard() {
                     </TouchableOpacity>
                   </View>
                 </View>
-               ):<></>} 
+              ) : (
+                <></>
+              )}
             </View>
             {tutorialState == 11 ? (
               <>
@@ -172,9 +162,13 @@ export default function GlobalDashboard() {
                   />
                 </View>
               </>
-            ):<View style={{marginTop: 1000}}></View>}
+            ) : (
+              <View style={{ marginTop: 1000 }}></View>
+            )}
           </>
-        ):<></>}
+        ) : (
+          <></>
+        )}
       </ScrollView>
     </GestureHandlerRootView>
   )

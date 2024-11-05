@@ -82,7 +82,9 @@ const DataVisualizations = ({
                 Carbon Budget
               </Text>
             </TouchableOpacity>
-          ):<></>}
+          ) : (
+            <></>
+          )}
           <TouchableOpacity
             onPress={() => setActiveButton('Forecast Comparison')}
             style={
@@ -120,7 +122,9 @@ const DataVisualizations = ({
                 Regional Comparison
               </Text>
             </TouchableOpacity>
-          ):<></>}
+          ) : (
+            <></>
+          )}
           <TouchableOpacity
             onPress={() => setActiveButton('Technology Comparison')}
             style={

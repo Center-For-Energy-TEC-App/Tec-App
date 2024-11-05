@@ -25,7 +25,10 @@ type TechnologyComparisonProps = {
   data: RegionData
   technologyRef: React.RefObject<View>
 }
-export const TechnologyComparison = ({ data, technologyRef }: TechnologyComparisonProps) => {
+export const TechnologyComparison = ({
+  data,
+  technologyRef,
+}: TechnologyComparisonProps) => {
   const solar_data = data.solar.slice(1)
   const wind_data = data.wind.slice(1)
   const hydro_data = data.hydropower.slice(1)
@@ -103,7 +106,11 @@ export const TechnologyComparison = ({ data, technologyRef }: TechnologyComparis
         See how different energy-generating technologies compare to each other
         based on your custom changes.
       </Text>
-      <View style={styles.graphContainer} ref={technologyRef} collapsable={false}>
+      <View
+        style={styles.graphContainer}
+        ref={technologyRef}
+        collapsable={false}
+      >
         <View style={styles.graphInnerContainer}>
           <GraphKey label="SOLAR" color={getTechnologyColor('Solar')} />
           <GraphKey label="WIND" color={getTechnologyColor('Wind')} />

@@ -130,16 +130,16 @@ export const RegionalDashboard = ({
       </View>
       <View style={styles.horizontalLine} />
       {activeTab === 'renewables' ? (
-          <DistributeRenewables
-            currRegion={currRegion}
-            values={sliderValues}
-            minMaxValues={minMaxValues}
-            onSliderChange={onSliderChange}
-            onReset={onReset}
-            disabled={sliderDisabled}
-            tutorialState={tutorialState}
-            setTutorialState={setTutorialState}
-          />
+        <DistributeRenewables
+          currRegion={currRegion}
+          values={sliderValues}
+          minMaxValues={minMaxValues}
+          onSliderChange={onSliderChange}
+          onReset={onReset}
+          disabled={sliderDisabled}
+          tutorialState={tutorialState}
+          setTutorialState={setTutorialState}
+        />
       ) : (
         <DataVisualizations
           initialData={initialGraphData}

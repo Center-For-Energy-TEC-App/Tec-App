@@ -18,7 +18,7 @@ import { getData, removeData } from '../util/Caching'
 import { ExportButton } from '../SVGs/ExportButton'
 //@ts-ignore
 import CERLogo from '../../assets/CERLogo.png'
-import { Asset } from 'expo-asset';
+import { Asset } from 'expo-asset'
 
 // Export PDF
 import DataVisualizations from '../components/DataVisualizations/DataVisualizations'
@@ -109,17 +109,17 @@ export default function Home() {
         quality: 1,
       })
 
-      const asset = Asset.fromModule(CERLogo);
+      const asset = Asset.fromModule(CERLogo)
 
-      await asset.downloadAsync();
+      await asset.downloadAsync()
 
-      const logo_uri = asset.localUri || asset.uri;
-      
+      const logo_uri = asset.localUri || asset.uri
+
       const data = await FileSystem.readAsStringAsync(logo_uri, {
         encoding: FileSystem.EncodingType.Base64,
-      });
-      
-      const imageData = 'data:image/png;base64,' + data;
+      })
+
+      const imageData = 'data:image/png;base64,' + data
 
       const html = `
 <div style="width: 100%; padding: 5px; font-family: Arial, sans-serif; text-align: center; box-sizing: border-box;">
@@ -197,7 +197,10 @@ export default function Home() {
   return (
     <GestureHandlerRootView style={mobileStyles.gestureHandler}>
       <Host>
-        <View style={mobileStyles.appWrapper} onLayout={()=>setIsRendered(true)}>
+        <View
+          style={mobileStyles.appWrapper}
+          onLayout={() => setIsRendered(true)}
+        >
           <Tutorial
             refresh={refreshTutorial}
             state={tutorialState}
@@ -213,10 +216,14 @@ export default function Home() {
               }
               tutorialState={tutorialState}
               setTutorialState={setTutorialState}
-              onSwipeDown={()=>setSelectedRegion('Global')}
+              onSwipeDown={() => setSelectedRegion('Global')}
             />
           </Portal>
-          <View style={mobileStyles.trackerWrapper} ref={trackerRef} collapsable={false}>
+          <View
+            style={mobileStyles.trackerWrapper}
+            ref={trackerRef}
+            collapsable={false}
+          >
             <Tracker type="temperature" temperatureData={temperatureData} />
             <Tracker type="renewable" totalGlobalEnergy={totalGlobalEnergy} />
           </View>
@@ -234,7 +241,9 @@ export default function Home() {
               <View style={{ position: 'absolute', top: 75, left: -150 }}>
                 <Tooltip1 />
               </View>
-            ):<></>}
+            ) : (
+              <></>
+            )}
           </View>
           <TouchableOpacity
             onPress={() => {
@@ -252,7 +261,9 @@ export default function Home() {
             <View style={{ position: 'absolute', top: vh * 0.5 }}>
               <Tooltip4 />
             </View>
-          ):<></>}
+          ) : (
+            <></>
+          )}
           {tutorialState == 10 ? (
             <View
               style={{
@@ -269,32 +280,34 @@ export default function Home() {
                 <Text style={mobileStyles.onboardingButtonText}>Finish</Text>
               </TouchableOpacity>
             </View>
-          ):<></>}
+          ) : (
+            <></>
+          )}
           <View style={mobileStyles.exportButton}>
             <ExportButton onPress={handleExport} />
           </View>
 
-        {initialGraphData &&
-          dynamicGraphData &&
-          initialFossilData &&
-          dynamicFossilData &&
-          temperatureData && (
-            <View style={mobileStyles.hidden}>
-              <DataVisualizations
-                initialGlobalData={initialGraphData}
-                dynamicGlobalData={dynamicGraphData}
-                initialFossilData={initialFossilData}
-                dynamicFossilData={dynamicFossilData}
-                temperatureData={temperatureData}
-                region="Global"
-                bauRef={bauComparisonRef}
-                carbonRef={carbonBudgetRef}
-                technologyRef={technologyComparisonRef}
-                isInteracting={() => {}}
-              />
-            </View>
-          )}
-      </View>
+          {initialGraphData &&
+            dynamicGraphData &&
+            initialFossilData &&
+            dynamicFossilData &&
+            temperatureData && (
+              <View style={mobileStyles.hidden}>
+                <DataVisualizations
+                  initialGlobalData={initialGraphData}
+                  dynamicGlobalData={dynamicGraphData}
+                  initialFossilData={initialFossilData}
+                  dynamicFossilData={dynamicFossilData}
+                  temperatureData={temperatureData}
+                  region="Global"
+                  bauRef={bauComparisonRef}
+                  carbonRef={carbonBudgetRef}
+                  technologyRef={technologyComparisonRef}
+                  isInteracting={() => {}}
+                />
+              </View>
+            )}
+        </View>
       </Host>
     </GestureHandlerRootView>
   )
@@ -320,7 +333,7 @@ const mobileStyles = StyleSheet.create({
     left: '3%',
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center',
+    // alignItems: 'center',
     gap: 15,
   },
   dashboardButton: {
@@ -344,7 +357,7 @@ const mobileStyles = StyleSheet.create({
     right: '3%',
     bottom: '3%',
   },
-  
+
   hidden: {
     position: 'absolute',
     top: -9999,
@@ -363,7 +376,8 @@ const mobileStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 4,  },
+    paddingVertical: 4,
+  },
 
   onboardingButtonText: {
     fontFamily: 'Brix Sans',
