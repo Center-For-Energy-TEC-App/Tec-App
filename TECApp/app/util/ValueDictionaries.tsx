@@ -22,6 +22,8 @@ export const getAbbrv = (region: string) => {
       return 'sea'
     case 'OECD Pacific':
       return 'opa'
+    default:
+      return region
   }
 }
 
@@ -108,5 +110,30 @@ export const getElectricityGenerationCoal = (region: string) => {
       return 0.82
     case 'opa':
       return 0.7
+  }
+}
+
+export const getCarbonReductionMaximum = (region: string) => {
+  switch (region) {
+    case 'chn':
+      return 8438
+    case 'ind':
+      return 2279
+    case 'mea':
+      return 1046
+    case 'nam':
+      return 2228
+    case 'nee':
+      return 1007
+    case 'sea':
+      return 1253
+    case 'eur':
+      return 2550
+    case 'lam':
+      return 1486
+    case 'ssa':
+      return 939
+    case 'opa':
+      return 1806
   }
 }

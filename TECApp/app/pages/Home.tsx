@@ -33,6 +33,7 @@ import { TemperatureData } from '../util/Calculations'
 import { Tooltip1 } from '../SVGs/TutorialPopups/Tooltip1'
 import { Tooltip4 } from '../SVGs/TutorialPopups/Tooltip4'
 import { Tooltip6 } from '../SVGs/TutorialPopups/Tooltip6'
+import { FeedbackButton } from '../SVGs/FeedbackButton'
 
 const vw = Dimensions.get('window').width
 const vh = Dimensions.get('window').height
@@ -283,6 +284,9 @@ export default function Home() {
           ) : (
             <></>
           )}
+          <View style={mobileStyles.feedbackButton}>
+            <FeedbackButton onPress={() => router.push('pages/Feedback')} />
+          </View>
           <View style={mobileStyles.exportButton}>
             <ExportButton onPress={handleExport} />
           </View>
@@ -355,6 +359,11 @@ const mobileStyles = StyleSheet.create({
   exportButton: {
     position: 'absolute',
     right: '3%',
+    bottom: '3%',
+  },
+  feedbackButton: {
+    position: 'absolute',
+    left: '3%',
     bottom: '3%',
   },
 

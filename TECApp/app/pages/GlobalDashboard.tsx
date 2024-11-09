@@ -14,6 +14,7 @@ import { router } from 'expo-router'
 import { TemperatureData } from '../util/Calculations'
 import { Tooltip2 } from '../SVGs/TutorialPopups/Tooltip2'
 import { Tooltip3 } from '../SVGs/TutorialPopups/Tooltip3'
+import { FAQButton } from '../SVGs/FAQButton'
 
 export default function GlobalDashboard() {
   const [initialGraphData, setInitialGraphData] = useState<RegionData>()
@@ -96,7 +97,7 @@ export default function GlobalDashboard() {
               <Tracker type="temperature" temperatureData={temperatureData} />
               <Tracker type="renewable" totalGlobalEnergy={globalEnergy} />
               {tutorialState == 6 ? (
-                <View style={{ position: 'absolute', top: 90, left: 20 }}>
+                <View style={{ position: 'absolute', top: 90, left: 50 }}>
                   <Tooltip2 />
                   <View style={styles.onBoardingButtonWrapper}>
                     <TouchableOpacity
@@ -111,7 +112,7 @@ export default function GlobalDashboard() {
                 <></>
               )}
               {tutorialState == 7 ? (
-                <View style={{ position: 'absolute', top: 90, right: -10 }}>
+                <View style={{ position: 'absolute', top: 90, right: 0 }}>
                   <Tooltip3 />
                   <View style={styles.onBoardingButtonWrapper}>
                     <TouchableOpacity
@@ -150,9 +151,9 @@ export default function GlobalDashboard() {
                 />
 
                 <View style={styles.bottomButtons}>
-                  <FeedbackButton
+                  <FAQButton
                     onPress={() => {
-                      router.push('pages/Feedback')
+                      router.push('pages/FAQ')
                     }}
                   />
                   <LearnMoreButton

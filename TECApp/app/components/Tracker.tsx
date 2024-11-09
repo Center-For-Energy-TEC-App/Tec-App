@@ -96,7 +96,7 @@ export const Tracker = ({
                       style={
                         temperatureHighlight
                           ? styles.flashLabel
-                          : styles.temperatureLabel
+                          : styles.temperatureBottomLabel
                       }
                     >
                       {temperatureVersion == 0
@@ -158,7 +158,7 @@ export const Tracker = ({
 const styles = StyleSheet.create({
   temperatureWrapper: {
     position: 'relative',
-    bottom: 54,
+    bottom: 58,
     display: 'flex',
     flexDirection: 'column',
     gap: 0,
@@ -208,6 +208,11 @@ const styles = StyleSheet.create({
   },
 
   temperatureLabel: {
+    fontFamily: 'Brix Sans',
+    fontSize: 20,
+  },
+
+  temperatureBottomLabel: {
     fontFamily: 'Brix Sans',
     fontSize: 15.5,
   },

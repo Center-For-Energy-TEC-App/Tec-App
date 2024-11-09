@@ -10,7 +10,7 @@ import {
   getDefaultValues,
   getInitialGraphData,
   getMinMaxValues,
-  getRegionCalculationData,
+  getCalculationData,
 } from '../api/requests'
 import { getAbbrv, getEnergyAbbrv } from '../util/ValueDictionaries'
 import {
@@ -18,7 +18,9 @@ import {
   calculateCarbonCurve,
   calculateCarbonReductions,
   calculateEnergyCurve,
+  calculateInitialCoalGasOil,
   calculateNewGlobalOnReset,
+  calculateRegionalCoalGasOil,
   calculateTemperature,
 } from '../util/Calculations'
 import { DataPoint } from './DataVisualizations/BAUComparison'
@@ -35,16 +37,35 @@ export interface BottomSheetProps {
 }
 
 export type FossilReductionData = {
-  chn: number
-  nam: number
-  lam: number
-  ind: number
-  sea: number
-  mea: number
-  opa: number
-  eur: number
-  ssa: number
-  nee: number
+  chn: number[]
+  nam: number[]
+  lam: number[]
+  ind: number[]
+  sea: number[]
+  mea: number[]
+  opa: number[]
+  eur: number[]
+  ssa: number[]
+  nee: number[]
+}
+
+export type CoalGasOil = {
+  coal: number
+  gas: number
+  oil: number
+}
+
+export type CoalGasOilData = {
+  chn: CoalGasOil
+  nam: CoalGasOil
+  lam: CoalGasOil
+  ind: CoalGasOil
+  sea: CoalGasOil
+  mea: CoalGasOil
+  opa: CoalGasOil
+  eur: CoalGasOil
+  ssa: CoalGasOil
+  nee: CoalGasOil
 }
 
 const regions = [
@@ -88,7 +109,9 @@ export const BottomSheet = ({
   const [fossilReductionData, setFossilReductionData] =
     useState<FossilReductionData>() //carbon reduction data (to be applied to fossil data above)
 
-  const [calculationData, setCalculationData] = useState<CalculationData>() //storage of all necessary calculation data for the current region
+  const [calculationData, setCalculationData] = useState<CalculationData>() //storage of all necessary calculation data for the current region'
+
+  const [coalGasOil, setCoalGasOil] = useState<CoalGasOilData>()
 
   const calculateTotalGlobalEnergy = (sliderValues: RegionalValues) => {
     let totalEnergy = 0
@@ -109,7 +132,10 @@ export const BottomSheet = ({
     return totalEnergy
   }
 
-  const initializeFossilData = () => {
+  const initializeFossilData = (
+    initialGraphData: GraphData,
+    calculationData: CalculationData,
+  ) => {
     let initialFossilData = []
     initialFossilData.push({ year: 2025, value: 33.29 + (3.8205 + 5.0 - 0.07) })
     initialFossilData.push({ year: 2030, value: 31.6 + (3.815 + 5.0 - 0.19) })
@@ -123,13 +149,19 @@ export const BottomSheet = ({
 
     const initialFossilReductionData = {} as FossilReductionData
     for (const region of regions) {
-      initialFossilReductionData[region] = 0
+      initialFossilReductionData[region] = [0, 0, 0, 0, 0, 0]
     }
     setFossilReductionData(initialFossilReductionData)
 
     const temperatureData = calculateTemperature(initialFossilData)
     passTemperatureToHome(temperatureData)
     storeData('temperature-data', JSON.stringify(temperatureData))
+
+    const initialCoalGasOil = calculateInitialCoalGasOil(
+      calculationData,
+      initialGraphData,
+    )
+    setCoalGasOil(initialCoalGasOil)
   }
 
   //pull all initial data
@@ -155,7 +187,12 @@ export const BottomSheet = ({
                 storeData('bau-graph-data', JSON.stringify(val.global))
                 storeData('dynamic-graph-data', JSON.stringify(val.global))
 
-                initializeFossilData()
+                getCalculationData()
+                  .then((val2) => {
+                    setCalculationData(val2)
+                    initializeFossilData(val, val2)
+                  })
+                  .catch(console.error)
               })
               .catch(console.error)
           })
@@ -166,12 +203,6 @@ export const BottomSheet = ({
 
   //update regional calculation data on region select
   useEffect(() => {
-    getRegionCalculationData(getAbbrv(selectedRegion))
-      .then((val) => {
-        setCalculationData(val)
-      })
-      .catch(console.error)
-
     if (selectedRegion !== 'Global') {
       bottomSheetRef.current?.snapToIndex(3) // Snap to 80% when a region is selected
     } else {
@@ -190,6 +221,8 @@ export const BottomSheet = ({
       onClose={onSwipeDown}
     >
       {dynamicFossilData &&
+      fossilReductionData &&
+      coalGasOil &&
       calculationData && //don't render regional sheet until all values load
       selectedRegion !== 'Global' ? (
         <View style={styles.contentContainer}>
@@ -226,7 +259,7 @@ export const BottomSheet = ({
                   technologyChanged,
                   dynamicGraphData[getAbbrv(selectedRegion)],
                   dynamicGraphData.global,
-                  calculationData,
+                  calculationData[getAbbrv(selectedRegion)],
                 )
 
               setDynamicGraphData({
@@ -236,15 +269,17 @@ export const BottomSheet = ({
               })
               storeData('dynamic-graph-data', JSON.stringify(globalGraphData))
 
-              const { newFossilReduction, newFossilData } =
-                calculateCarbonReductions(
-                  //calculate new global carbon budget curve based on new graph data
-                  getAbbrv(selectedRegion),
-                  calculationData,
-                  regionalGraphData,
-                  fossilReductionData[getAbbrv(selectedRegion)],
-                  dynamicFossilData,
-                )
+              const newFossilReduction = calculateCarbonReductions(
+                getAbbrv(selectedRegion),
+                calculationData[getAbbrv(selectedRegion)],
+                regionalGraphData,
+              )
+
+              const newFossilData = calculateCarbonCurve(
+                newFossilReduction[5] -
+                  fossilReductionData[getAbbrv(selectedRegion)][5],
+                dynamicFossilData,
+              )
 
               setDynamicFossilData(newFossilData)
 
@@ -258,6 +293,14 @@ export const BottomSheet = ({
               const temperatureData = calculateTemperature(newFossilData)
               passTemperatureToHome(temperatureData)
               storeData('temperature-data', JSON.stringify(temperatureData))
+              setCoalGasOil({
+                ...coalGasOil,
+                [getAbbrv(selectedRegion)]: calculateRegionalCoalGasOil(
+                  calculationData[getAbbrv(selectedRegion)],
+                  regionalGraphData,
+                  getAbbrv(selectedRegion),
+                ),
+              })
             }}
             onReset={() => {
               //when reset button is clicked within region
@@ -290,7 +333,7 @@ export const BottomSheet = ({
               )
 
               const newFossilData = calculateCarbonCurve(
-                0 - fossilReductionData[getAbbrv(selectedRegion)],
+                0 - fossilReductionData[getAbbrv(selectedRegion)][5],
                 dynamicFossilData,
               )
 
@@ -300,18 +343,32 @@ export const BottomSheet = ({
 
               setFossilReductionData({
                 ...fossilReductionData,
-                [getAbbrv(selectedRegion)]: 0,
+                [getAbbrv(selectedRegion)]: [0, 0, 0, 0, 0, 0],
               })
 
               const temperatureData = calculateTemperature(newFossilData)
               passTemperatureToHome(temperatureData)
               storeData('temperature-data', JSON.stringify(temperatureData))
+              setCoalGasOil({
+                ...coalGasOil,
+                [getAbbrv(selectedRegion)]: calculateRegionalCoalGasOil(
+                  calculationData[getAbbrv(selectedRegion)],
+                  initialGraphData[getAbbrv(selectedRegion)],
+                  getAbbrv(selectedRegion),
+                ),
+              })
             }}
             initialGraphData={initialGraphData}
             dynamicGraphData={dynamicGraphData}
             sliderDisabled={
-              calculationData.region !== getAbbrv(selectedRegion) //don't let sliders be changed until region calculation data is updated
+              calculationData[getAbbrv(selectedRegion)].region !==
+              getAbbrv(selectedRegion) //don't let sliders be changed until region calculation data is updated
             }
+            coalGasOil={coalGasOil[getAbbrv(selectedRegion)]}
+            carbonReduction={fossilReductionData[
+              getAbbrv(selectedRegion)
+            ].reduce((a, b) => a + b, 0)}
+            calculationData={calculationData[getAbbrv(selectedRegion)]}
           />
         </View>
       ) : (

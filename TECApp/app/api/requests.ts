@@ -136,13 +136,13 @@ type ElectricityGenerationData = {
 }
 
 type CarbonBudgetData = {
-  coal: number
-  gas: number
-  oil: number
-  zero_carbon: number
+  coal: YearRange
+  gas: YearRange
+  oil: YearRange
+  zero_carbon: YearRange
 }
 
-export type CalculationData = {
+export type RegionCalculationData = {
   installed_capacity: ElectricityGenerationData
   capacity_factor: ElectricityGenerationData
   electricity_generation: CarbonBudgetData
@@ -150,12 +150,26 @@ export type CalculationData = {
   region: string
 }
 
+export type CalculationData = {
+  global: RegionCalculationData
+  chn: RegionCalculationData
+  nam: RegionCalculationData
+  lam: RegionCalculationData
+  ind: RegionCalculationData
+  sea: RegionCalculationData
+  mea: RegionCalculationData
+  opa: RegionCalculationData
+  eur: RegionCalculationData
+  ssa: RegionCalculationData
+  nee: RegionCalculationData
+}
+
 /**
  * Calculation data is split up into 6 categories of data + one key value pair for the region
  * Each category contains information about a specific technology and its values in years
  */
-export async function getRegionCalculationData(region: string) {
-  const response = await fetch(BASE_URL + `/calc/${region}`, { method: 'GET' })
+export async function getCalculationData() {
+  const response = await fetch(BASE_URL + `/calc`, { method: 'GET' })
   return (await response.json()) as CalculationData
 }
 
