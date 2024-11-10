@@ -30,7 +30,7 @@ type BAUComparisonProps = {
   region: string
   BAUData: RegionData
   dynamicData: RegionData
-  bauRef: React.RefObject<View>
+  bauRef?: React.RefObject<View>
 }
 
 const deviceType = () => {

@@ -1,9 +1,10 @@
-import React, { StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, View, Text } from 'react-native'
 import { TemperatureIcon } from '../SVGs/TemperatureIcon'
 import { RenewableIcon } from '../SVGs/RenewableIcon'
 import { useEffect, useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { TemperatureData } from '../util/Calculations'
+import React from 'react'
 
 type TrackerProps = {
   type: 'temperature' | 'renewable'
@@ -16,7 +17,7 @@ export const Tracker = ({
   type,
   dashboard,
   totalGlobalEnergy,
-  temperatureData,
+  temperatureData
 }: TrackerProps) => {
   const [temperatureVersion, setTemperatureVersion] = useState<number>(0)
   const [energyVersion, setEnergyVersion] = useState<number>(0)
@@ -114,8 +115,11 @@ export const Tracker = ({
                   </Text>
                 </View>
               </View>
-            ):<></>}
+            ) : (
+              <></>
+            )}
           </View>
+          
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
@@ -199,6 +203,27 @@ const mobileStyles = StyleSheet.create({
     gap: 3,
   },
 
+  iconRowPDF: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+
+  tempBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    margin: 5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#f9f9f9',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
   dataColumn: {
     display: 'flex',
     flexDirection: 'column',
@@ -245,5 +270,10 @@ const mobileStyles = StyleSheet.create({
     textShadowRadius: 8.5,
     textShadowOffset: { width: 0, height: 0 },
     textShadowColor: 'green',
+  },
+  hidden: {
+    position: 'absolute',
+    top: -9999,
+    left: -9999,
   },
 })
