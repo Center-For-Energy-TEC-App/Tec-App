@@ -5,14 +5,14 @@ import { RegionalDashboard } from './RegionalDashboard'
 import {
   GraphData,
   RegionalMinMaxValues,
-  RegionalValues,
   CalculationData,
   getDefaultValues,
   getInitialGraphData,
   getMinMaxValues,
   getCalculationData,
+  DefaultValues,
 } from '../api/requests'
-import { getAbbrv, getEnergyAbbrv } from '../util/ValueDictionaries'
+import { getAbbrv } from '../util/ValueDictionaries'
 import {
   TemperatureData,
   calculateCarbonCurve,
@@ -97,9 +97,9 @@ export const BottomSheet = ({
 
   //see api/requests.ts for specific info on structure of data objects
   const [initialSliderValues, setInitialSliderValues] =
-    useState<RegionalValues>() //default slider values for every region
+    useState<DefaultValues>() //default slider values for every region
   const [dynamicSliderValues, setDynamicSliderValues] =
-    useState<RegionalValues>() //storage of user changes to sliders
+    useState<DefaultValues>() //storage of user changes to sliders
   const [minMaxValues, setMinMaxValues] = useState<RegionalMinMaxValues>() //min-max values for every slider
 
   const [initialGraphData, setInitialGraphData] = useState<GraphData>() //default graph data
@@ -113,18 +113,18 @@ export const BottomSheet = ({
 
   const [coalGasOil, setCoalGasOil] = useState<CoalGasOilData>()
 
-  const calculateTotalGlobalEnergy = (sliderValues: RegionalValues) => {
+  const calculateTotalGlobalEnergy = (sliderValues: DefaultValues) => {
     let totalEnergy = 0
 
     for (const region of regions) {
-      const values = sliderValues[region][2]
+      const values = sliderValues[region].dynamic
       const regionEnergy =
-        values.solar_gw +
-        values.wind_gw +
-        values.hydro_gw +
-        values.bio_gw +
-        values.geo_gw +
-        values.nuclear_gw
+        values.solar +
+        values.wind +
+        values.hydropower +
+        values.biomass +
+        values.geothermal +
+        values.nuclear
 
       totalEnergy += regionEnergy
     }
@@ -236,11 +236,10 @@ export const BottomSheet = ({
               //on slider change for a region, store changes here to preserve each region changes
               const newSliderValues = {
                 ...dynamicSliderValues,
-                [getAbbrv(selectedRegion)]: [
-                  dynamicSliderValues[getAbbrv(selectedRegion)][0],
-                  dynamicSliderValues[getAbbrv(selectedRegion)][1],
-                  val,
-                ],
+                [getAbbrv(selectedRegion)]: {
+                  ...dynamicSliderValues[getAbbrv(selectedRegion)],
+                  dynamic: val,
+                },
               }
               setDynamicSliderValues(newSliderValues)
 
@@ -255,7 +254,7 @@ export const BottomSheet = ({
                 globalGraphData,
               } = //calculate new graph (excluding carbon budget) data for current region and global
                 calculateEnergyCurve(
-                  val[getEnergyAbbrv(technologyChanged)],
+                  val[technologyChanged],
                   technologyChanged,
                   dynamicGraphData[getAbbrv(selectedRegion)],
                   dynamicGraphData.global,

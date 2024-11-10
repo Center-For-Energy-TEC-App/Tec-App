@@ -71,23 +71,6 @@ export const getRegionColor = (region: string) => {
   }
 }
 
-export const getEnergyAbbrv = (energy: string) => {
-  switch (energy) {
-    case 'solar':
-      return 'solar_gw'
-    case 'wind':
-      return 'wind_gw'
-    case 'hydropower':
-      return 'hydro_gw'
-    case 'biomass':
-      return 'bio_gw'
-    case 'geothermal':
-      return 'geo_gw'
-    case 'nuclear':
-      return 'nuclear_gw'
-  }
-}
-
 export const getElectricityGenerationCoal = (region: string) => {
   switch (region) {
     case 'chn':

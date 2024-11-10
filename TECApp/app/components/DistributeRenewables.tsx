@@ -22,7 +22,6 @@ import Svg, { Path, Rect, Text as TextSvg } from 'react-native-svg'
 import {
   getAbbrv,
   getCarbonReductionMaximum,
-  getEnergyAbbrv,
   getTechnologyColor,
 } from '../util/ValueDictionaries'
 import {
@@ -30,6 +29,8 @@ import {
   MinMaxValues,
   RegionCalculationData,
   RegionData,
+  RegionInfo,
+  RegionalDefaultValues,
 } from '../api/requests'
 import { NativeViewGestureHandler } from 'react-native-gesture-handler'
 import { SliderIndicator } from '../SVGs/SliderIndicator'
@@ -61,9 +62,9 @@ export type ElectricityProportions = {
 
 type DistributeRenewablesProps = {
   currRegion: string
-  values: DefaultValues
+  values: RegionalDefaultValues
   minMaxValues: MinMaxValues
-  onSliderChange: (val: DefaultValues, technologyChanged: string) => void
+  onSliderChange: (val: RegionInfo, technologyChanged: string) => void
   onReset: () => void
   disabled: boolean
   tutorialState: number
@@ -102,7 +103,7 @@ const DistributeRenewables = ({
 
   const isIpad = deviceType() === 'ipad'
 
-  const [sliderValues, setSliderValues] = useState<DefaultValues>(values[2])
+  const [sliderValues, setSliderValues] = useState<RegionInfo>(values.dynamic)
 
   const [proportionBarWidth, setProportionBarWidth] = //actual pixel width of proportion bar (based on parent div)
     useState<number>(undefined)
@@ -128,7 +129,7 @@ const DistributeRenewables = ({
     useState<number>()
 
   useEffect(() => {
-    setSliderValues(values[2])
+    setSliderValues(values.dynamic)
     setZeroCarbonTotal(
       graphData.solar[6].value +
         graphData.wind[6].value +
@@ -148,23 +149,24 @@ const DistributeRenewables = ({
   useEffect(() => {
     if (proportionBarWidth) {
       const sliderTotal =
-        sliderValues.wind_gw +
-        sliderValues.solar_gw +
-        sliderValues.hydro_gw +
-        sliderValues.bio_gw +
-        sliderValues.geo_gw +
-        sliderValues.nuclear_gw
+        sliderValues.wind +
+        sliderValues.solar +
+        sliderValues.hydropower +
+        sliderValues.biomass +
+        sliderValues.geothermal +
+        sliderValues.nuclear
 
       setTechnologyProportions({
-        wind: (sliderValues.wind_gw / sliderTotal) * (proportionBarWidth - 5),
-        solar: (sliderValues.solar_gw / sliderTotal) * (proportionBarWidth - 5),
+        wind: (sliderValues.wind / sliderTotal) * (proportionBarWidth - 5),
+        solar: (sliderValues.solar / sliderTotal) * (proportionBarWidth - 5),
         hydropower:
-          (sliderValues.hydro_gw / sliderTotal) * (proportionBarWidth - 5),
-        biomass: (sliderValues.bio_gw / sliderTotal) * (proportionBarWidth - 5),
+          (sliderValues.hydropower / sliderTotal) * (proportionBarWidth - 5),
+        biomass:
+          (sliderValues.biomass / sliderTotal) * (proportionBarWidth - 5),
         geothermal:
-          (sliderValues.geo_gw / sliderTotal) * (proportionBarWidth - 5),
+          (sliderValues.geothermal / sliderTotal) * (proportionBarWidth - 5),
         nuclear:
-          (sliderValues.nuclear_gw / sliderTotal) * (proportionBarWidth - 5),
+          (sliderValues.nuclear / sliderTotal) * (proportionBarWidth - 5),
       })
 
       const electricityTotal =
@@ -255,7 +257,7 @@ const DistributeRenewables = ({
             maximumValue={Math.round(
               parseFloat(minMaxValues.max[label.toLowerCase()]),
             )}
-            value={sliderValues[getEnergyAbbrv(label.toLowerCase())]}
+            value={sliderValues[label.toLowerCase()]}
             step={1.0}
             thumbTintColor={
               selectedSlider === label ? getTechnologyColor(label) : '#B5B1AA'
@@ -263,11 +265,11 @@ const DistributeRenewables = ({
             minimumTrackTintColor={getTechnologyColor(label)}
             maximumTrackTintColor="#B5B1AA"
             trackMarks={[
-              values[0][getEnergyAbbrv(label.toLowerCase())] + //add slight offset because the trackmark div is wider than the trackmark itself
+              values[2025][label.toLowerCase()] + //add slight offset because the trackmark div is wider than the trackmark itself
                 0.0275 *
                   (parseFloat(minMaxValues.max[label.toLowerCase()]) -
                     parseFloat(minMaxValues.min[label.toLowerCase()])),
-              values[1][getEnergyAbbrv(label.toLowerCase())] +
+              values['bau'][label.toLowerCase()] +
                 0.0275 *
                   (parseFloat(minMaxValues.max[label.toLowerCase()]) -
                     parseFloat(minMaxValues.min[label.toLowerCase()])),
@@ -275,8 +277,8 @@ const DistributeRenewables = ({
             renderTrackMarkComponent={(index) =>
               renderTrackMark(
                 index,
-                values[0][getEnergyAbbrv(label.toLowerCase())] < //ordering based on which value (2024 or bau) is higher
-                  values[1][getEnergyAbbrv(label.toLowerCase())]
+                values[2025][label.toLowerCase()] < //ordering based on which value (2025 or bau) is higher
+                  values['bau'][label.toLowerCase()]
                   ? ['2025', '2030'][index]
                   : ['2030', '2025'][index],
               )
@@ -288,7 +290,7 @@ const DistributeRenewables = ({
             onValueChange={(val) => {
               setSliderValues({
                 ...sliderValues,
-                [getEnergyAbbrv(label.toLowerCase())]: val[0],
+                [label.toLowerCase()]: val[0],
               })
               const newData = calculateRegionalCurve(
                 val[0],
@@ -326,7 +328,7 @@ const DistributeRenewables = ({
               onSliderChange(
                 {
                   ...sliderValues,
-                  [getEnergyAbbrv(label.toLowerCase())]: val[0],
+                  [label.toLowerCase()]: val[0],
                 },
                 label.toLowerCase(),
               )
@@ -335,8 +337,7 @@ const DistributeRenewables = ({
         </NativeViewGestureHandler>
         <View style={styles.sliderValueBox}>
           <Text style={styles.sliderValue}>
-            {Math.round(sliderValues[getEnergyAbbrv(label.toLowerCase())]) +
-              ' GW'}
+            {Math.round(sliderValues[label.toLowerCase()]) + ' GW'}
           </Text>
         </View>
       </View>
@@ -397,7 +398,7 @@ const DistributeRenewables = ({
                 fill="white"
               />
               <TextSvg
-                x={proportionBarWidth * 0.6 + 50}
+                x={proportionBarWidth * 0.6 + 45}
                 y={16}
                 fill="black"
                 stroke="black"
@@ -443,7 +444,11 @@ const DistributeRenewables = ({
                 fill="#6D8D39"
               />
               <TextSvg
-                x={electricityProportions.zeroCarbon / 2 - 55}
+                x={
+                  electricityProportions.zeroCarbon / 2 - 55 > 0
+                    ? electricityProportions.zeroCarbon / 2 - 55
+                    : 0
+                }
                 y={35}
                 fill="black"
                 stroke="black"

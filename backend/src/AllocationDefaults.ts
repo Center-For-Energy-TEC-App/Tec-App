@@ -4,52 +4,63 @@ import { Request, Response, NextFunction } from "express"
 
 const regions = ["global","chn","ind","mea","nam","nee","sea","eur","lam","ssa","opa"]
 
-type DefaultValues = {
-    region: string
-    category: string
-    global_tw: string
-    regional_gw?: number
-    solar_gw: number
-    wind_gw: number
-    hydro_gw: number
-    geo_gw: number
-    bio_gw: number
-    nuclear_gw: number
+type RegionInfo = {
+    solar: number
+    wind: number
+    hydropower: number
+    geothermal: number
+    biomass: number
+    nuclear: number
 }
 
-type RegionalValues = {
-    global: DefaultValues[]
-    chn: DefaultValues[]
-    nam: DefaultValues[]
-    lam: DefaultValues[]
-    ind: DefaultValues[]
-    sea: DefaultValues[]
-    mea: DefaultValues[]
-    opa: DefaultValues[]
-    eur: DefaultValues[]
-    ssa: DefaultValues[]
-    nee: DefaultValues[]
+type RegionalDefaultValues = {
+    2025: RegionInfo
+    bau: RegionInfo
+    dynamic: RegionInfo
+}
+
+type DefaultValues = {
+    global: RegionalDefaultValues
+    chn: RegionalDefaultValues
+    nam: RegionalDefaultValues
+    lam: RegionalDefaultValues
+    ind: RegionalDefaultValues
+    sea: RegionalDefaultValues
+    mea: RegionalDefaultValues
+    opa: RegionalDefaultValues
+    eur: RegionalDefaultValues
+    ssa: RegionalDefaultValues
+    nee: RegionalDefaultValues
 }
 
 export const getAllDefaultValues = async (req: Request, res: Response, next: NextFunction) =>{
-    // const {global_tw} = req.query
+    let results  =
+         {global: {2025: {}, bau: {}, dynamic: {}}, 
+         chn:{2025: {}, bau: {}, dynamic: {}}, 
+         ind:{2025: {}, bau: {}, dynamic: {}}, 
+         mea:{2025: {}, bau: {}, dynamic: {}}, 
+         nam:{2025: {}, bau: {}, dynamic: {}}, 
+         nee:{2025: {}, bau: {}, dynamic: {}},
+         sea:{2025: {}, bau: {}, dynamic: {}}, 
+         eur:{2025: {}, bau: {}, dynamic: {}}, 
+         lam:{2025: {}, bau: {}, dynamic: {}}, 
+         ssa:{2025: {}, bau: {}, dynamic: {}}, 
+         opa:{2025: {}, bau: {}, dynamic: {}}} as DefaultValues
 
-    // let results = {}
-    // for(const region of regions){
-    //     const result = await pool.query(`SELECT * FROM allocation_defaults_${region} WHERE (global_tw=$1 AND category='altered') OR category!='altered'`, [global_tw])
-    //     results = {...results, [region]:result.rows}
+    let technologies = ["solar", "wind", "biomass", "geothermal", "hydropower" , "nuclear"]
 
-    let results: RegionalValues  = {global: [], chn:[], ind:[], mea:[], nam:[], nee:[],sea:[], eur:[], lam:[], ssa:[], opa:[]}
-    const query= await pool.query('SELECT * FROM allocation_defaults')
-    for(const row of query.rows){
-        const regionKey = row.region as keyof typeof results
-        const values = row as DefaultValues
-        if(row.category==='2023'){
-            results[regionKey].push(values)
+    const data_aggregation_installed_capacity_query = await pool.query("SELECT * FROM data_aggregation_installed_capacity WHERE (year=2025 OR year=2030) AND (energy_type='Solar' OR energy_type='Wind');")
+    const transpose_installed_capacity_query = await pool.query("SELECT * FROM transpose_installed_capacity WHERE (year=2025 OR year=2030) AND (energy_type='hydropower' OR energy_type='geothermal' OR energy_type='biomass_fired' OR energy_type='nuclear');")
+    const installed_capacity_rows = data_aggregation_installed_capacity_query.rows.concat(transpose_installed_capacity_query.rows)
+
+    for(let i=0; i<installed_capacity_rows.length; i++){
+        const techKey = technologies[Math.floor(i/(2*11))] as keyof typeof results.global.bau
+        const region = installed_capacity_rows[i].region as keyof typeof results
+        if(parseInt(installed_capacity_rows[i].year)===2025){
+            results[region][2025][techKey] =  parseInt(parseFloat(installed_capacity_rows[i].value).toFixed(0))
         }else{
-            results[regionKey].push(values)
-            results[regionKey].push(values)
-
+            results[region]["bau"][techKey] =  parseInt(parseFloat(installed_capacity_rows[i].value).toFixed(0))
+            results[region]["dynamic"][techKey] =  parseInt(parseFloat(installed_capacity_rows[i].value).toFixed(0))
         }
     }
     

@@ -15,6 +15,8 @@ import {
   GraphData,
   MinMaxValues,
   RegionCalculationData,
+  RegionInfo,
+  RegionalDefaultValues,
 } from '../api/requests'
 import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
 import { getRegionSummary } from '../util/RegionDescriptions'
@@ -23,9 +25,9 @@ import { getAbbrv } from '../util/ValueDictionaries'
 
 type RegionalDashboardProps = {
   currRegion: string
-  sliderValues: DefaultValues
+  sliderValues: RegionalDefaultValues
   minMaxValues: MinMaxValues
-  onSliderChange: (val: DefaultValues, technologyChanged: string) => void
+  onSliderChange: (val: RegionInfo, technologyChanged: string) => void
   onReset: () => void
   initialGraphData: GraphData
   dynamicGraphData: GraphData
