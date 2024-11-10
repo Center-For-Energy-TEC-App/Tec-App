@@ -176,7 +176,7 @@ export default function Home() {
         to: filePath,
       })
       // console.log('PDF successfully saved to:', filePath)
-      Alert.alert(`PDF exported successfully to ${filePath}`)
+      // Alert.alert(`PDF exported successfully to ${filePath}`)
 
       // Opens the file in a viewer / allow share option
       if (await Sharing.isAvailableAsync()) {

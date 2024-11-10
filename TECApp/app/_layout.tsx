@@ -12,6 +12,15 @@ const RootLayout = () => {
     <GestureHandlerRootView>
       <Stack>
         <Stack.Screen
+        name="index"
+        options={{
+          headerShown: false,
+            contentStyle: {
+              backgroundColor: 'white',
+            },
+        }}
+        />
+        <Stack.Screen
           name="pages/Home"
           options={{
             headerShown: false,
