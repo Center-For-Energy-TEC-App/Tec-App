@@ -95,13 +95,13 @@ type ElectricityGenerationData = {
 }
 
 type CarbonBudgetData = {
-    coal: number
-    gas: number
-    oil: number
-    zero_carbon: number
+    coal: YearRange
+    gas: YearRange
+    oil: YearRange
+    zero_carbon: YearRange
 }
 
-type CalculationData = {
+type RegionCalculationData = {
     installed_capacity: ElectricityGenerationData
     capacity_factor: ElectricityGenerationData
     electricity_generation: CarbonBudgetData,
@@ -109,50 +109,85 @@ type CalculationData = {
     region: string
 }
 
-export const getRegionCalculationData = async (req: Request, res: Response, next: NextFunction) =>{
+type CalculationData = {
+    global: RegionCalculationData
+    chn: RegionCalculationData
+    nam: RegionCalculationData
+    lam: RegionCalculationData
+    ind: RegionCalculationData
+    sea: RegionCalculationData
+    mea: RegionCalculationData
+    opa: RegionCalculationData
+    eur: RegionCalculationData
+    ssa: RegionCalculationData
+    nee: RegionCalculationData
+}
+
+export const getCalculationData = async (req: Request, res: Response, next: NextFunction) =>{
+    
+    const results = {
+        global: {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:"global"},
+        chn: {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:"chn"},
+        nam: {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:"nam"},
+        lam: {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:"lam"},
+        ind: {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:"ind"},
+        sea: {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:"sea"},
+        mea: {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:"mea"},
+        opa: {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:"opa"},
+        eur: {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:"eur"},
+        ssa: {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:"ssa"},
+        nee: {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:"nee"},
+    } as CalculationData
+
     let technologies = ["solar", "wind", "biomass", "geothermal", "hydropower" , "nuclear"]
     let nonrenewables = ["coal", "gas", "oil", "zero_carbon"]
 
-    const region = req.params.region
-    
-    const results = {installed_capacity: {}, capacity_factor: {}, electricity_generation: {}, co2_emissions:{}, region:region} as CalculationData
+    const data_aggregation_installed_capacity_query = await pool.query("SELECT * FROM data_aggregation_installed_capacity WHERE year=2024 AND (energy_type='Solar' OR energy_type='Wind');")
+    const transpose_installed_capacity_query = await pool.query("SELECT * FROM transpose_installed_capacity WHERE year=2024 AND (energy_type='hydropower' OR energy_type='geothermal' OR energy_type='biomass_fired' OR energy_type='nuclear');")
 
     //installed capacity
-    const data_aggregation_installed_capacity_query = await pool.query("SELECT * FROM data_aggregation_installed_capacity WHERE region=$1 AND year=2024 AND (energy_type='Solar' OR energy_type='Wind');", [region])
-    const transpose_installed_capacity_query = await pool.query("SELECT * FROM transpose_installed_capacity WHERE region=$1 AND year=2024 AND (energy_type='hydropower' OR energy_type='geothermal' OR energy_type='biomass_fired' OR energy_type='nuclear');", [region])
     const installed_capacity_rows = data_aggregation_installed_capacity_query.rows.concat(transpose_installed_capacity_query.rows)
-
     for(let i=0; i<installed_capacity_rows.length; i++){
-        const techKey = technologies[i] as keyof typeof results.installed_capacity
-        results.installed_capacity[techKey] = {"2024": parseFloat(installed_capacity_rows[i].value)}
+        const techKey = technologies[Math.floor(i/11)] as keyof typeof results.global.installed_capacity
+        const region = installed_capacity_rows[i].region as keyof typeof results
+        results[region].installed_capacity[techKey] = {"2024": parseFloat(installed_capacity_rows[i].value)}
     }
-    
+
     technologies = ["solar", "wind","hydropower", "geothermal", "biomass",  "nuclear"]  //query order is different from here on
 
     //capacity_factor
-    const capacity_factor_query = await pool.query("SELECT * FROM secondary_calculations_capacity_factor WHERE region=$1 AND year>=2024", [region])
+    const capacity_factor_query = await pool.query("SELECT * FROM secondary_calculations_capacity_factor WHERE year>=2024")
     for(let i = 0; i<capacity_factor_query.rows.length; i++){
-        const techKey = technologies[Math.floor(i/7)] as keyof typeof results.capacity_factor
+        const techKey = technologies[Math.floor(i/(7*11))] as keyof typeof results.global.capacity_factor
         const yearKey = capacity_factor_query.rows[i].year
-        results.capacity_factor[techKey] = results.capacity_factor[techKey]?
-            {...results.capacity_factor[techKey], [yearKey]:parseFloat(capacity_factor_query.rows[i].value)}:
+        const region = capacity_factor_query.rows[i].region as keyof typeof results
+        results[region].capacity_factor[techKey] = results[region].capacity_factor[techKey]?
+            {...results[region].capacity_factor[techKey], [yearKey]:parseFloat(capacity_factor_query.rows[i].value)}:
             {[yearKey]:parseFloat(capacity_factor_query.rows[i].value)}
     }
 
     //electricity_generation
-    const transpose_electricity_generation_query = await pool.query("SELECT * FROM transpose_electricity_generation WHERE region=$1 AND year=2030 AND (energy_type='coal_fired' OR energy_type='gas_fired' OR energy_type='oil_fired');", [region])
-    const data_aggregation_total_zero_carbon_query = await pool.query("SELECT * FROM data_aggregation_electricity_generation WHERE region=$1 AND year=2030 AND energy_type='Total Zero-Carbon';", [region])
+    const transpose_electricity_generation_query = await pool.query("SELECT * FROM transpose_electricity_generation WHERE year>=2025 AND (energy_type='coal_fired' OR energy_type='gas_fired' OR energy_type='oil_fired');")
+    const data_aggregation_total_zero_carbon_query = await pool.query("SELECT * FROM data_aggregation_electricity_generation WHERE year>=2025 AND energy_type='Total Zero-Carbon';")
     const electricity_generation_query = transpose_electricity_generation_query.rows.concat(data_aggregation_total_zero_carbon_query.rows)
     for(let i = 0; i<electricity_generation_query.length; i++){
-        const nonrenewableKey = nonrenewables[i] as keyof typeof results.electricity_generation
-        results.electricity_generation[nonrenewableKey] = parseFloat(electricity_generation_query[i].value)
+        const nonrenewableKey = nonrenewables[Math.floor(i/(6*11))] as keyof typeof results.global.electricity_generation
+        const region = electricity_generation_query[i].region as keyof typeof results
+        const yearKey = electricity_generation_query[i].year
+        results[region].electricity_generation[nonrenewableKey] = results[region].electricity_generation[nonrenewableKey]?
+        {...results[region].electricity_generation[nonrenewableKey], [yearKey]:parseFloat(electricity_generation_query[i].value)}:
+        {[yearKey]:parseFloat(electricity_generation_query[i].value)}
     }
 
     //co2 emissions
-    const co2_emissions_query = await pool.query("SELECT * FROM transpose_co2_emissions WHERE region=$1 AND year=2030 AND (energy_type='coal' OR energy_type='natural_gas' OR energy_type='oil')", [region])
+    const co2_emissions_query = await pool.query("SELECT * FROM transpose_co2_emissions WHERE year>=2025 AND (energy_type='coal' OR energy_type='natural_gas' OR energy_type='oil')")
     for(let i = 0; i<co2_emissions_query.rows.length; i++){
-        const nonrenewableKey = nonrenewables[i] as keyof typeof results.co2_emissions
-        results.co2_emissions[nonrenewableKey] = parseFloat(co2_emissions_query.rows[i].value)
+        const nonrenewableKey = nonrenewables[Math.floor(i/(6*11))] as keyof typeof results.global.co2_emissions
+        const region = co2_emissions_query.rows[i].region as keyof typeof results
+        const yearKey = co2_emissions_query.rows[i].year
+        results[region].co2_emissions[nonrenewableKey] = results[region].co2_emissions[nonrenewableKey]?
+        {...results[region].co2_emissions[nonrenewableKey], [yearKey]:parseFloat(co2_emissions_query.rows[i].value)}:
+        {[yearKey]:parseFloat(co2_emissions_query.rows[i].value)}
     }
 
     if(results!==null){
@@ -161,6 +196,7 @@ export const getRegionCalculationData = async (req: Request, res: Response, next
         res.status(400)
     }
 }
+
 
 /*
 -Initial all region graph data stored in db

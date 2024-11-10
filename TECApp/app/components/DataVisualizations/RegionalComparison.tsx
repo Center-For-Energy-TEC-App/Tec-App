@@ -228,7 +228,9 @@ export const RegionalComparison = ({
                   ),
               )}
             </View>
-          ):<></>}
+          ) : (
+            <></>
+          )}
         </View>
       </View>
       {currGradientCurve && currLineCurves ? (
@@ -256,7 +258,9 @@ export const RegionalComparison = ({
             />
           </View>
         </View>
-      ):<></>}
+      ) : (
+        <></>
+      )}
       <View style={{ height: 50 }} />
     </Pressable>
   )

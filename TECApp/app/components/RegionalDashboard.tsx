@@ -10,21 +10,33 @@ import {
 } from 'react-native'
 import DistributeRenewables from './DistributeRenewables'
 import DataVisualizations from './DataVisualizations/DataVisualizations'
-import { DefaultValues, GraphData, MinMaxValues } from '../api/requests'
+import {
+  DefaultValues,
+  GraphData,
+  MinMaxValues,
+  RegionCalculationData,
+  RegionInfo,
+  RegionalDefaultValues,
+} from '../api/requests'
 import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
 import { getRegionSummary } from '../util/RegionDescriptions'
+import { CoalGasOil, CoalGasOilData } from './BottomSheet'
+import { getAbbrv } from '../util/ValueDictionaries'
 
 type RegionalDashboardProps = {
   currRegion: string
-  sliderValues: DefaultValues
+  sliderValues: RegionalDefaultValues
   minMaxValues: MinMaxValues
-  onSliderChange: (val: DefaultValues, technologyChanged: string) => void
+  onSliderChange: (val: RegionInfo, technologyChanged: string) => void
   onReset: () => void
   initialGraphData: GraphData
   dynamicGraphData: GraphData
   sliderDisabled: boolean
   tutorialState: number
   setTutorialState: (state: number) => void
+  coalGasOil: CoalGasOil
+  carbonReduction: number
+  calculationData: RegionCalculationData
 }
 
 export const RegionalDashboard = ({
@@ -38,6 +50,9 @@ export const RegionalDashboard = ({
   sliderDisabled,
   tutorialState,
   setTutorialState,
+  coalGasOil,
+  carbonReduction,
+  calculationData,
 }: RegionalDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'renewables' | 'visualizations'>(
     'renewables',
@@ -130,16 +145,20 @@ export const RegionalDashboard = ({
       </View>
       <View style={styles.horizontalLine} />
       {activeTab === 'renewables' ? (
-          <DistributeRenewables
-            currRegion={currRegion}
-            values={sliderValues}
-            minMaxValues={minMaxValues}
-            onSliderChange={onSliderChange}
-            onReset={onReset}
-            disabled={sliderDisabled}
-            tutorialState={tutorialState}
-            setTutorialState={setTutorialState}
-          />
+        <DistributeRenewables
+          currRegion={currRegion}
+          values={sliderValues}
+          minMaxValues={minMaxValues}
+          onSliderChange={onSliderChange}
+          onReset={onReset}
+          disabled={sliderDisabled}
+          tutorialState={tutorialState}
+          setTutorialState={setTutorialState}
+          coalGasOil={coalGasOil}
+          graphData={dynamicGraphData[getAbbrv(currRegion)]}
+          carbonReduction={carbonReduction}
+          calculationData={calculationData}
+        />
       ) : (
         <DataVisualizations
           initialData={initialGraphData}
@@ -225,8 +244,10 @@ const styles = StyleSheet.create({
     right: 5,
     display: 'flex',
     alignItems: 'center',
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
+    paddingTop: 5,
+    //  backgroundColor: "red"
   },
   tooltipCloseButtonText: {
     fontSize: 16,

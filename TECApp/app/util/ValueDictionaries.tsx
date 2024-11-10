@@ -22,6 +22,8 @@ export const getAbbrv = (region: string) => {
       return 'sea'
     case 'OECD Pacific':
       return 'opa'
+    default:
+      return region
   }
 }
 
@@ -69,23 +71,6 @@ export const getRegionColor = (region: string) => {
   }
 }
 
-export const getEnergyAbbrv = (energy: string) => {
-  switch (energy) {
-    case 'solar':
-      return 'solar_gw'
-    case 'wind':
-      return 'wind_gw'
-    case 'hydropower':
-      return 'hydro_gw'
-    case 'biomass':
-      return 'bio_gw'
-    case 'geothermal':
-      return 'geo_gw'
-    case 'nuclear':
-      return 'nuclear_gw'
-  }
-}
-
 export const getElectricityGenerationCoal = (region: string) => {
   switch (region) {
     case 'chn':
@@ -108,5 +93,30 @@ export const getElectricityGenerationCoal = (region: string) => {
       return 0.82
     case 'opa':
       return 0.7
+  }
+}
+
+export const getCarbonReductionMaximum = (region: string) => {
+  switch (region) {
+    case 'chn':
+      return 8438
+    case 'ind':
+      return 2279
+    case 'mea':
+      return 1046
+    case 'nam':
+      return 2228
+    case 'nee':
+      return 1007
+    case 'sea':
+      return 1253
+    case 'eur':
+      return 2550
+    case 'lam':
+      return 1486
+    case 'ssa':
+      return 939
+    case 'opa':
+      return 1806
   }
 }

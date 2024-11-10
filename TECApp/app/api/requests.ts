@@ -2,43 +2,46 @@ import { DataPoint } from '../components/DataVisualizations/BAUComparison'
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3001'
 
-export type DefaultValues = {
-  region: string
-  category: string
-  global_tw: string
-  regional_gw?: number
-  solar_gw: number
-  wind_gw: number
-  hydro_gw: number
-  geo_gw: number
-  bio_gw: number
-  nuclear_gw: number
+export type RegionInfo = {
+  solar: number
+  wind: number
+  hydropower: number
+  geothermal: number
+  biomass: number
+  nuclear: number
 }
 
-export type RegionalValues = {
-  chn: DefaultValues[]
-  nam: DefaultValues[]
-  lam: DefaultValues[]
-  ind: DefaultValues[]
-  sea: DefaultValues[]
-  mea: DefaultValues[]
-  opa: DefaultValues[]
-  eur: DefaultValues[]
-  ssa: DefaultValues[]
-  nee: DefaultValues[]
+export type RegionalDefaultValues = {
+  2025: RegionInfo
+  bau: RegionInfo
+  dynamic: RegionInfo
+}
+
+export type DefaultValues = {
+  global: RegionalDefaultValues
+  chn: RegionalDefaultValues
+  nam: RegionalDefaultValues
+  lam: RegionalDefaultValues
+  ind: RegionalDefaultValues
+  sea: RegionalDefaultValues
+  mea: RegionalDefaultValues
+  opa: RegionalDefaultValues
+  eur: RegionalDefaultValues
+  ssa: RegionalDefaultValues
+  nee: RegionalDefaultValues
 }
 
 /**
  * Slider values object is an object with 10 key-value pairs; one per region
- * Each region value is a 3 element array:
- *  index 0: values for 2023 (for the 2023 tick mark on sliders)
- *  index 1: predicted values for 2030 business-as-usual (for the bau tick and for resetting sliders)
- *  index 2: to store values after they've been changed by users using the sliders
+ * Each region value is a 3 pair object:
+ *  2025: values for 2025 (for the 2025 tick mark on sliders)
+ *  bau: predicted values for 2030 business-as-usual (for the bau tick and for resetting sliders)
+ *  dynamic: to store values after they've been changed by users using the sliders
  */
 export async function getDefaultValues() {
   const url = `/defaults`
   const response = await fetch(BASE_URL + url, { method: 'GET' })
-  return (await response.json()) as RegionalValues
+  return (await response.json()) as DefaultValues
 }
 
 export type MinMaxValues = {
@@ -136,13 +139,13 @@ type ElectricityGenerationData = {
 }
 
 type CarbonBudgetData = {
-  coal: number
-  gas: number
-  oil: number
-  zero_carbon: number
+  coal: YearRange
+  gas: YearRange
+  oil: YearRange
+  zero_carbon: YearRange
 }
 
-export type CalculationData = {
+export type RegionCalculationData = {
   installed_capacity: ElectricityGenerationData
   capacity_factor: ElectricityGenerationData
   electricity_generation: CarbonBudgetData
@@ -150,12 +153,26 @@ export type CalculationData = {
   region: string
 }
 
+export type CalculationData = {
+  global: RegionCalculationData
+  chn: RegionCalculationData
+  nam: RegionCalculationData
+  lam: RegionCalculationData
+  ind: RegionCalculationData
+  sea: RegionCalculationData
+  mea: RegionCalculationData
+  opa: RegionCalculationData
+  eur: RegionCalculationData
+  ssa: RegionCalculationData
+  nee: RegionCalculationData
+}
+
 /**
  * Calculation data is split up into 6 categories of data + one key value pair for the region
  * Each category contains information about a specific technology and its values in years
  */
-export async function getRegionCalculationData(region: string) {
-  const response = await fetch(BASE_URL + `/calc/${region}`, { method: 'GET' })
+export async function getCalculationData() {
+  const response = await fetch(BASE_URL + `/calc`, { method: 'GET' })
   return (await response.json()) as CalculationData
 }
 
