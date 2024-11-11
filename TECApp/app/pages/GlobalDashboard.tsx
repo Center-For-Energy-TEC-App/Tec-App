@@ -1,11 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { StyleSheet, TouchableOpacity } from 'react-native'
-import {
-  Dimensions,
-  Platform,
-  Text,
-  View,
-} from 'react-native'
+import { Dimensions, Platform, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Tracker } from '../components/Tracker'
 import { DataPoint } from '../components/DataVisualizations/BAUComparison'
@@ -19,6 +14,7 @@ import { router } from 'expo-router'
 import { TemperatureData } from '../util/Calculations'
 import { Tooltip2 } from '../SVGs/TutorialPopups/Tooltip2'
 import { Tooltip3 } from '../SVGs/TutorialPopups/Tooltip3'
+import { FAQButton } from '../SVGs/FAQButton'
 
 export default function GlobalDashboard() {
   const [initialGraphData, setInitialGraphData] = useState<RegionData>()
@@ -72,8 +68,6 @@ export default function GlobalDashboard() {
     })
   }, [])
 
-
-
   const deviceType = () => {
     const { width, height } = Dimensions.get('window')
     return Platform.OS === 'ios' && (width >= 1024 || height >= 1366)
@@ -82,7 +76,6 @@ export default function GlobalDashboard() {
   }
 
   const isIpad = deviceType() === 'ipad'
-  
 
   return (
     <GestureHandlerRootView>
@@ -93,26 +86,18 @@ export default function GlobalDashboard() {
       >
         {temperatureData ? (
           <>
-            <Text style={styles.regionName}>Global Progress</Text>
+            <Text style={styles.regionName}>Global Impact</Text>
 
             <Text style={[styles.body, isIpad && styles.iPadText]}>
-              The world aims to keep global warming below 2°C by 2030. We can do
-              this through increasing our current renewable capacity from 8 to
-              12 TW.
+              The world aims to keep global warming below 2°C in this century.
+              Tripling our renewable capacity by 2030 to 12 TW globally will
+              make reaching this goal possible.
             </Text>
             <View ref={trackerRef} style={styles.trackersWrapper}>
-              <Tracker
-                type="temperature"
-                dashboard
-                temperatureData={temperatureData}
-              />
-              <Tracker
-                type="renewable"
-                dashboard
-                totalGlobalEnergy={globalEnergy}
-              />
+              <Tracker type="temperature" temperatureData={temperatureData} />
+              <Tracker type="renewable" totalGlobalEnergy={globalEnergy} />
               {tutorialState == 6 ? (
-                <View style={{ position: 'absolute', top: 90, left: 20 }}>
+                <View style={{ position: 'absolute', top: 90, left: 50 }}>
                   <Tooltip2 />
                   <View style={styles.onBoardingButtonWrapper}>
                     <TouchableOpacity
@@ -123,9 +108,11 @@ export default function GlobalDashboard() {
                     </TouchableOpacity>
                   </View>
                 </View>
-              ):<></>} 
-             {tutorialState == 7 ? ( 
-                <View style={{ position: 'absolute', top: 90, right: -10 }}>
+              ) : (
+                <></>
+              )}
+              {tutorialState == 7 ? (
+                <View style={{ position: 'absolute', top: 90, right: 0 }}>
                   <Tooltip3 />
                   <View style={styles.onBoardingButtonWrapper}>
                     <TouchableOpacity
@@ -142,7 +129,9 @@ export default function GlobalDashboard() {
                     </TouchableOpacity>
                   </View>
                 </View>
-               ):<></>} 
+              ) : (
+                <></>
+              )}
             </View>
             {tutorialState == 11 ? (
               <>
@@ -162,9 +151,9 @@ export default function GlobalDashboard() {
                 />
 
                 <View style={styles.bottomButtons}>
-                  <FeedbackButton
+                  <FAQButton
                     onPress={() => {
-                      router.push('pages/Feedback')
+                      router.push('pages/FAQ')
                     }}
                   />
                   <LearnMoreButton
@@ -174,9 +163,13 @@ export default function GlobalDashboard() {
                   />
                 </View>
               </>
-            ):<View style={{marginTop: 1000}}></View>}
+            ) : (
+              <View style={{ marginTop: 1000 }}></View>
+            )}
           </>
-        ):<></>}
+        ) : (
+          <></>
+        )}
       </ScrollView>
     </GestureHandlerRootView>
   )

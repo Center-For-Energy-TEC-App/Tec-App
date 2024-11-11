@@ -3,7 +3,7 @@ import "dotenv/config"
 import { getAllDefaultValues, getMinMaxValues } from "./src/AllocationDefaults"
 import Pool from "pg"
 import cors from "cors"
-import { getInitialGraphData, getRegionCalculationData } from "./src/GraphData"
+import { getCalculationData, getInitialGraphData } from "./src/GraphData"
 import { insertFeedback } from "./src/Feedback"
 
 const app = express()
@@ -36,7 +36,7 @@ router.get('/minmax', getMinMaxValues)
 
 router.get('/initgraph', getInitialGraphData)
 
-router.get('/calc/:region', getRegionCalculationData)
+router.get('/calc', getCalculationData)
 
 router.post('/feedback', insertFeedback)
 

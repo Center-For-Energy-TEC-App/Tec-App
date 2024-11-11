@@ -1,4 +1,10 @@
-import { RegionData, CalculationData } from '../api/requests'
+import {
+  RegionData,
+  CalculationData,
+  RegionCalculationData,
+  GraphData,
+} from '../api/requests'
+import { CoalGasOilData } from '../components/BottomSheet'
 import { DataPoint } from '../components/DataVisualizations/BAUComparison'
 import { getElectricityGenerationCoal } from './ValueDictionaries'
 
@@ -7,7 +13,7 @@ export const calculateEnergyCurve = (
   technologyChanged: string,
   regionGraphData: RegionData,
   globalGraphData: RegionData,
-  calculationData: CalculationData,
+  calculationData: RegionCalculationData,
 ) => {
   const installed_capacity =
     calculationData.installed_capacity[technologyChanged]['2024']
@@ -61,60 +67,90 @@ export const calculateEnergyCurve = (
   }
 }
 
+export const calculateRegionalCurve = (
+  newVal: number,
+  graphData: RegionData,
+  technologyChanged: string,
+  calculationData: RegionCalculationData,
+) => {
+  const installed_capacity =
+    calculationData.installed_capacity[technologyChanged]['2024']
+
+  const capacity_factor = calculationData.capacity_factor[technologyChanged]
+
+  const climate_path_cagr = Math.pow(newVal / installed_capacity, 1 / 6) - 1
+
+  let climate_path_installed_capacty = installed_capacity
+  let electricity_generation: number
+  let newData = []
+  let newDataTotal = []
+  for (let i = 2024; i <= 2030; i++) {
+    electricity_generation =
+      climate_path_installed_capacty * 8760 * capacity_factor[i] * 0.001
+    climate_path_installed_capacty =
+      climate_path_installed_capacty * (1 + climate_path_cagr)
+    newData.push({ year: i, value: electricity_generation })
+    newDataTotal.push({
+      year: i,
+      value:
+        graphData.total[i - 2024].value +
+        (electricity_generation - graphData[technologyChanged][i - 2024].value),
+    })
+  }
+  return { ...graphData, [technologyChanged]: newData, total: newDataTotal }
+}
+
 export const calculateCarbonReductions = (
   region: string,
-  calculationData: CalculationData,
+  calculationData: RegionCalculationData,
   regionData: RegionData,
-  currFossilReduction: number,
-  fossilData: DataPoint[],
 ) => {
   const electricity_generation = calculationData.electricity_generation
   const co2_emissions = calculationData.co2_emissions
 
-  const climate_path_additional_electricity_gen =
-    regionData.total[regionData.total.length - 1].value -
-    electricity_generation.zero_carbon * 0.001
+  let fossilReduction = []
+  for (let i = 2025; i <= 2030; i++) {
+    const climate_path_additional_electricity_gen =
+      regionData.total[i - 2024].value -
+      electricity_generation.zero_carbon[i] * 0.001
 
-  const dnv_forecast =
-    electricity_generation.oil /
-    (electricity_generation.oil + electricity_generation.gas)
+    const dnv_forecast =
+      electricity_generation.oil[i] /
+      (electricity_generation.oil[i] + electricity_generation.gas[i])
 
-  const additional_electricity_gen_coal = getElectricityGenerationCoal(region)
-  const additional_electricity_gen_oil =
-    dnv_forecast * (1 - additional_electricity_gen_coal)
-  const additional_electricity_gen_gas =
-    1 - (additional_electricity_gen_coal - additional_electricity_gen_oil)
+    const additional_electricity_gen_coal = getElectricityGenerationCoal(region)
+    const additional_electricity_gen_oil =
+      dnv_forecast * (1 - additional_electricity_gen_coal)
+    const additional_electricity_gen_gas =
+      1 - (additional_electricity_gen_coal - additional_electricity_gen_oil)
 
-  const displaced_electricity_coal =
-    climate_path_additional_electricity_gen * additional_electricity_gen_coal
-  const displaced_electricity_gas =
-    climate_path_additional_electricity_gen * additional_electricity_gen_gas
-  const displaced_electricity_oil =
-    climate_path_additional_electricity_gen * additional_electricity_gen_oil
+    const displaced_electricity_coal =
+      climate_path_additional_electricity_gen * additional_electricity_gen_coal
+    const displaced_electricity_gas =
+      climate_path_additional_electricity_gen * additional_electricity_gen_gas
+    const displaced_electricity_oil =
+      climate_path_additional_electricity_gen * additional_electricity_gen_oil
 
-  const reduction_electricity_gen_coal =
-    displaced_electricity_coal / (electricity_generation.coal * 0.001)
-  const reduction_electricity_gen_oil =
-    displaced_electricity_oil / (electricity_generation.oil * 0.001)
-  const reduction_electricity_gen_gas =
-    displaced_electricity_gas / (electricity_generation.gas * 0.001)
+    const reduction_electricity_gen_coal =
+      displaced_electricity_coal / (electricity_generation.coal[i] * 0.001)
+    const reduction_electricity_gen_oil =
+      displaced_electricity_oil / (electricity_generation.oil[i] * 0.001)
+    const reduction_electricity_gen_gas =
+      displaced_electricity_gas / (electricity_generation.gas[i] * 0.001)
 
-  const reduction_fossil_energy_coal =
-    reduction_electricity_gen_coal * co2_emissions.coal
-  const reduction_fossil_energy_oil =
-    reduction_electricity_gen_oil * co2_emissions.oil
-  const reduction_fossil_energy_gas =
-    reduction_electricity_gen_gas * co2_emissions.gas
-
-  const fossilReduction =
-    reduction_fossil_energy_coal +
-    reduction_fossil_energy_oil +
-    reduction_fossil_energy_gas
-  const newFossilData = calculateCarbonCurve(
-    fossilReduction - currFossilReduction,
-    fossilData,
-  )
-  return { newFossilReduction: fossilReduction, newFossilData: newFossilData }
+    const reduction_fossil_energy_coal =
+      reduction_electricity_gen_coal * co2_emissions.coal[i]
+    const reduction_fossil_energy_oil =
+      reduction_electricity_gen_oil * co2_emissions.oil[i]
+    const reduction_fossil_energy_gas =
+      reduction_electricity_gen_gas * co2_emissions.gas[i]
+    fossilReduction.push(
+      reduction_fossil_energy_coal +
+        reduction_fossil_energy_oil +
+        reduction_fossil_energy_gas,
+    )
+  }
+  return fossilReduction
 }
 
 export const calculateCarbonCurve = (
@@ -203,6 +239,71 @@ export const calculateTemperature = (fossilData: DataPoint[]) => {
     '1.8Year': onePointEightYear,
     '2.0Year': twoPointZeroYear,
   }
+}
+
+export const calculateRegionalCoalGasOil = (
+  calculationData: RegionCalculationData,
+  regionData: RegionData,
+  region: string,
+) => {
+  const electricity_generation = calculationData.electricity_generation
+  const climate_path_additional_electricity_gen =
+    regionData.total[regionData.total.length - 1].value -
+    electricity_generation.zero_carbon[2030] * 0.001
+
+  const dnv_forecast =
+    electricity_generation.oil[2030] /
+    (electricity_generation.oil[2030] + electricity_generation.gas[2030])
+
+  const additional_electricity_gen_coal = getElectricityGenerationCoal(region)
+  const additional_electricity_gen_oil =
+    dnv_forecast * (1 - additional_electricity_gen_coal)
+  const additional_electricity_gen_gas =
+    1 - (additional_electricity_gen_coal - additional_electricity_gen_oil)
+
+  const displaced_electricity_coal =
+    climate_path_additional_electricity_gen * additional_electricity_gen_coal
+  const displaced_electricity_gas =
+    climate_path_additional_electricity_gen * additional_electricity_gen_gas
+  const displaced_electricity_oil =
+    climate_path_additional_electricity_gen * additional_electricity_gen_oil
+  const coal =
+    0.001 * calculationData.electricity_generation.coal[2030] -
+    displaced_electricity_coal
+  const gas =
+    0.001 * calculationData.electricity_generation.gas[2030] -
+    displaced_electricity_gas
+  const oil =
+    0.001 * calculationData.electricity_generation.oil[2030] -
+    displaced_electricity_oil
+  return { coal, gas, oil }
+}
+
+const regions = [
+  'chn',
+  'nam',
+  'lam',
+  'ind',
+  'sea',
+  'mea',
+  'opa',
+  'eur',
+  'ssa',
+  'nee',
+]
+export const calculateInitialCoalGasOil = (
+  calculationData: CalculationData,
+  graphData: GraphData,
+) => {
+  let coalgasoil = {} as CoalGasOilData
+  for (const region of regions) {
+    coalgasoil[region] = calculateRegionalCoalGasOil(
+      calculationData[region],
+      graphData[region],
+      region,
+    )
+  }
+  return coalgasoil
 }
 
 const technologies = [

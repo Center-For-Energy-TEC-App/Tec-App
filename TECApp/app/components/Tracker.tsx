@@ -5,22 +5,22 @@ import { useEffect, useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { TemperatureData } from '../util/Calculations'
 import React from 'react'
+import { TrackerButton } from '../SVGs/TrackerButton'
+import { TrackerButtonArrow } from '../SVGs/TrackerButtonArrow'
 
 type TrackerProps = {
   type: 'temperature' | 'renewable'
-  dashboard?: boolean
   totalGlobalEnergy?: number
   temperatureData?: TemperatureData
 }
 
 export const Tracker = ({
   type,
-  dashboard,
   totalGlobalEnergy,
   temperatureData
 }: TrackerProps) => {
-  const [temperatureVersion, setTemperatureVersion] = useState<number>(0)
-  const [energyVersion, setEnergyVersion] = useState<number>(0)
+  const [temperatureVersion, setTemperatureVersion] = useState<number>(1)
+  const [energyVersion, setEnergyVersion] = useState<number>(1)
 
   const [currTemperatureData, setCurrTemperatureData] =
     useState<TemperatureData>()
@@ -76,88 +76,80 @@ export const Tracker = ({
     <>
       {type === 'temperature' ? (
         <TouchableOpacity
+          style={{ height: 75 }}
           onPress={() => setTemperatureVersion((temperatureVersion + 1) % 3)}
         >
-          <View
-            style={
-              dashboard ? mobileStyles.dashboardWrapper : mobileStyles.wrapper
-            }
-          >
-            {temperatureData ? (
-              <View style={mobileStyles.iconRow}>
-                <TemperatureIcon dashboard={dashboard} />
-                <View style={mobileStyles.dataColumn}>
-                  <Text style={mobileStyles.dashboardLabel}>
-                    {temperatureVersion == 0
-                      ? '+1.5°C'
-                      : temperatureVersion == 1
-                        ? '+1.8°C'
-                        : '+2.0°C'}
-                  </Text>
-                  <Text
-                    style={
-                      temperatureHighlight
-                        ? mobileStyles.flashLabel
-                        : mobileStyles.dashboardLabel
-                    }
-                  >
-                    {temperatureVersion == 0
-                      ? 'by ' +
-                        temperatureData['1.5Year'] +
-                        (temperatureData['1.5Year'] == 2060 ? '+' : '')
-                      : temperatureVersion == 1
+          <TrackerButton />
+          <View style={styles.temperatureWrapper}>
+            <View>
+              {temperatureData ? (
+                <View style={styles.iconRow}>
+                  <TemperatureIcon />
+                  <View style={styles.dataColumn}>
+                    <Text style={styles.temperatureLabel}>
+                      {temperatureVersion == 0
+                        ? '+1.5°C'
+                        : temperatureVersion == 1
+                          ? '+1.8°C'
+                          : '+2.0°C'}
+                    </Text>
+                    <Text
+                      style={
+                        temperatureHighlight
+                          ? styles.flashLabel
+                          : styles.temperatureBottomLabel
+                      }
+                    >
+                      {temperatureVersion == 0
                         ? 'by ' +
-                          temperatureData['1.8Year'] +
-                          (temperatureData['1.8Year'] == 2060 ? '+' : '')
-                        : 'by ' +
-                          temperatureData['2.0Year'] +
-                          (temperatureData['2.0Year'] == 2060 ? '+' : '')}
-                  </Text>
+                          temperatureData['1.5Year'] +
+                          (temperatureData['1.5Year'] == 2060 ? '+' : '')
+                        : temperatureVersion == 1
+                          ? 'by ' +
+                            temperatureData['1.8Year'] +
+                            (temperatureData['1.8Year'] == 2060 ? '+' : '')
+                          : 'by ' +
+                            temperatureData['2.0Year'] +
+                            (temperatureData['2.0Year'] == 2060 ? '+' : '')}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            ) : (
-              <></>
-            )}
+              ) : (
+                <></>
+              )}
+            </View>
+            <View style={styles.trackerButtonWrapper}>
+              <TrackerButtonArrow />
+            </View>
           </View>
           
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
+          style={{ height: 75 }}
           onPress={() => setEnergyVersion((energyVersion + 1) % 2)}
         >
-          <View
-            style={
-              dashboard ? mobileStyles.dashboardWrapper : mobileStyles.wrapper
-            }
-          >
-            <View style={mobileStyles.iconRow}>
-              <RenewableIcon dashboard={dashboard} />
-              <Text
-                style={
-                  dashboard ? mobileStyles.dashboardHeader : mobileStyles.header
-                }
-              >
-                {energyVersion == 0
-                  ? (totalGlobalEnergy / 1000).toFixed(1)
-                  : ((totalGlobalEnergy / 1000 / 12) * 100).toFixed(0) + '%'}
-              </Text>
-              <Text
-                style={
-                  dashboard
-                    ? mobileStyles.dashboardSmallHeader
-                    : mobileStyles.smallHeader
-                }
-              >
-                {energyVersion == 0 && 'TW'}
+          <TrackerButton />
+          <View style={styles.energyWrapper}>
+            <View style={{ alignItems: 'center' }}>
+              <View style={styles.iconRow}>
+                <RenewableIcon />
+                <Text style={styles.header}>
+                  {energyVersion == 0
+                    ? (totalGlobalEnergy / 1000).toFixed(1)
+                    : ((totalGlobalEnergy / 1000 / 12) * 100).toFixed(0) + '%'}
+                </Text>
+                <Text style={styles.smallHeader}>
+                  {energyVersion == 0 && 'TW'}
+                </Text>
+              </View>
+              <Text style={styles.energyLabel}>
+                {energyVersion == 0 ? 'of power by 2030' : 'of 12 TW Goal'}
               </Text>
             </View>
-            <Text
-              style={
-                dashboard ? mobileStyles.dashboardLabel : mobileStyles.label
-              }
-            >
-              {energyVersion == 0 ? 'of power by 2030' : 'of 12 TW Goal'}
-            </Text>
+            <View style={styles.trackerButtonWrapper}>
+              <TrackerButtonArrow />
+            </View>
           </View>
         </TouchableOpacity>
       )}
@@ -165,35 +157,25 @@ export const Tracker = ({
   )
 }
 
-const mobileStyles = StyleSheet.create({
-  wrapper: {
-    paddingHorizontal: 10,
-    paddingVertical: 12,
+const styles = StyleSheet.create({
+  temperatureWrapper: {
+    position: 'relative',
+    bottom: 58,
     display: 'flex',
     flexDirection: 'column',
-    gap: 3,
-    backgroundColor: '#FFF',
-    borderRadius: 8,
-    borderColor: '#D9D9D9',
-    borderWidth: 1.5,
+    gap: 0,
     alignItems: 'center',
-    justifyContent: 'center',
     height: 75,
   },
 
-  dashboardWrapper: {
-    paddingHorizontal: 17,
-    paddingVertical: 8.5,
+  energyWrapper: {
+    position: 'relative',
+    bottom: 60,
     display: 'flex',
     flexDirection: 'column',
-    gap: 4,
-    backgroundColor: '#FFF',
-    borderRadius: 8,
-    borderColor: '#D9D9D9',
-    borderWidth: 1.5,
+    gap: 0,
     alignItems: 'center',
-    justifyContent: 'center',
-    height: 85,
+    height: 75,
   },
 
   iconRow: {
@@ -227,7 +209,7 @@ const mobileStyles = StyleSheet.create({
   dataColumn: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 2,
+    gap: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -237,29 +219,23 @@ const mobileStyles = StyleSheet.create({
     fontSize: 24,
   },
 
-  dashboardHeader: {
-    fontFamily: 'Brix Sans',
-    fontSize: 32,
-  },
-
   smallHeader: {
     fontFamily: 'Brix Sans',
     fontSize: 16,
     paddingBottom: 2,
   },
 
-  dashboardSmallHeader: {
-    fontFamily: 'Brix Sans',
-    fontSize: 20,
-    paddingBottom: 2,
-  },
-
-  label: {
+  energyLabel: {
     fontFamily: 'Brix Sans',
     fontSize: 11,
   },
 
-  dashboardLabel: {
+  temperatureLabel: {
+    fontFamily: 'Brix Sans',
+    fontSize: 20,
+  },
+
+  temperatureBottomLabel: {
     fontFamily: 'Brix Sans',
     fontSize: 15.5,
   },
@@ -271,9 +247,12 @@ const mobileStyles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 0 },
     textShadowColor: 'green',
   },
-  hidden: {
-    position: 'absolute',
-    top: -9999,
-    left: -9999,
+
+  trackerButtonWrapper: {
+    display: 'flex',
+    alignItems: 'flex-end',
+    width: '100%',
+    position: 'relative',
+    bottom: 4,
   },
 })

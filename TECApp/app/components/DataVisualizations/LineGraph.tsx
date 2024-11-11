@@ -65,7 +65,7 @@ export const LineGraph = ({
   return (
     <Svg width={graphWidth} height={svgHeight}>
       {/* Gradient definitions*/}
-      {gradientCurve ?(
+      {gradientCurve ? (
         <Defs>
           <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
             <Stop
@@ -76,7 +76,9 @@ export const LineGraph = ({
             <Stop offset="1" stopColor="#FFF" stopOpacity={0.01} />
           </LinearGradient>
         </Defs>
-      ):<></>}
+      ) : (
+        <></>
+      )}
 
       {/* Graph frame */}
       <G y={offset}>
@@ -166,7 +168,9 @@ export const LineGraph = ({
               fill="none"
             />
           </>
-        ):<></>}
+        ) : (
+          <></>
+        )}
         {lineCurves.map((curveObject, key) => (
           <Path
             key={key}

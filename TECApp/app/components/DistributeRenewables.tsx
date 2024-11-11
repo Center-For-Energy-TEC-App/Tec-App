@@ -18,13 +18,31 @@ import { BiomassIcon } from '../SVGs/DistributeRenewablesIcons/BiomassIcon'
 import { GeothermalIcon } from '../SVGs/DistributeRenewablesIcons/GeothermalIcon'
 import { NuclearIcon } from '../SVGs/DistributeRenewablesIcons/NuclearIcon'
 import { ToolTipIcon } from '../SVGs/DistributeRenewablesIcons/ToolTipIcon'
-import Svg, { Path, Rect } from 'react-native-svg'
-import { getEnergyAbbrv, getTechnologyColor } from '../util/ValueDictionaries'
-import { DefaultValues, MinMaxValues } from '../api/requests'
+import Svg, { Path, Rect, Text as TextSvg } from 'react-native-svg'
+import {
+  getAbbrv,
+  getCarbonReductionMaximum,
+  getTechnologyColor,
+} from '../util/ValueDictionaries'
+import {
+  DefaultValues,
+  MinMaxValues,
+  RegionCalculationData,
+  RegionData,
+  RegionInfo,
+  RegionalDefaultValues,
+} from '../api/requests'
 import { NativeViewGestureHandler } from 'react-native-gesture-handler'
 import { SliderIndicator } from '../SVGs/SliderIndicator'
 import { Tooltip5 } from '../SVGs/TutorialPopups/Tooltip5'
 import { getRegionTechnologySummary } from '../util/RegionDescriptions'
+import { CoalGasOil, CoalGasOilData } from './BottomSheet'
+import {
+  calculateCarbonReductions,
+  calculateEnergyCurve,
+  calculateRegionalCoalGasOil,
+  calculateRegionalCurve,
+} from '../util/Calculations'
 
 export type TechnologyProportions = {
   solar: number
@@ -35,15 +53,26 @@ export type TechnologyProportions = {
   nuclear: number
 }
 
+export type ElectricityProportions = {
+  zeroCarbon: number
+  coal: number
+  gas: number
+  oil: number
+}
+
 type DistributeRenewablesProps = {
   currRegion: string
-  values: DefaultValues
+  values: RegionalDefaultValues
   minMaxValues: MinMaxValues
-  onSliderChange: (val: DefaultValues, technologyChanged: string) => void
+  onSliderChange: (val: RegionInfo, technologyChanged: string) => void
   onReset: () => void
   disabled: boolean
   tutorialState: number
   setTutorialState: (state: number) => void
+  coalGasOil: CoalGasOil
+  graphData: RegionData
+  carbonReduction: number
+  calculationData: RegionCalculationData
 }
 
 const DistributeRenewables = ({
@@ -55,6 +84,10 @@ const DistributeRenewables = ({
   disabled,
   tutorialState,
   setTutorialState,
+  coalGasOil,
+  graphData,
+  carbonReduction,
+  calculationData,
 }: DistributeRenewablesProps) => {
   const [selectedSlider, setSelectedSlider] = useState<string | null>(null)
   const [visibleTooltip, setVisibleTooltip] = useState<string | null>(null)
@@ -70,18 +103,43 @@ const DistributeRenewables = ({
 
   const isIpad = deviceType() === 'ipad'
 
-  const [sliderValues, setSliderValues] = useState<DefaultValues>(values[2])
+  const [sliderValues, setSliderValues] = useState<RegionInfo>(values.dynamic)
 
   const [proportionBarWidth, setProportionBarWidth] = //actual pixel width of proportion bar (based on parent div)
     useState<number>(undefined)
   const [technologyProportions, setTechnologyProportions] = //pixel width values of each technology for proportion bar
     useState<TechnologyProportions>(undefined)
 
-  const [globalEnergyProportion, setGlobalEnergyProportion] = useState<number>()
+  const [zeroCarbonTotal, setZeroCarbonTotal] = useState<number>(
+    graphData.solar[6].value +
+      graphData.wind[6].value +
+      graphData.hydropower[6].value +
+      graphData.biomass[6].value +
+      graphData.geothermal[6].value +
+      graphData.nuclear[6].value,
+  )
+  const [dynamicCoalGasOil, setDynamicCoalGasOil] =
+    useState<CoalGasOil>(coalGasOil)
+  const [electricityProportions, setElectricityProportions] =
+    useState<ElectricityProportions>()
+
+  const [dynamicCarbonReduction, setDynamicCarbonReduction] =
+    useState<number>(carbonReduction)
+  const [carbonReductionProportions, setCarbonReductionProportions] =
+    useState<number>()
 
   useEffect(() => {
-    setSliderValues(values[2])
-    console.log(tutorialState)
+    setSliderValues(values.dynamic)
+    setZeroCarbonTotal(
+      graphData.solar[6].value +
+        graphData.wind[6].value +
+        graphData.hydropower[6].value +
+        graphData.biomass[6].value +
+        graphData.geothermal[6].value +
+        graphData.nuclear[6].value,
+    )
+    setDynamicCoalGasOil(coalGasOil)
+    setDynamicCarbonReduction(carbonReduction)
     if (tutorialState === 9) {
       setRenderTutorial(true)
     }
@@ -91,28 +149,50 @@ const DistributeRenewables = ({
   useEffect(() => {
     if (proportionBarWidth) {
       const sliderTotal =
-        sliderValues.wind_gw +
-        sliderValues.solar_gw +
-        sliderValues.hydro_gw +
-        sliderValues.bio_gw +
-        sliderValues.geo_gw +
-        sliderValues.nuclear_gw
+        sliderValues.wind +
+        sliderValues.solar +
+        sliderValues.hydropower +
+        sliderValues.biomass +
+        sliderValues.geothermal +
+        sliderValues.nuclear
 
       setTechnologyProportions({
-        wind: (sliderValues.wind_gw / sliderTotal) * (proportionBarWidth - 5),
-        solar: (sliderValues.solar_gw / sliderTotal) * (proportionBarWidth - 5),
+        wind: (sliderValues.wind / sliderTotal) * (proportionBarWidth - 5),
+        solar: (sliderValues.solar / sliderTotal) * (proportionBarWidth - 5),
         hydropower:
-          (sliderValues.hydro_gw / sliderTotal) * (proportionBarWidth - 5),
-        biomass: (sliderValues.bio_gw / sliderTotal) * (proportionBarWidth - 5),
+          (sliderValues.hydropower / sliderTotal) * (proportionBarWidth - 5),
+        biomass:
+          (sliderValues.biomass / sliderTotal) * (proportionBarWidth - 5),
         geothermal:
-          (sliderValues.geo_gw / sliderTotal) * (proportionBarWidth - 5),
+          (sliderValues.geothermal / sliderTotal) * (proportionBarWidth - 5),
         nuclear:
-          (sliderValues.nuclear_gw / sliderTotal) * (proportionBarWidth - 5),
+          (sliderValues.nuclear / sliderTotal) * (proportionBarWidth - 5),
       })
 
-      setGlobalEnergyProportion((sliderTotal / 12000) * proportionBarWidth)
+      const electricityTotal =
+        zeroCarbonTotal +
+        dynamicCoalGasOil.coal +
+        dynamicCoalGasOil.gas +
+        dynamicCoalGasOil.oil
+      setElectricityProportions({
+        zeroCarbon: (zeroCarbonTotal / electricityTotal) * proportionBarWidth,
+        coal: (dynamicCoalGasOil.coal / electricityTotal) * proportionBarWidth,
+        gas: (dynamicCoalGasOil.gas / electricityTotal) * proportionBarWidth,
+        oil: (dynamicCoalGasOil.oil / electricityTotal) * proportionBarWidth,
+      })
+
+      const max = getCarbonReductionMaximum(getAbbrv(currRegion))
+      setCarbonReductionProportions(
+        ((dynamicCarbonReduction * 1000) / max) * (proportionBarWidth * 0.7),
+      )
     }
-  }, [sliderValues, proportionBarWidth])
+  }, [
+    sliderValues,
+    proportionBarWidth,
+    zeroCarbonTotal,
+    dynamicCoalGasOil,
+    dynamicCarbonReduction,
+  ])
 
   const renderTrackMark = (index: number, mark: string) => (
     <View style={styles.trackMarkContainer} key={index}>
@@ -177,7 +257,7 @@ const DistributeRenewables = ({
             maximumValue={Math.round(
               parseFloat(minMaxValues.max[label.toLowerCase()]),
             )}
-            value={sliderValues[getEnergyAbbrv(label.toLowerCase())]}
+            value={sliderValues[label.toLowerCase()]}
             step={1.0}
             thumbTintColor={
               selectedSlider === label ? getTechnologyColor(label) : '#B5B1AA'
@@ -185,11 +265,11 @@ const DistributeRenewables = ({
             minimumTrackTintColor={getTechnologyColor(label)}
             maximumTrackTintColor="#B5B1AA"
             trackMarks={[
-              values[0][getEnergyAbbrv(label.toLowerCase())] + //add slight offset because the trackmark div is wider than the trackmark itself
+              values[2025][label.toLowerCase()] + //add slight offset because the trackmark div is wider than the trackmark itself
                 0.0275 *
                   (parseFloat(minMaxValues.max[label.toLowerCase()]) -
                     parseFloat(minMaxValues.min[label.toLowerCase()])),
-              values[1][getEnergyAbbrv(label.toLowerCase())] +
+              values['bau'][label.toLowerCase()] +
                 0.0275 *
                   (parseFloat(minMaxValues.max[label.toLowerCase()]) -
                     parseFloat(minMaxValues.min[label.toLowerCase()])),
@@ -197,8 +277,8 @@ const DistributeRenewables = ({
             renderTrackMarkComponent={(index) =>
               renderTrackMark(
                 index,
-                values[0][getEnergyAbbrv(label.toLowerCase())] < //ordering based on which value (2024 or bau) is higher
-                  values[1][getEnergyAbbrv(label.toLowerCase())]
+                values[2025][label.toLowerCase()] < //ordering based on which value (2025 or bau) is higher
+                  values['bau'][label.toLowerCase()]
                   ? ['2025', '2030'][index]
                   : ['2030', '2025'][index],
               )
@@ -207,18 +287,48 @@ const DistributeRenewables = ({
               setSelectedSlider(label)
             }}
             //just change local state during sliding
-            onValueChange={(val) =>
+            onValueChange={(val) => {
               setSliderValues({
                 ...sliderValues,
-                [getEnergyAbbrv(label.toLowerCase())]: val[0],
+                [label.toLowerCase()]: val[0],
               })
-            }
+              const newData = calculateRegionalCurve(
+                val[0],
+                graphData,
+                label.toLowerCase(),
+                calculationData,
+              )
+              setZeroCarbonTotal(
+                newData.solar[6].value +
+                  newData.wind[6].value +
+                  newData.hydropower[6].value +
+                  newData.biomass[6].value +
+                  newData.geothermal[6].value +
+                  newData.nuclear[6].value,
+              )
+              setDynamicCoalGasOil(
+                calculateRegionalCoalGasOil(
+                  calculationData,
+                  newData,
+                  getAbbrv(currRegion),
+                ),
+              )
+
+              const newCarbonReduction = calculateCarbonReductions(
+                getAbbrv(currRegion),
+                calculationData,
+                newData,
+              )
+              setDynamicCarbonReduction(
+                newCarbonReduction.reduce((a, b) => a + b, 0),
+              )
+            }}
             //callback once sliding is complete (to send changed data back up to BottomSheet)
             onSlidingComplete={(val) => {
               onSliderChange(
                 {
                   ...sliderValues,
-                  [getEnergyAbbrv(label.toLowerCase())]: val[0],
+                  [label.toLowerCase()]: val[0],
                 },
                 label.toLowerCase(),
               )
@@ -227,8 +337,7 @@ const DistributeRenewables = ({
         </NativeViewGestureHandler>
         <View style={styles.sliderValueBox}>
           <Text style={styles.sliderValue}>
-            {Math.round(sliderValues[getEnergyAbbrv(label.toLowerCase())]) +
-              ' GW'}
+            {Math.round(sliderValues[label.toLowerCase()]) + ' GW'}
           </Text>
         </View>
       </View>
@@ -238,172 +347,282 @@ const DistributeRenewables = ({
   return (
     <ScrollView
       contentContainerStyle={styles.container}
-      stickyHeaderIndices={[2]}
+      stickyHeaderIndices={[0]}
     >
-      <Text style={[styles.description, isIpad && styles.iPadText]}>
+      {/* <Text style={[styles.description, isIpad && styles.iPadText]}>
         Using the sliders below, make region specific changes for each renewable
         energy source to reach 12 TW of renewable capacity. This will override
         default values set in the global dashboard.
-      </Text>
-      <View style={styles.capacityProportionContainer}>
-        <Text style={styles.capacityProportionText}>
-          Region&apos;s Contribution to 12 TW Goal
-        </Text>
-        {proportionBarWidth && globalEnergyProportion ? (
-          <Svg height={20}>
-            <Rect
-              x={0}
-              y={0}
-              width={proportionBarWidth}
-              height={20}
-              fill="#DEDCD9"
-            />
-            <Rect
-              x={0}
-              y={0}
-              width={globalEnergyProportion}
-              height={20}
-              fill="#266297"
-            />
-            <Path
-              d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-            <Path
-              d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-            <Path
-              d={`M ${proportionBarWidth - 4} 0 Q ${proportionBarWidth - 0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`}
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-            <Path
-              d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth - 0.5} 19.5 ${proportionBarWidth - 4} 20 L ${proportionBarWidth} 20 z`}
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-          </Svg>
-        ) : (
-          <></>
-        )}
-      </View>
-      <View
-        style={styles.capacityProportionContainer}
-        onLayout={(event) => {
-          setProportionBarWidth(event.nativeEvent.layout.width - 20)
-        }}
-      >
-        <Text style={styles.capacityProportionText}>
-          Renewable Capacity Proportions
-        </Text>
-        {proportionBarWidth && technologyProportions ? (
-          <Svg height={20}>
-            <Rect
-              x={0}
-              y={0}
-              width={technologyProportions.wind}
-              height={20}
-              fill="#C66AAA"
-            />
-            <Rect
-              x={technologyProportions.wind}
-              y={0}
-              width={technologyProportions.solar}
-              height={20}
-              fill="#F8CE46"
-            />
-            <Rect
-              x={technologyProportions.wind + technologyProportions.solar}
-              y={0}
-              width={technologyProportions.hydropower}
-              height={20}
-              fill="#58C4D4"
-            />
-            <Rect
-              x={
-                technologyProportions.wind +
-                technologyProportions.solar +
-                technologyProportions.hydropower
-              }
-              y={0}
-              width={technologyProportions.biomass}
-              height={20}
-              fill="#779448"
-            />
-            <Rect
-              x={
-                technologyProportions.wind +
-                technologyProportions.solar +
-                technologyProportions.hydropower +
-                technologyProportions.biomass
-              }
-              y={0}
-              width={technologyProportions.geothermal}
-              height={20}
-              fill="#BF9336"
-            />
-            <Rect
-              x={
-                technologyProportions.wind +
-                technologyProportions.solar +
-                technologyProportions.hydropower +
-                technologyProportions.biomass +
-                technologyProportions.geothermal
-              }
-              y={0}
-              width={5}
-              height={20}
-              fill="white"
-            />
-            <Rect
-              x={
-                technologyProportions.wind +
-                technologyProportions.solar +
-                technologyProportions.hydropower +
-                technologyProportions.biomass +
-                technologyProportions.geothermal +
-                5
-              }
-              y={0}
-              width={technologyProportions.nuclear}
-              height={20}
-              fill="#EE8E35"
-            />
-            <Path
-              d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-            <Path
-              d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-            <Path
-              d={`M ${proportionBarWidth - 4} 0 Q ${proportionBarWidth - 0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`}
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-            <Path
-              d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth - 0.5} 19.5 ${proportionBarWidth - 4} 20 L ${proportionBarWidth} 20 z`}
-              strokeWidth={0.1}
-              stroke="white"
-              fill="white"
-            />
-          </Svg>
-        ) : (
-          <></>
-        )}
+      </Text> */}
+      <View>
+        <View style={styles.capacityProportionContainer}>
+          <Text style={styles.capacityProportionText}>Reduced CO2 by 2030</Text>
+          {proportionBarWidth && carbonReductionProportions !== undefined ? (
+            <Svg height={20}>
+              <Rect
+                x={0}
+                y={0}
+                width={carbonReductionProportions}
+                height={20}
+                fill="#9ebce6"
+              />
+              <Rect
+                x={carbonReductionProportions}
+                y={0}
+                width={proportionBarWidth * 0.7 - carbonReductionProportions}
+                height={20}
+                fill="#EDEBE7"
+              />
+              <Path
+                d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d={`M ${proportionBarWidth * 0.7 - 4} 0 Q ${proportionBarWidth * 0.7 - 0.5} 0.5 ${proportionBarWidth * 0.7} 4 L ${proportionBarWidth * 0.7} 0 z`}
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d={`M ${proportionBarWidth * 0.7} 16 Q ${proportionBarWidth * 0.7 - 0.5} 19.5 ${proportionBarWidth * 0.7 - 4} 20 L ${proportionBarWidth * 0.7} 20 z`}
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <TextSvg
+                x={proportionBarWidth * 0.6 + 45}
+                y={16}
+                fill="black"
+                stroke="black"
+                fontSize={20}
+              >
+                {(dynamicCarbonReduction * 1000).toFixed(0) + ' MT'}
+              </TextSvg>
+            </Svg>
+          ) : (
+            <></>
+          )}
+        </View>
+        <View
+          onLayout={(event) => {
+            setProportionBarWidth(event.nativeEvent.layout.width - 20)
+          }}
+          style={styles.electricityMixContainer}
+        >
+          <View style={styles.electricityMixTopRow}>
+            <Text style={styles.capacityProportionText}>Electricity Mix</Text>
+            <View style={styles.electricityMixKeys}>
+              <View style={styles.sliderIndicator}>
+                <SliderIndicator color="#1C1C1C" />
+                <Text style={{ fontSize: 12 }}>Coal</Text>
+              </View>
+              <View style={styles.sliderIndicator}>
+                <SliderIndicator color="#AFA59F" />
+                <Text style={{ fontSize: 12 }}>Gas</Text>
+              </View>
+              <View style={styles.sliderIndicator}>
+                <SliderIndicator color="#945E3C" />
+                <Text style={{ fontSize: 12 }}>Oil</Text>
+              </View>
+            </View>
+          </View>
+          {proportionBarWidth && electricityProportions ? (
+            <Svg height={40}>
+              <Rect
+                x={0}
+                y={0}
+                width={electricityProportions.zeroCarbon}
+                height={20}
+                fill="#6D8D39"
+              />
+              <TextSvg
+                x={
+                  electricityProportions.zeroCarbon / 2 - 55 > 0
+                    ? electricityProportions.zeroCarbon / 2 - 55
+                    : 0
+                }
+                y={35}
+                fill="black"
+                stroke="black"
+                strokeWidth={0.1}
+                fontSize={12}
+              >
+                Zero-Carbon Energy
+              </TextSvg>
+              <Rect
+                x={electricityProportions.zeroCarbon}
+                y={0}
+                width={electricityProportions.coal}
+                height={20}
+                fill="#1C1C1C"
+              />
+              <Rect
+                x={
+                  electricityProportions.zeroCarbon +
+                  electricityProportions.coal
+                }
+                y={0}
+                width={electricityProportions.gas}
+                height={20}
+                fill="#AFA59F"
+              />
+              <Rect
+                x={
+                  electricityProportions.zeroCarbon +
+                  electricityProportions.coal +
+                  electricityProportions.gas
+                }
+                y={0}
+                width={
+                  electricityProportions.zeroCarbon + electricityProportions.oil
+                }
+                height={20}
+                fill="#945E3C"
+              />
+              <Path
+                d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d={`M ${proportionBarWidth - 4} 0 Q ${proportionBarWidth - 0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`}
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth - 0.5} 19.5 ${proportionBarWidth - 4} 20 L ${proportionBarWidth} 20 z`}
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+            </Svg>
+          ) : (
+            <></>
+          )}
+        </View>
+
+        <View style={styles.capacityProportionContainer}>
+          <Text style={styles.capacityProportionText}>
+            Renewable Capacity Mix
+          </Text>
+          {proportionBarWidth && technologyProportions ? (
+            <Svg height={20}>
+              <Rect
+                x={0}
+                y={0}
+                width={technologyProportions.wind}
+                height={20}
+                fill="#C66AAA"
+              />
+              <Rect
+                x={technologyProportions.wind}
+                y={0}
+                width={technologyProportions.solar}
+                height={20}
+                fill="#F8CE46"
+              />
+              <Rect
+                x={technologyProportions.wind + technologyProportions.solar}
+                y={0}
+                width={technologyProportions.hydropower}
+                height={20}
+                fill="#58C4D4"
+              />
+              <Rect
+                x={
+                  technologyProportions.wind +
+                  technologyProportions.solar +
+                  technologyProportions.hydropower
+                }
+                y={0}
+                width={technologyProportions.biomass}
+                height={20}
+                fill="#779448"
+              />
+              <Rect
+                x={
+                  technologyProportions.wind +
+                  technologyProportions.solar +
+                  technologyProportions.hydropower +
+                  technologyProportions.biomass
+                }
+                y={0}
+                width={technologyProportions.geothermal}
+                height={20}
+                fill="#BF9336"
+              />
+              <Rect
+                x={
+                  technologyProportions.wind +
+                  technologyProportions.solar +
+                  technologyProportions.hydropower +
+                  technologyProportions.biomass +
+                  technologyProportions.geothermal
+                }
+                y={0}
+                width={5}
+                height={20}
+                fill="white"
+              />
+              <Rect
+                x={
+                  technologyProportions.wind +
+                  technologyProportions.solar +
+                  technologyProportions.hydropower +
+                  technologyProportions.biomass +
+                  technologyProportions.geothermal +
+                  5
+                }
+                y={0}
+                width={technologyProportions.nuclear}
+                height={20}
+                fill="#EE8E35"
+              />
+              <Path
+                d="M 0 4 Q 0.5 0.5 4 0 L 0 0 z"
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d="M 0 16 Q 0.5 19.5 4 20 L 0 20 z"
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d={`M ${proportionBarWidth - 4} 0 Q ${proportionBarWidth - 0.5} 0.5 ${proportionBarWidth} 4 L ${proportionBarWidth} 0 z`}
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+              <Path
+                d={`M ${proportionBarWidth} 16 Q ${proportionBarWidth - 0.5} 19.5 ${proportionBarWidth - 4} 20 L ${proportionBarWidth} 20 z`}
+                strokeWidth={0.1}
+                stroke="white"
+                fill="white"
+              />
+            </Svg>
+          ) : (
+            <></>
+          )}
+        </View>
       </View>
       <View style={styles.sliderIndicatorRow}>
         <View style={styles.sliderIndicator}>
@@ -440,7 +659,9 @@ const DistributeRenewables = ({
             </TouchableOpacity>
           </View>
         </>
-      ):<></>}
+      ) : (
+        <></>
+      )}
       {renderSlider(
         'Solar',
         SolarIcon,
@@ -504,8 +725,36 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingHorizontal: 10,
     paddingVertical: 16,
-    marginBottom: 16,
-    gap: 10,
+    marginBottom: 6,
+    gap: 2,
+    alignSelf: 'stretch',
+    borderRadius: 8,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6.1,
+    elevation: 3,
+  },
+  electricityMixTopRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  electricityMixKeys: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 15,
+  },
+  electricityMixContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    paddingHorizontal: 10,
+    paddingTop: 16,
+    paddingBottom: 8,
+    marginBottom: 6,
+    gap: 2,
     alignSelf: 'stretch',
     borderRadius: 8,
     backgroundColor: 'white',
@@ -564,8 +813,9 @@ const styles = StyleSheet.create({
     right: 5,
     display: 'flex',
     alignItems: 'center',
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
+    paddingTop: 5,
   },
   tooltipCloseButtonText: {
     fontSize: 16,
@@ -665,7 +915,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 10,
     paddingVertical: 4,
-    },
+  },
 
   onboardingButtonText: {
     fontFamily: 'Brix Sans',
