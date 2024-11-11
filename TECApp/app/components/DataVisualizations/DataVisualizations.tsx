@@ -185,22 +185,22 @@ const DataVisualizations = ({
       )}
 
       {region === 'Global' && (
-        <View style={styles.hidden}>
+        <View style={styles.hidden} >
           <View>
-            <BAUComparison
-              bauRef={bauRef}
-              region={region}
-              BAUData={
-                initialGlobalData
-                  ? initialGlobalData
-                  : initialData[getAbbrv(region)]
-              }
-              dynamicData={
-                dynamicGlobalData
-                  ? dynamicGlobalData
-                  : dynamicData[getAbbrv(region)]
-              }
-            />
+              <BAUComparison
+                bauRef={bauRef}
+                region={region}
+                BAUData={
+                  initialGlobalData
+                    ? initialGlobalData
+                    : initialData[getAbbrv(region)]
+                }
+                dynamicData={
+                  dynamicGlobalData
+                    ? dynamicGlobalData
+                    : dynamicData[getAbbrv(region)]
+                }
+              />
           </View>
 
           <View>

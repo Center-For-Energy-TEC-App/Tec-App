@@ -1,9 +1,10 @@
-import React, { StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, View, Text } from 'react-native'
 import { TemperatureIcon } from '../SVGs/TemperatureIcon'
 import { RenewableIcon } from '../SVGs/RenewableIcon'
 import { useEffect, useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { TemperatureData } from '../util/Calculations'
+import React from 'react'
 import { TrackerButton } from '../SVGs/TrackerButton'
 import { TrackerButtonArrow } from '../SVGs/TrackerButtonArrow'
 
@@ -16,7 +17,7 @@ type TrackerProps = {
 export const Tracker = ({
   type,
   totalGlobalEnergy,
-  temperatureData,
+  temperatureData
 }: TrackerProps) => {
   const [temperatureVersion, setTemperatureVersion] = useState<number>(1)
   const [energyVersion, setEnergyVersion] = useState<number>(1)
@@ -121,6 +122,7 @@ export const Tracker = ({
               <TrackerButtonArrow />
             </View>
           </View>
+          
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
@@ -181,6 +183,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
+  },
+
+  iconRowPDF: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+
+  tempBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    margin: 5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#f9f9f9',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
 
   dataColumn: {
