@@ -34,6 +34,7 @@ import { Tooltip1 } from '../SVGs/TutorialPopups/Tooltip1'
 import { Tooltip4 } from '../SVGs/TutorialPopups/Tooltip4'
 import { Tooltip6 } from '../SVGs/TutorialPopups/Tooltip6'
 import { FeedbackButton } from '../SVGs/FeedbackButton'
+import { Tooltip7 } from '../SVGs/TutorialPopups/Tooltip7'
 
 const vw = Dimensions.get('window').width
 const vh = Dimensions.get('window').height
@@ -265,7 +266,7 @@ export default function Home() {
           ) : (
             <></>
           )}
-          {tutorialState == 10 ? (
+          {tutorialState == 11 ? (
             <View
               style={{
                 position: 'absolute',
@@ -273,9 +274,9 @@ export default function Home() {
                 right: 27.5,
               }}
             >
-              <Tooltip6 />
+              <Tooltip7 />
               <TouchableOpacity
-                onPress={() => setTutorialState(11)}
+                onPress={() => setTutorialState(12)}
                 style={mobileStyles.onboardingButton}
               >
                 <Text style={mobileStyles.onboardingButtonText}>Finish</Text>

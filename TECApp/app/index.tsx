@@ -15,8 +15,7 @@ export default function App() {
   const [needsUpdate, setNeedsUpdate] = useState<boolean>(true)
 
   const checkNeedsUpdate = async () => {
-    const version = await checkVersion({ bundleId: 'com.CER.Tec-App'})
-    console.log(version)
+    const version = await checkVersion({ bundleId: 'com.CER.Tec-App', currentVersion: "1.0.2"})
     return version
   }
 

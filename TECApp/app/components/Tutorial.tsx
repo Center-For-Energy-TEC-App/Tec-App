@@ -26,12 +26,12 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
   useEffect(() => {
     getData('tutorial').then((value) => {
       if (value === 'complete') {
-        setTutorialState(11)
-        sendStateHome(11)
+        setTutorialState(12)
+        sendStateHome(12)
       } else {
         state == 0 && setTutorialState(state)
       }
-      if (state === 11) {
+      if (state === 12) {
         storeData('tutorial', 'complete').then(() => {
           console.log('tutorial complete')
         })
@@ -145,8 +145,8 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                   sendStateHome(5)
                   setTutorialState(5)
                 } else {
-                  setTutorialState(11)
-                  sendStateHome(11)
+                  setTutorialState(12)
+                  sendStateHome(12)
                   storeData('tutorial', 'complete')
                 }
               }}

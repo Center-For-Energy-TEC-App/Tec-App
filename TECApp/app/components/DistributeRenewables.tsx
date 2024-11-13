@@ -43,6 +43,7 @@ import {
   calculateRegionalCoalGasOil,
   calculateRegionalCurve,
 } from '../util/Calculations'
+import { Tooltip6 } from '../SVGs/TutorialPopups/Tooltip6'
 
 export type TechnologyProportions = {
   solar: number
@@ -140,7 +141,7 @@ const DistributeRenewables = ({
     )
     setDynamicCoalGasOil(coalGasOil)
     setDynamicCarbonReduction(carbonReduction)
-    if (tutorialState === 9) {
+    if (tutorialState === 9 || tutorialState === 10) {
       setRenderTutorial(true)
     }
   }, [values])
@@ -404,7 +405,7 @@ const DistributeRenewables = ({
                 stroke="black"
                 fontSize={20}
               >
-                {(dynamicCarbonReduction * 1000).toFixed(0) + ' MT'}
+                {(dynamicCarbonReduction<0?0:(dynamicCarbonReduction * 1000).toFixed(0)) + ' MT'}
               </TextSvg>
             </Svg>
           ) : (
@@ -641,6 +642,7 @@ const DistributeRenewables = ({
         <Text>{getRegionTechnologySummary(currRegion, 'Wind')}</Text>,
       )}
       {renderTutorial ? (
+        tutorialState===9?
         <>
           <View
             style={{ shadowColor: 'gray', shadowRadius: 5, shadowOpacity: 0.5 }}
@@ -651,14 +653,40 @@ const DistributeRenewables = ({
             <TouchableOpacity
               style={styles.onboardingButton}
               onPress={() => {
-                setRenderTutorial(false)
                 setTutorialState(10)
               }}
             >
               <Text style={styles.onboardingButtonText}>Next</Text>
             </TouchableOpacity>
           </View>
-        </>
+        </>:(
+          <>
+           <View
+            style={{ shadowColor: 'gray', shadowRadius: 5, shadowOpacity: 0.5 }}
+          >
+            <Tooltip6 />
+          </View>
+          <View style={styles.onBoardingButtonWrapper}>
+            <TouchableOpacity
+                style={styles.onboardingButton}
+                onPress={() => {
+                  setTutorialState(9)
+                }}
+              >
+              <Text style={styles.onboardingButtonText}>Back</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.onboardingButton}
+              onPress={() => {
+                setRenderTutorial(false)
+                setTutorialState(11)
+              }}
+            >
+              <Text style={styles.onboardingButtonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
+          </>
+        )
       ) : (
         <></>
       )}
