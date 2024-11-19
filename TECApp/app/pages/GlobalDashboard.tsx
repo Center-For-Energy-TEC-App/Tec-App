@@ -55,7 +55,7 @@ export default function GlobalDashboard() {
 
                 getData('tutorial').then((value) => {
                   if (value === 'complete') {
-                    setTutorialState(11)
+                    setTutorialState(12)
                   } else {
                     setTutorialState(6)
                   }
@@ -122,7 +122,7 @@ export default function GlobalDashboard() {
                       <Text style={styles.onboardingButtonText}>Back</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      onPress={() => setTutorialState(11)}
+                      onPress={() => setTutorialState(12)}
                       style={styles.onboardingButton}
                     >
                       <Text style={styles.onboardingButtonText}>Next</Text>
@@ -133,7 +133,7 @@ export default function GlobalDashboard() {
                 <></>
               )}
             </View>
-            {tutorialState == 11 ? (
+            {tutorialState == 12 ? (
               <>
                 <DataVisualizations
                   initialGlobalData={initialGraphData}
