@@ -14,6 +14,7 @@ const RootLayout = () => {
         <Stack.Screen
         name="index"
         options={{
+          orientation: "portrait",
           headerShown: false,
             contentStyle: {
               backgroundColor: 'white',
@@ -23,6 +24,7 @@ const RootLayout = () => {
         <Stack.Screen
           name="pages/Home"
           options={{
+            orientation: "portrait",
             headerShown: false,
             contentStyle: {
               backgroundColor: '#1C2B47',
@@ -32,19 +34,13 @@ const RootLayout = () => {
         <Stack.Screen
           name="pages/GlobalDashboard"
           options={{
+            orientation: "portrait",
             headerBackVisible: false,
             headerShown: true,
             headerBackTitleVisible: false,
             headerShadowVisible: false,
             headerTitle() {
               return <></>
-            },
-            headerRight() {
-              return (
-                <HelpButton
-                  onPress={() => Alert.alert('Help', 'Information here')}
-                />
-              )
             },
             headerLeft() {
               return <BackArrow onPress={() => router.back()} />
@@ -62,6 +58,7 @@ const RootLayout = () => {
             headerBackVisible: false,
             headerBackTitleVisible: false,
             headerShadowVisible: false,
+            orientation: "portrait",
             headerTitle() {
               return <></>
             },
@@ -80,6 +77,7 @@ const RootLayout = () => {
             headerBackVisible: false,
             headerBackTitleVisible: false,
             headerShadowVisible: false,
+            orientation: "portrait",
             headerTitle() {
               return <></>
             },
@@ -98,6 +96,7 @@ const RootLayout = () => {
             headerBackVisible: false,
             headerBackTitleVisible: false,
             headerShadowVisible: false,
+            orientation: "portrait",
             headerTitle() {
               return <></>
             },

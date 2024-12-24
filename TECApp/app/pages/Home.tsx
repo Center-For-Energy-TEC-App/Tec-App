@@ -299,7 +299,7 @@ export default function Home() {
             <Text>View Tutorial</Text>
           </TouchableOpacity>
           {tutorialState == 8 ? (
-            <View style={{ position: 'absolute', top: vh * 0.5 }}>
+            <View style={{ position: 'absolute', top: vh * 0.5, left: vw/2-100}}>
               <Tooltip4 />
             </View>
           ) : (
@@ -310,7 +310,7 @@ export default function Home() {
               style={{
                 position: 'absolute',
                 bottom: vh * 0.03 + 50,
-                right: 27.5,
+                right: vw*0.03 + 17,
               }}
             >
               <Tooltip7 />

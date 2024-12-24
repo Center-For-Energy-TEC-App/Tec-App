@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   regionInfoContainer: {
     flex: 1,
     width: '100%',
-    alignItems: 'flex-start',
+    // alignItems: 'flex-start',
   },
   regionHeader: {
     display: 'flex',

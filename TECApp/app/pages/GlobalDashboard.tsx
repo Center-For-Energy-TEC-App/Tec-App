@@ -16,6 +16,9 @@ import { Tooltip2 } from '../SVGs/TutorialPopups/Tooltip2'
 import { Tooltip3 } from '../SVGs/TutorialPopups/Tooltip3'
 import { FAQButton } from '../SVGs/FAQButton'
 
+const windowWidth = Dimensions.get('window').width
+const windowHeight = Dimensions.get('window').height
+
 export default function GlobalDashboard() {
   const [initialGraphData, setInitialGraphData] = useState<RegionData>()
   const [dynamicGraphData, setDynamicGraphData] = useState<RegionData>()
@@ -97,7 +100,7 @@ export default function GlobalDashboard() {
               <Tracker type="temperature" temperatureData={temperatureData} />
               <Tracker type="renewable" totalGlobalEnergy={globalEnergy} />
               {tutorialState == 6 ? (
-                <View style={{ position: 'absolute', top: 90, left: 50 }}>
+                <View style={{ position: 'absolute', top: 90, left: windowWidth/2-150 }}>
                   <Tooltip2 />
                   <View style={styles.onBoardingButtonWrapper}>
                     <TouchableOpacity
@@ -112,7 +115,7 @@ export default function GlobalDashboard() {
                 <></>
               )}
               {tutorialState == 7 ? (
-                <View style={{ position: 'absolute', top: 90, right: 0 }}>
+                <View style={{ position: 'absolute', top: 90, right: windowWidth/2-175 }}>
                   <Tooltip3 />
                   <View style={styles.onBoardingButtonWrapper}>
                     <TouchableOpacity
