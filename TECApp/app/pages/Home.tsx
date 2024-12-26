@@ -20,7 +20,7 @@ import { ExportButton } from '../SVGs/ExportButton'
 import CERLogo from '../../assets/CERLogo.png'
 import { Asset } from 'expo-asset'
 import * as Clipboard from 'expo-clipboard'
-
+import * as ScreenOrientation from "expo-screen-orientation"
 
 // Export PDF
 import DataVisualizations from '../components/DataVisualizations/DataVisualizations'
@@ -38,9 +38,6 @@ import { Tooltip6 } from '../SVGs/TutorialPopups/Tooltip6'
 import { FeedbackButton } from '../SVGs/FeedbackButton'
 import { Tooltip7 } from '../SVGs/TutorialPopups/Tooltip7'
 
-const vw = Dimensions.get('window').width
-const vh = Dimensions.get('window').height
-
 export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState<string>('Global')
   const [totalGlobalEnergy, setTotalGlobalEnergy] = useState<number>(0)
@@ -56,16 +53,37 @@ export default function Home() {
   const [dynamicFossilData, setDynamicFossilData] = useState<DataPoint[]>()
   const [isRendered, setIsRendered] = useState(false)
 
-  
   const carbonBudgetRef = useRef(null)
   const bauComparisonRef = useRef(null)
   const technologyComparisonRef = useRef(null)
 
+  const [orientation, setOrientation] = useState(
+    ScreenOrientation.Orientation.PORTRAIT_UP
+  );
 
   useEffect(() => {
     // Fetch data initially when component loads
     fetchData()
+
+     // set initial orientation
+     ScreenOrientation.getOrientationAsync().then((info) => {
+      setOrientation(info);
+    });
+  
+    // subscribe to future changes
+    const subscription = ScreenOrientation.addOrientationChangeListener((evt) => {
+      setOrientation(evt.orientationInfo.orientation);
+    });
+  
+    // return a clean up function to unsubscribe from notifications
+    return () => {
+      ScreenOrientation.removeOrientationChangeListener(subscription);
+    };
   }, [])
+  
+  useEffect(()=>{
+    console.log(orientation)
+  }, [orientation])
 
   // Function to fetch all data and update state
   const fetchData = async () => {
@@ -266,7 +284,18 @@ export default function Home() {
               type="renewable"
               totalGlobalEnergy={totalGlobalEnergy}
             />
-
+          <TouchableOpacity
+            onPress={() => {
+              removeData('tutorial').then(() => {
+                setTutorialState(0)
+                setSelectedRegion('Global')
+                setRefreshTutorial(!refreshTutorial)
+              })
+            }}
+            style={mobileStyles.resetTutorial}
+          >
+            <Text>View Tutorial</Text>
+          </TouchableOpacity>
           </View>
           <View style={mobileStyles.dashboardButton}>
             <GlobalDashboardButton
@@ -286,31 +315,24 @@ export default function Home() {
               <></>
             )}
           </View>
-          <TouchableOpacity
-            onPress={() => {
-              removeData('tutorial').then(() => {
-                setTutorialState(0)
-                setSelectedRegion('Global')
-                setRefreshTutorial(!refreshTutorial)
-              })
-            }}
-            style={mobileStyles.resetTutorial}
-          >
-            <Text>View Tutorial</Text>
-          </TouchableOpacity>
           {tutorialState == 8 ? (
-            <View style={{ position: 'absolute', top: vh * 0.5, left: vw/2-100}}>
+            <View style={{ position: 'absolute', top: "50%", left: "35%"}}>
               <Tooltip4 />
             </View>
           ) : (
             <></>
           )}
-          {tutorialState == 11 ? (
+          <View style={mobileStyles.feedbackButton}>
+            <FeedbackButton onPress={() => router.push('pages/Feedback')} />
+          </View>
+          <View style={mobileStyles.exportButton}>
+            <ExportButton onPress={handleExport} />
+            {tutorialState == 11 ? (
             <View
               style={{
                 position: 'absolute',
-                bottom: vh * 0.03 + 50,
-                right: vw*0.03 + 17,
+                bottom: 50,
+                right: 17,
               }}
             >
               <Tooltip7 />
@@ -324,11 +346,6 @@ export default function Home() {
           ) : (
             <></>
           )}
-          <View style={mobileStyles.feedbackButton}>
-            <FeedbackButton onPress={() => router.push('pages/Feedback')} />
-          </View>
-          <View style={mobileStyles.exportButton}>
-            <ExportButton onPress={handleExport} />
           </View>
 
           {initialGraphData &&
@@ -367,8 +384,8 @@ const mobileStyles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   appWrapper: {
-    width: vw,
-    height: vh,
+    width: "100%",
+    height: "100%",
   },
 
   trackerWrapper: {
@@ -389,8 +406,8 @@ const mobileStyles = StyleSheet.create({
   },
   resetTutorial: {
     position: 'absolute',
-    top: vh * 0.07 + 75,
-    left: '3%',
+    top: 80,
+    left: 2,
     backgroundColor: 'white',
     borderRadius: 4,
     paddingHorizontal: 10,

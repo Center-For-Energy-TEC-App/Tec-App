@@ -7,7 +7,6 @@ import {Alert, Linking, Platform} from "react-native"
 import * as ScreenOrientation from "expo-screen-orientation"
 
 SplashScreen.preventAutoHideAsync()
-ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
 
 export default function App() {
   const [loaded, error] = useFonts({
