@@ -1,3 +1,7 @@
+/**
+ * Helper functions to quickly convert specific values + some lazy data storage
+ */
+
 export const getAbbrv = (region: string) => {
   switch (region) {
     case 'Global':

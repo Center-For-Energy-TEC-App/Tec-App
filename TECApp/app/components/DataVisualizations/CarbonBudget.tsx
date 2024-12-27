@@ -44,6 +44,9 @@ type CarbonBudgetProps = {
   carbonRef: React.RefObject<View>
 }
 
+/**
+ * Interactive Carbon Budget graph on global dashboard
+ */
 export const CarbonBudget = ({
   BAUData,
   dynamicData,
@@ -76,7 +79,7 @@ export const CarbonBudget = ({
   ]
   const horizontalAxis = [2030, 2040, 2050, 2060]
 
-  //find y value on a curve from x value
+  //find y value on a curve from x value; gives high accuracy approximatiomn of y = f(x) for our generated curve
   const findYbyX = (x: number, curve: string) => {
     const path = new svgPathProperties(curve)
     let length_start = 0,

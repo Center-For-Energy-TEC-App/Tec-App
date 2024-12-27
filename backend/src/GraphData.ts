@@ -33,6 +33,10 @@ type InitialGraphData = {
 
 const regions = ["global","chn","ind","mea","nam","nee","sea","eur","lam","ssa","opa"]
 
+/**
+ * Get all initial graph data for every region so no initial calculations have to be done
+ * Specific details for how this data is formatted and sent to frontend found in TEC developer documentation google doc
+ */
 export const getInitialGraphData = async (req: Request, res: Response, next: NextFunction) => {
 
     let results = {global:{}, chn:{},ind: {}, mea:{}, nam:{}, nee:{}, sea:{}, eur:{}, lam:{}, ssa:{}, opa:{}} as InitialGraphData
@@ -40,7 +44,7 @@ export const getInitialGraphData = async (req: Request, res: Response, next: Nex
     const query= await pool.query('SELECT * FROM initial_graph_data');
     let rowNum = 0
     for(const row of query.rows){
-        if(rowNum<=6){
+        if(rowNum<6){
             for(const region of regions){
                 const regionKey = region as keyof typeof results
                 const energyKey = row.energy_type as keyof typeof results[typeof regionKey]
@@ -61,7 +65,7 @@ export const getInitialGraphData = async (req: Request, res: Response, next: Nex
                     [...results[regionKey][energyKey], {year:row.year, value:parseFloat(row[region])}]:
                     [{year:row.year, value:parseFloat(row[region])}]
 
-                results[regionKey].total[rowNum%7].value+=parseFloat(row[region])
+                results[regionKey].total[rowNum%6].value+=parseFloat(row[region])
             }
         }
         rowNum++
@@ -123,6 +127,10 @@ type CalculationData = {
     nee: RegionCalculationData
 }
 
+/**
+ * Get all calculation data needed for every use-case for every region
+ * Specific details for how this data is formatted and sent to frontend found in TEC developer documentation google doc
+ */
 export const getCalculationData = async (req: Request, res: Response, next: NextFunction) =>{
     
     const results = {

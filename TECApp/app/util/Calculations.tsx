@@ -5,9 +5,13 @@ import {
   GraphData,
 } from '../api/requests'
 import { CoalGasOilData } from '../components/BottomSheet'
-import { DataPoint } from '../components/DataVisualizations/BAUComparison'
+import { DataPoint } from '../components/DataVisualizations/ForecastComparison'
 import { getElectricityGenerationCoal } from './ValueDictionaries'
 
+/**
+ * Calculate new region and global graph data (regional comparison, bau comparison, energy comparison)
+ * Called once when user releases slider
+ */
 export const calculateEnergyCurve = (
   newVal: number,
   technologyChanged: string,
@@ -27,29 +31,30 @@ export const calculateEnergyCurve = (
   const newGlobalTechnology = []
   const newGlobalTotal = []
   let climate_path_installed_capacty = installed_capacity
-  for (let i = 2024; i <= 2030; i++) {
+  for (let i = 2025; i <= 2030; i++) {
+    climate_path_installed_capacty =
+    climate_path_installed_capacty * (1 + climate_path_cagr)
+
     const electricity_generation =
       climate_path_installed_capacty * 8760 * capacity_factor[i] * 0.001
-    climate_path_installed_capacty =
-      climate_path_installed_capacty * (1 + climate_path_cagr)
 
     const valueChange =
       electricity_generation -
-      regionGraphData[technologyChanged][i - 2024].value
+      regionGraphData[technologyChanged][i - 2025].value
 
     newRegionTechnology.push({ year: i, value: electricity_generation })
 
     newRegionTotal.push({
       year: i,
-      value: regionGraphData.total[i - 2024].value + valueChange,
+      value: regionGraphData.total[i - 2025].value + valueChange,
     })
     newGlobalTechnology.push({
       year: i,
-      value: globalGraphData[technologyChanged][i - 2024].value + valueChange,
+      value: globalGraphData[technologyChanged][i - 2025].value + valueChange,
     })
     newGlobalTotal.push({
       year: i,
-      value: globalGraphData.total[i - 2024].value + valueChange,
+      value: globalGraphData.total[i - 2025].value + valueChange,
     })
   }
 
@@ -67,6 +72,9 @@ export const calculateEnergyCurve = (
   }
 }
 
+/**
+ * Calculate only regional curves (to continuously update locally while sliders are being moved)
+ */
 export const calculateRegionalCurve = (
   newVal: number,
   graphData: RegionData,
@@ -84,22 +92,29 @@ export const calculateRegionalCurve = (
   let electricity_generation: number
   let newData = []
   let newDataTotal = []
-  for (let i = 2024; i <= 2030; i++) {
-    electricity_generation =
-      climate_path_installed_capacty * 8760 * capacity_factor[i] * 0.001
+  for (let i = 2025; i <= 2030; i++) {
     climate_path_installed_capacty =
       climate_path_installed_capacty * (1 + climate_path_cagr)
+
+    electricity_generation =
+      climate_path_installed_capacty * 8760 * capacity_factor[i] * 0.001
+    
     newData.push({ year: i, value: electricity_generation })
     newDataTotal.push({
       year: i,
       value:
-        graphData.total[i - 2024].value +
-        (electricity_generation - graphData[technologyChanged][i - 2024].value),
+        graphData.total[i - 2025].value +
+        (electricity_generation - graphData[technologyChanged][i - 2025].value),
     })
   }
   return { ...graphData, [technologyChanged]: newData, total: newDataTotal }
 }
 
+/**
+ * Calculate global carbon reduction data
+ * We calculate all reduction values 2025-2030 even though we only use the 2030 value for the
+ * carbon curve because the aggregate reduction is used for the regional CO2 reduction bars
+ */
 export const calculateCarbonReductions = (
   region: string,
   calculationData: RegionCalculationData,
@@ -111,7 +126,7 @@ export const calculateCarbonReductions = (
   let fossilReduction = []
   for (let i = 2025; i <= 2030; i++) {
     const climate_path_additional_electricity_gen =
-      regionData.total[i - 2024].value -
+      regionData.total[i - 2025].value -
       electricity_generation.zero_carbon[i] * 0.001
 
     const dnv_forecast =
@@ -153,6 +168,9 @@ export const calculateCarbonReductions = (
   return fossilReduction
 }
 
+/**
+ * Calculate & extrapolate carbon curve from reduction data
+ */
 export const calculateCarbonCurve = (
   deltaFossilReduction: number,
   fossilData: DataPoint[],
@@ -201,6 +219,9 @@ export type TemperatureData = {
   '2.0Year': number
 }
 
+/**
+ * Calculate predicted year to pass 1.5, 1.8, and 2.0 degree increases
+ */
 export const calculateTemperature = (fossilData: DataPoint[]) => {
   const cumulativeEmmissions2025To2060 = { 2025: 0 }
   let currTotal = 0
@@ -241,6 +262,9 @@ export const calculateTemperature = (fossilData: DataPoint[]) => {
   }
 }
 
+/**
+ * Calculate coal, gas, oil values regionally in response to user iteraction w/ sliders
+ */
 export const calculateRegionalCoalGasOil = (
   calculationData: RegionCalculationData,
   regionData: RegionData,
@@ -291,6 +315,9 @@ const regions = [
   'ssa',
   'nee',
 ]
+/**
+ * Initialize values for every region on app start so bars are accurate on first interaction with a region
+ */
 export const calculateInitialCoalGasOil = (
   calculationData: CalculationData,
   graphData: GraphData,
@@ -316,6 +343,9 @@ const technologies = [
   'total',
 ]
 
+/**
+ * Calculate new global curves in response to resetting values in a single region
+ */
 export const calculateNewGlobalOnReset = (
   BAURegionData: RegionData,
   oldRegionData: RegionData,
@@ -330,14 +360,14 @@ export const calculateNewGlobalOnReset = (
     nuclear: [],
     total: [],
   }
-  for (let i = 2024; i <= 2030; i++) {
+  for (let i = 2025; i <= 2030; i++) {
     for (const technology of technologies) {
       newGlobal[technology].push({
         year: i,
         value:
-          oldGlobalData[technology][i - 2024].value +
-          (BAURegionData[technology][i - 2024].value -
-            oldRegionData[technology][i - 2024].value),
+          oldGlobalData[technology][i - 2025].value +
+          (BAURegionData[technology][i - 2025].value -
+            oldRegionData[technology][i - 2025].value),
       })
     }
   }

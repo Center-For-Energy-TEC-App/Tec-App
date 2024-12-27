@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Text, StyleSheet, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { BAUComparison, DataPoint } from './BAUComparison'
+import { BAUComparison, DataPoint } from './ForecastComparison'
 import { RegionalComparison } from './RegionalComparison'
 import { CarbonBudget } from './CarbonBudget'
 import { TechnologyComparison } from './TechnologyComparison'
@@ -24,6 +24,10 @@ type DataVisualizationsProps = {
   carbonRef?: React.RefObject<View>
   technologyRef?: React.RefObject<View>
 }
+
+/**
+ * Container for all graphs in data visualizations tab in regional dashboards
+ */
 const DataVisualizations = ({
   region,
   initialData,
@@ -44,6 +48,7 @@ const DataVisualizations = ({
   const [scrollEnabled, setScrollEnabled] = useState<boolean>(true)
   const scrollViewRef = useRef(null)
 
+  //flash horizontal scrollbar on interaction to show that there are extra, scrollable options
   useEffect(() => {
     setTimeout(function () {
       scrollViewRef.current?.flashScrollIndicators()
@@ -184,23 +189,24 @@ const DataVisualizations = ({
         />
       )}
 
+      {/* Render all graphs off-screen for Home page export button */}
       {region === 'Global' && (
-        <View style={styles.hidden} >
+        <View style={styles.hidden}>
           <View>
-              <BAUComparison
-                bauRef={bauRef}
-                region={region}
-                BAUData={
-                  initialGlobalData
-                    ? initialGlobalData
-                    : initialData[getAbbrv(region)]
-                }
-                dynamicData={
-                  dynamicGlobalData
-                    ? dynamicGlobalData
-                    : dynamicData[getAbbrv(region)]
-                }
-              />
+            <BAUComparison
+              bauRef={bauRef}
+              region={region}
+              BAUData={
+                initialGlobalData
+                  ? initialGlobalData
+                  : initialData[getAbbrv(region)]
+              }
+              dynamicData={
+                dynamicGlobalData
+                  ? dynamicGlobalData
+                  : dynamicData[getAbbrv(region)]
+              }
+            />
           </View>
 
           <View>

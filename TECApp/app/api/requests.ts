@@ -1,4 +1,4 @@
-import { DataPoint } from '../components/DataVisualizations/BAUComparison'
+import { DataPoint } from '../components/DataVisualizations/ForecastComparison'
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3001'
 

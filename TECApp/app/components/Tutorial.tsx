@@ -20,7 +20,7 @@ type TutorialProps = {
 const vh = Dimensions.get('window').height
 
 export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
-  //states 0-4 represent 5 slides; state 5 represents popup to click on global dashboard, state 6 represents popup to click on a region
+  //full description of each tutorial state can be found in the TEC developer documentation google doc
   const [tutorialState, setTutorialState] = useState(0)
 
   useEffect(() => {

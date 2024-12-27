@@ -12,19 +12,19 @@ const RootLayout = () => {
     <GestureHandlerRootView>
       <Stack>
         <Stack.Screen
-        name="index"
-        options={{
-          orientation: "portrait",
-          headerShown: false,
+          name="index"
+          options={{
+            orientation: 'portrait',
+            headerShown: false,
             contentStyle: {
               backgroundColor: 'white',
             },
-        }}
+          }}
         />
         <Stack.Screen
           name="pages/Home"
           options={{
-            orientation: "portrait",
+            orientation: 'portrait',
             headerShown: false,
             contentStyle: {
               backgroundColor: '#1C2B47',
@@ -34,7 +34,7 @@ const RootLayout = () => {
         <Stack.Screen
           name="pages/GlobalDashboard"
           options={{
-            orientation: "portrait",
+            orientation: 'portrait',
             headerBackVisible: false,
             headerShown: true,
             headerBackTitleVisible: false,
@@ -58,7 +58,7 @@ const RootLayout = () => {
             headerBackVisible: false,
             headerBackTitleVisible: false,
             headerShadowVisible: false,
-            orientation: "portrait",
+            orientation: 'portrait',
             headerTitle() {
               return <></>
             },
@@ -77,7 +77,7 @@ const RootLayout = () => {
             headerBackVisible: false,
             headerBackTitleVisible: false,
             headerShadowVisible: false,
-            orientation: "portrait",
+            orientation: 'portrait',
             headerTitle() {
               return <></>
             },
@@ -96,7 +96,7 @@ const RootLayout = () => {
             headerBackVisible: false,
             headerBackTitleVisible: false,
             headerShadowVisible: false,
-            orientation: "portrait",
+            orientation: 'portrait',
             headerTitle() {
               return <></>
             },

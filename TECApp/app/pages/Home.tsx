@@ -20,7 +20,7 @@ import { ExportButton } from '../SVGs/ExportButton'
 import CERLogo from '../../assets/CERLogo.png'
 import { Asset } from 'expo-asset'
 import * as Clipboard from 'expo-clipboard'
-import * as ScreenOrientation from "expo-screen-orientation"
+import * as ScreenOrientation from 'expo-screen-orientation'
 
 // Export PDF
 import DataVisualizations from '../components/DataVisualizations/DataVisualizations'
@@ -29,7 +29,7 @@ import * as Print from 'expo-print'
 import * as FileSystem from 'expo-file-system'
 import * as Sharing from 'expo-sharing'
 import { RegionData } from '../api/requests'
-import { DataPoint } from '../components/DataVisualizations/BAUComparison'
+import { DataPoint } from '../components/DataVisualizations/ForecastComparison'
 import { Host, Portal } from 'react-native-portalize'
 import { TemperatureData } from '../util/Calculations'
 import { Tooltip1 } from '../SVGs/TutorialPopups/Tooltip1'
@@ -38,6 +38,9 @@ import { Tooltip6 } from '../SVGs/TutorialPopups/Tooltip6'
 import { FeedbackButton } from '../SVGs/FeedbackButton'
 import { Tooltip7 } from '../SVGs/TutorialPopups/Tooltip7'
 
+/**
+ * Main page container
+ */
 export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState<string>('Global')
   const [totalGlobalEnergy, setTotalGlobalEnergy] = useState<number>(0)
@@ -57,33 +60,10 @@ export default function Home() {
   const bauComparisonRef = useRef(null)
   const technologyComparisonRef = useRef(null)
 
-  const [orientation, setOrientation] = useState(
-    ScreenOrientation.Orientation.PORTRAIT_UP
-  );
-
   useEffect(() => {
     // Fetch data initially when component loads
     fetchData()
-
-     // set initial orientation
-     ScreenOrientation.getOrientationAsync().then((info) => {
-      setOrientation(info);
-    });
-  
-    // subscribe to future changes
-    const subscription = ScreenOrientation.addOrientationChangeListener((evt) => {
-      setOrientation(evt.orientationInfo.orientation);
-    });
-  
-    // return a clean up function to unsubscribe from notifications
-    return () => {
-      ScreenOrientation.removeOrientationChangeListener(subscription);
-    };
   }, [])
-  
-  useEffect(()=>{
-    console.log(orientation)
-  }, [orientation])
 
   // Function to fetch all data and update state
   const fetchData = async () => {
@@ -106,6 +86,9 @@ export default function Home() {
     }
   }
 
+  /**
+   * Large method for handling share-your-plan file export
+   */
   const handleExport = async () => {
     // Re-fetch the data before exporting
     await fetchData()
@@ -276,26 +259,20 @@ export default function Home() {
             />
           </Portal>
           <View style={mobileStyles.trackerWrapper} collapsable={false}>
-            <Tracker
-              type="temperature"
-              temperatureData={temperatureData}
-            />
-            <Tracker
-              type="renewable"
-              totalGlobalEnergy={totalGlobalEnergy}
-            />
-          <TouchableOpacity
-            onPress={() => {
-              removeData('tutorial').then(() => {
-                setTutorialState(0)
-                setSelectedRegion('Global')
-                setRefreshTutorial(!refreshTutorial)
-              })
-            }}
-            style={mobileStyles.resetTutorial}
-          >
-            <Text>View Tutorial</Text>
-          </TouchableOpacity>
+            <Tracker type="temperature" temperatureData={temperatureData} />
+            <Tracker type="renewable" totalGlobalEnergy={totalGlobalEnergy} />
+            <TouchableOpacity
+              onPress={() => {
+                removeData('tutorial').then(() => {
+                  setTutorialState(0)
+                  setSelectedRegion('Global')
+                  setRefreshTutorial(!refreshTutorial)
+                })
+              }}
+              style={mobileStyles.resetTutorial}
+            >
+              <Text>View Tutorial</Text>
+            </TouchableOpacity>
           </View>
           <View style={mobileStyles.dashboardButton}>
             <GlobalDashboardButton
@@ -316,7 +293,7 @@ export default function Home() {
             )}
           </View>
           {tutorialState == 8 ? (
-            <View style={{ position: 'absolute', top: "50%", left: "35%"}}>
+            <View style={{ position: 'absolute', top: '50%', left: '35%' }}>
               <Tooltip4 />
             </View>
           ) : (
@@ -328,26 +305,27 @@ export default function Home() {
           <View style={mobileStyles.exportButton}>
             <ExportButton onPress={handleExport} />
             {tutorialState == 11 ? (
-            <View
-              style={{
-                position: 'absolute',
-                bottom: 50,
-                right: 17,
-              }}
-            >
-              <Tooltip7 />
-              <TouchableOpacity
-                onPress={() => setTutorialState(12)}
-                style={mobileStyles.onboardingButton}
+              <View
+                style={{
+                  position: 'absolute',
+                  bottom: 50,
+                  right: 17,
+                }}
               >
-                <Text style={mobileStyles.onboardingButtonText}>Finish</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <></>
-          )}
+                <Tooltip7 />
+                <TouchableOpacity
+                  onPress={() => setTutorialState(12)}
+                  style={mobileStyles.onboardingButton}
+                >
+                  <Text style={mobileStyles.onboardingButtonText}>Finish</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <></>
+            )}
           </View>
 
+          {/* Data-visuzalitions component that we render entirely off-screen so we can show graphs in exported pdfs */}
           {initialGraphData &&
             dynamicGraphData &&
             initialFossilData &&
@@ -384,8 +362,8 @@ const mobileStyles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   appWrapper: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
 
   trackerWrapper: {

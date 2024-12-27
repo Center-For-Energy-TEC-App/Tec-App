@@ -1,3 +1,7 @@
+/**
+ * Region & technology text that shows up when user clicks on info boxes in regional dashboards
+ */
+
 export const getRegionSummary = (region: string) => {
   switch (region) {
     case 'North America':
