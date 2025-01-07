@@ -16,6 +16,9 @@ import { Tooltip2 } from '../SVGs/TutorialPopups/Tooltip2'
 import { Tooltip3 } from '../SVGs/TutorialPopups/Tooltip3'
 import { FAQButton } from '../SVGs/FAQButton'
 
+const windowWidth = Dimensions.get('window').width
+const windowHeight = Dimensions.get('window').height
+
 export default function GlobalDashboard() {
   const [initialGraphData, setInitialGraphData] = useState<RegionData>()
   const [dynamicGraphData, setDynamicGraphData] = useState<RegionData>()
@@ -93,11 +96,12 @@ export default function GlobalDashboard() {
               Tripling our renewable capacity by 2030 to 12 TW globally will
               make reaching this goal possible.
             </Text>
-            <View ref={trackerRef} style={styles.trackersWrapper}>
-              <Tracker type="temperature" temperatureData={temperatureData} />
-              <Tracker type="renewable" totalGlobalEnergy={globalEnergy} />
-              {tutorialState == 6 ? (
-                <View style={{ position: 'absolute', top: 90, left: 50 }}>
+            <View ref={trackerRef} style={styles.trackersRow}>
+              <View style={styles.trackersWrapper}>
+                <Tracker type="temperature" temperatureData={temperatureData} />
+                <Tracker type="renewable" totalGlobalEnergy={globalEnergy} />
+                {tutorialState == 6 ? (
+                <View style={{ position: 'absolute', top: 90 }}>
                   <Tooltip2 />
                   <View style={styles.onBoardingButtonWrapper}>
                     <TouchableOpacity
@@ -111,8 +115,8 @@ export default function GlobalDashboard() {
               ) : (
                 <></>
               )}
-              {tutorialState == 7 ? (
-                <View style={{ position: 'absolute', top: 90, right: 0 }}>
+               {tutorialState == 7 ? (
+                <View style={{ position: 'absolute', top: 90 }}>
                   <Tooltip3 />
                   <View style={styles.onBoardingButtonWrapper}>
                     <TouchableOpacity
@@ -132,6 +136,7 @@ export default function GlobalDashboard() {
               ) : (
                 <></>
               )}
+              </View>
             </View>
             {tutorialState == 12 ? (
               <>
@@ -194,14 +199,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
-  trackersWrapper: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
+  trackersRow: {
+    alignItems: 'center',
     width: '100%',
     marginTop: 32,
     zIndex: 1,
+  },
+  
+  trackersWrapper:{
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 16
   },
 
   iPadText: {

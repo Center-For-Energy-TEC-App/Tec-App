@@ -9,14 +9,15 @@ export interface WorldMapProps {
   onSelectCountry: (country: string) => void
 }
 
+const windowWidth = Dimensions.get('window').width
+const windowHeight = Dimensions.get('window').height
+
 export const WorldMap = ({ onSelectCountry }: WorldMapProps) => {
   const platform = Platform.OS
 
   const [currRegion, setCurrRegion] = useState<string>('Global')
   // const zoomableViewRef = createRef<ReactNativeZoomableView>();
 
-  const windowWidth = Dimensions.get('window').width
-  const windowHeight = Dimensions.get('window').height
   const widthScale = 3
 
   const projection = d3

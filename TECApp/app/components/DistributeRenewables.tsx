@@ -266,14 +266,8 @@ const DistributeRenewables = ({
             minimumTrackTintColor={getTechnologyColor(label)}
             maximumTrackTintColor="#B5B1AA"
             trackMarks={[
-              values[2025][label.toLowerCase()] + //add slight offset because the trackmark div is wider than the trackmark itself
-                0.0275 *
-                  (parseFloat(minMaxValues.max[label.toLowerCase()]) -
-                    parseFloat(minMaxValues.min[label.toLowerCase()])),
-              values['bau'][label.toLowerCase()] +
-                0.0275 *
-                  (parseFloat(minMaxValues.max[label.toLowerCase()]) -
-                    parseFloat(minMaxValues.min[label.toLowerCase()])),
+              values[2025][label.toLowerCase()],
+              values['bau'][label.toLowerCase()],
             ]}
             renderTrackMarkComponent={(index) =>
               renderTrackMark(
@@ -399,7 +393,7 @@ const DistributeRenewables = ({
                 fill="white"
               />
               <TextSvg
-                x={proportionBarWidth * 0.6 + 45}
+                x={proportionBarWidth * 0.725}
                 y={16}
                 fill="black"
                 stroke="black"
@@ -898,6 +892,7 @@ const styles = StyleSheet.create({
   },
   trackMarkContainer: {
     paddingTop: 10,
+    width: 20,
     gap: 4,
     alignItems: 'center',
   },
