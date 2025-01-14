@@ -7,6 +7,9 @@ import {
   TapGestureHandler,
 } from 'react-native-gesture-handler'
 
+/**
+ * https://docs.expo.dev/router/introduction/
+ */
 const RootLayout = () => {
   return (
     <GestureHandlerRootView>

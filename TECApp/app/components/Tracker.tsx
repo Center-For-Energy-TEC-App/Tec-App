@@ -39,6 +39,7 @@ export const Tracker = ({
     return () => clearTimeout(timeout)
   }
 
+  //adds a flash glow to the year text every time user changes causes the year on the current temperature tracker to change
   useEffect(() => {
     if (!currTemperatureData && temperatureData) {
       setCurrTemperatureData(temperatureData)
