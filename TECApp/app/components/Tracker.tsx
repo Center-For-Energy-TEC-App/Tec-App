@@ -14,10 +14,13 @@ type TrackerProps = {
   temperatureData?: TemperatureData
 }
 
+/**
+ * Temperature and Energy tracker bubbles on the Home screen and Global Dashboard
+ */
 export const Tracker = ({
   type,
   totalGlobalEnergy,
-  temperatureData
+  temperatureData,
 }: TrackerProps) => {
   const [temperatureVersion, setTemperatureVersion] = useState<number>(1)
   const [energyVersion, setEnergyVersion] = useState<number>(1)
@@ -36,6 +39,7 @@ export const Tracker = ({
     return () => clearTimeout(timeout)
   }
 
+  //adds a flash glow to the year text every time user changes causes the year on the current temperature tracker to change
   useEffect(() => {
     if (!currTemperatureData && temperatureData) {
       setCurrTemperatureData(temperatureData)
@@ -122,7 +126,6 @@ export const Tracker = ({
               <TrackerButtonArrow />
             </View>
           </View>
-          
         </TouchableOpacity>
       ) : (
         <TouchableOpacity

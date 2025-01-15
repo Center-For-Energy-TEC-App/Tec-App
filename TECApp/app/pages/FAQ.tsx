@@ -3,6 +3,9 @@ import { View, Text, StyleSheet } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Link } from 'expo-router'
 
+/**
+ * FAQ page on the global dashboard
+ */
 export default function FAQ() {
   return (
     <ScrollView contentContainerStyle={styles.wrapper}>

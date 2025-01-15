@@ -36,6 +36,9 @@ type LineGraphProps = {
   yMax: number //maximum y-axis value of data
 }
 
+/**
+ * Template for generic Line Graph with or without gradient fills
+ */
 export const LineGraph = ({
   gradient,
   gradientCurve,

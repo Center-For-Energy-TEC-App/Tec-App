@@ -21,6 +21,9 @@ export type DataPoint = {
   value: number
 }
 
+/**
+ * Technology Comparison graph on regional and global dashboards
+ */
 type TechnologyComparisonProps = {
   data: RegionData
   technologyRef: React.RefObject<View>
@@ -29,12 +32,12 @@ export const TechnologyComparison = ({
   data,
   technologyRef,
 }: TechnologyComparisonProps) => {
-  const solar_data = data.solar.slice(1)
-  const wind_data = data.wind.slice(1)
-  const hydro_data = data.hydropower.slice(1)
-  const geo_data = data.geothermal.slice(1)
-  const bio_data = data.biomass.slice(1)
-  const nuclear_data = data.nuclear.slice(1)
+  const solar_data = data.solar
+  const wind_data = data.wind
+  const hydro_data = data.hydropower
+  const geo_data = data.geothermal
+  const bio_data = data.biomass
+  const nuclear_data = data.nuclear
 
   const yMin = Math.min(
     Math.min(...solar_data.map((val) => val.value)),

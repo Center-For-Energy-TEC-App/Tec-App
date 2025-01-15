@@ -1,5 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+/**
+ * Helper functions for caching data
+ */
+
 export const storeData = async (key: string, value: string) => {
   try {
     await AsyncStorage.setItem(key, value)

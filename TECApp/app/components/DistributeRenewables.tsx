@@ -76,6 +76,9 @@ type DistributeRenewablesProps = {
   calculationData: RegionCalculationData
 }
 
+/**
+ * Container for all regional sliders + proportion bars
+ */
 const DistributeRenewables = ({
   currRegion,
   values,
@@ -112,12 +115,12 @@ const DistributeRenewables = ({
     useState<TechnologyProportions>(undefined)
 
   const [zeroCarbonTotal, setZeroCarbonTotal] = useState<number>(
-    graphData.solar[6].value +
-      graphData.wind[6].value +
-      graphData.hydropower[6].value +
-      graphData.biomass[6].value +
-      graphData.geothermal[6].value +
-      graphData.nuclear[6].value,
+    graphData.solar[5].value +
+      graphData.wind[5].value +
+      graphData.hydropower[5].value +
+      graphData.biomass[5].value +
+      graphData.geothermal[5].value +
+      graphData.nuclear[5].value,
   )
   const [dynamicCoalGasOil, setDynamicCoalGasOil] =
     useState<CoalGasOil>(coalGasOil)
@@ -132,12 +135,12 @@ const DistributeRenewables = ({
   useEffect(() => {
     setSliderValues(values.dynamic)
     setZeroCarbonTotal(
-      graphData.solar[6].value +
-        graphData.wind[6].value +
-        graphData.hydropower[6].value +
-        graphData.biomass[6].value +
-        graphData.geothermal[6].value +
-        graphData.nuclear[6].value,
+      graphData.solar[5].value +
+        graphData.wind[5].value +
+        graphData.hydropower[5].value +
+        graphData.biomass[5].value +
+        graphData.geothermal[5].value +
+        graphData.nuclear[5].value,
     )
     setDynamicCoalGasOil(coalGasOil)
     setDynamicCarbonReduction(carbonReduction)
@@ -294,12 +297,12 @@ const DistributeRenewables = ({
                 calculationData,
               )
               setZeroCarbonTotal(
-                newData.solar[6].value +
-                  newData.wind[6].value +
-                  newData.hydropower[6].value +
-                  newData.biomass[6].value +
-                  newData.geothermal[6].value +
-                  newData.nuclear[6].value,
+                newData.solar[5].value +
+                  newData.wind[5].value +
+                  newData.hydropower[5].value +
+                  newData.biomass[5].value +
+                  newData.geothermal[5].value +
+                  newData.nuclear[5].value,
               )
               setDynamicCoalGasOil(
                 calculateRegionalCoalGasOil(
@@ -344,11 +347,6 @@ const DistributeRenewables = ({
       contentContainerStyle={styles.container}
       stickyHeaderIndices={[0]}
     >
-      {/* <Text style={[styles.description, isIpad && styles.iPadText]}>
-        Using the sliders below, make region specific changes for each renewable
-        energy source to reach 12 TW of renewable capacity. This will override
-        default values set in the global dashboard.
-      </Text> */}
       <View>
         <View style={styles.capacityProportionContainer}>
           <Text style={styles.capacityProportionText}>Reduced CO2 by 2030</Text>
@@ -399,7 +397,9 @@ const DistributeRenewables = ({
                 stroke="black"
                 fontSize={20}
               >
-                {(dynamicCarbonReduction<0?0:(dynamicCarbonReduction * 1000).toFixed(0)) + ' MT'}
+                {(dynamicCarbonReduction < 0
+                  ? 0
+                  : (dynamicCarbonReduction * 1000).toFixed(0)) + ' MT'}
               </TextSvg>
             </Svg>
           ) : (
@@ -629,56 +629,64 @@ const DistributeRenewables = ({
           <Text style={{ fontSize: 12 }}>2030 Forecast</Text>
         </View>
       </View>
-      {/* </View> */}
       {renderSlider(
         'Wind',
         WindIcon,
         <Text>{getRegionTechnologySummary(currRegion, 'Wind')}</Text>,
       )}
       {renderTutorial ? (
-        tutorialState===9?
-        <>
-          <View
-            style={{ shadowColor: 'gray', shadowRadius: 5, shadowOpacity: 0.5 }}
-          >
-            <Tooltip5 />
-          </View>
-          <View style={styles.onBoardingButtonWrapper}>
-            <TouchableOpacity
-              style={styles.onboardingButton}
-              onPress={() => {
-                setTutorialState(10)
+        tutorialState === 9 ? (
+          <>
+            <View
+              style={{
+                shadowColor: 'gray',
+                shadowRadius: 5,
+                shadowOpacity: 0.5,
               }}
             >
-              <Text style={styles.onboardingButtonText}>Next</Text>
-            </TouchableOpacity>
-          </View>
-        </>:(
+              <Tooltip5 />
+            </View>
+            <View style={styles.onBoardingButtonWrapper}>
+              <TouchableOpacity
+                style={styles.onboardingButton}
+                onPress={() => {
+                  setTutorialState(10)
+                }}
+              >
+                <Text style={styles.onboardingButtonText}>Next</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : (
           <>
-           <View
-            style={{ shadowColor: 'gray', shadowRadius: 5, shadowOpacity: 0.5 }}
-          >
-            <Tooltip6 />
-          </View>
-          <View style={styles.onBoardingButtonWrapper}>
-            <TouchableOpacity
+            <View
+              style={{
+                shadowColor: 'gray',
+                shadowRadius: 5,
+                shadowOpacity: 0.5,
+              }}
+            >
+              <Tooltip6 />
+            </View>
+            <View style={styles.onBoardingButtonWrapper}>
+              <TouchableOpacity
                 style={styles.onboardingButton}
                 onPress={() => {
                   setTutorialState(9)
                 }}
               >
-              <Text style={styles.onboardingButtonText}>Back</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.onboardingButton}
-              onPress={() => {
-                setRenderTutorial(false)
-                setTutorialState(11)
-              }}
-            >
-              <Text style={styles.onboardingButtonText}>Next</Text>
-            </TouchableOpacity>
-          </View>
+                <Text style={styles.onboardingButtonText}>Back</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.onboardingButton}
+                onPress={() => {
+                  setRenderTutorial(false)
+                  setTutorialState(11)
+                }}
+              >
+                <Text style={styles.onboardingButtonText}>Next</Text>
+              </TouchableOpacity>
+            </View>
           </>
         )
       ) : (

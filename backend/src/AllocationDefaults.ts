@@ -33,6 +33,10 @@ type DefaultValues = {
     nee: RegionalDefaultValues
 }
 
+/**
+ * Get all intiial values for all sliders for all regions
+ * Specific details for how this data is formatted and sent to frontend found in TEC developer documentation google doc
+ */
 export const getAllDefaultValues = async (req: Request, res: Response, next: NextFunction) =>{
     let results  =
          {global: {2025: {}, bau: {}, dynamic: {}}, 
@@ -71,6 +75,10 @@ export const getAllDefaultValues = async (req: Request, res: Response, next: Nex
     }
 }
 
+/**
+ * Get minimum and maximum values for all sliders for all regions
+ * Specific details for how this data is formatted and sent to frontend found in TEC developer documentation google do
+ */
 export const getMinMaxValues = async (req: Request, res: Response, next: NextFunction) =>{
     const results  = await pool.query('SELECT * FROM min_max_values')
     let transposedResults = 

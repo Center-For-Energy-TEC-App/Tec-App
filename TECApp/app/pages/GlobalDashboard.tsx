@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity } from 'react-native'
 import { Dimensions, Platform, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Tracker } from '../components/Tracker'
-import { DataPoint } from '../components/DataVisualizations/BAUComparison'
+import { DataPoint } from '../components/DataVisualizations/ForecastComparison'
 import DataVisualizations from '../components/DataVisualizations/DataVisualizations'
 import { RegionData } from '../api/requests'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -15,9 +15,6 @@ import { TemperatureData } from '../util/Calculations'
 import { Tooltip2 } from '../SVGs/TutorialPopups/Tooltip2'
 import { Tooltip3 } from '../SVGs/TutorialPopups/Tooltip3'
 import { FAQButton } from '../SVGs/FAQButton'
-
-const windowWidth = Dimensions.get('window').width
-const windowHeight = Dimensions.get('window').height
 
 export default function GlobalDashboard() {
   const [initialGraphData, setInitialGraphData] = useState<RegionData>()
@@ -37,6 +34,9 @@ export default function GlobalDashboard() {
   const technologyComparisonRef = useRef(null)
   const trackerRef = useRef(null)
 
+  /**
+   * Pulls all data from the app; cannot be sent as a prop so has to be obtained asynchronously
+   */
   useEffect(() => {
     getData('bau-graph-data').then((value) => {
       setInitialGraphData(JSON.parse(value))
