@@ -66,13 +66,13 @@ export default function Feedback() {
           <></>
         ) : submitMessage === 'success' ? (
           <View style={styles.successMessage}>
-            <Text style={{ fontWeight: 400 }}>
+            <Text >
               Message received! Thank you for your feedback.
             </Text>
           </View>
         ) : (
           <View style={styles.failMessage}>
-            <Text style={{ fontWeight: 400 }}>
+            <Text>
               Something went wrong. Please try again later.
             </Text>
           </View>
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Brix Sans',
     fontSize: 28,
     fontStyle: 'normal',
-    fontWeight: 400,
+    // fontWeight: 400,
   },
 
   body: {
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Brix Sans',
     fontSize: 14,
     fontStyle: 'normal',
-    fontWeight: 400,
+    // fontWeight: "400",
   },
 
   inputBox: {
