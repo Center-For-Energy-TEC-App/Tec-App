@@ -43,6 +43,7 @@ import {
   calculateRegionalCoalGasOil,
   calculateRegionalCurve,
 } from '../util/Calculations'
+import { Tooltip6 } from '../SVGs/TutorialPopups/Tooltip6'
 
 export type TechnologyProportions = {
   solar: number
@@ -75,6 +76,9 @@ type DistributeRenewablesProps = {
   calculationData: RegionCalculationData
 }
 
+/**
+ * Container for all regional sliders + proportion bars
+ */
 const DistributeRenewables = ({
   currRegion,
   values,
@@ -111,12 +115,12 @@ const DistributeRenewables = ({
     useState<TechnologyProportions>(undefined)
 
   const [zeroCarbonTotal, setZeroCarbonTotal] = useState<number>(
-    graphData.solar[6].value +
-      graphData.wind[6].value +
-      graphData.hydropower[6].value +
-      graphData.biomass[6].value +
-      graphData.geothermal[6].value +
-      graphData.nuclear[6].value,
+    graphData.solar[5].value +
+      graphData.wind[5].value +
+      graphData.hydropower[5].value +
+      graphData.biomass[5].value +
+      graphData.geothermal[5].value +
+      graphData.nuclear[5].value,
   )
   const [dynamicCoalGasOil, setDynamicCoalGasOil] =
     useState<CoalGasOil>(coalGasOil)
@@ -131,16 +135,16 @@ const DistributeRenewables = ({
   useEffect(() => {
     setSliderValues(values.dynamic)
     setZeroCarbonTotal(
-      graphData.solar[6].value +
-        graphData.wind[6].value +
-        graphData.hydropower[6].value +
-        graphData.biomass[6].value +
-        graphData.geothermal[6].value +
-        graphData.nuclear[6].value,
+      graphData.solar[5].value +
+        graphData.wind[5].value +
+        graphData.hydropower[5].value +
+        graphData.biomass[5].value +
+        graphData.geothermal[5].value +
+        graphData.nuclear[5].value,
     )
     setDynamicCoalGasOil(coalGasOil)
     setDynamicCarbonReduction(carbonReduction)
-    if (tutorialState === 9) {
+    if (tutorialState === 9 || tutorialState === 10) {
       setRenderTutorial(true)
     }
   }, [values])
@@ -265,14 +269,8 @@ const DistributeRenewables = ({
             minimumTrackTintColor={getTechnologyColor(label)}
             maximumTrackTintColor="#B5B1AA"
             trackMarks={[
-              values[2025][label.toLowerCase()] + //add slight offset because the trackmark div is wider than the trackmark itself
-                0.0275 *
-                  (parseFloat(minMaxValues.max[label.toLowerCase()]) -
-                    parseFloat(minMaxValues.min[label.toLowerCase()])),
-              values['bau'][label.toLowerCase()] +
-                0.0275 *
-                  (parseFloat(minMaxValues.max[label.toLowerCase()]) -
-                    parseFloat(minMaxValues.min[label.toLowerCase()])),
+              values[2025][label.toLowerCase()],
+              values['bau'][label.toLowerCase()],
             ]}
             renderTrackMarkComponent={(index) =>
               renderTrackMark(
@@ -299,12 +297,12 @@ const DistributeRenewables = ({
                 calculationData,
               )
               setZeroCarbonTotal(
-                newData.solar[6].value +
-                  newData.wind[6].value +
-                  newData.hydropower[6].value +
-                  newData.biomass[6].value +
-                  newData.geothermal[6].value +
-                  newData.nuclear[6].value,
+                newData.solar[5].value +
+                  newData.wind[5].value +
+                  newData.hydropower[5].value +
+                  newData.biomass[5].value +
+                  newData.geothermal[5].value +
+                  newData.nuclear[5].value,
               )
               setDynamicCoalGasOil(
                 calculateRegionalCoalGasOil(
@@ -349,11 +347,6 @@ const DistributeRenewables = ({
       contentContainerStyle={styles.container}
       stickyHeaderIndices={[0]}
     >
-      {/* <Text style={[styles.description, isIpad && styles.iPadText]}>
-        Using the sliders below, make region specific changes for each renewable
-        energy source to reach 12 TW of renewable capacity. This will override
-        default values set in the global dashboard.
-      </Text> */}
       <View>
         <View style={styles.capacityProportionContainer}>
           <Text style={styles.capacityProportionText}>Reduced CO2 by 2030</Text>
@@ -398,13 +391,15 @@ const DistributeRenewables = ({
                 fill="white"
               />
               <TextSvg
-                x={proportionBarWidth * 0.6 + 45}
+                x={proportionBarWidth * 0.725}
                 y={16}
                 fill="black"
                 stroke="black"
                 fontSize={20}
               >
-                {(dynamicCarbonReduction * 1000).toFixed(0) + ' MT'}
+                {(dynamicCarbonReduction < 0
+                  ? 0
+                  : (dynamicCarbonReduction * 1000).toFixed(0)) + ' MT'}
               </TextSvg>
             </Svg>
           ) : (
@@ -634,31 +629,66 @@ const DistributeRenewables = ({
           <Text style={{ fontSize: 12 }}>2030 Forecast</Text>
         </View>
       </View>
-      {/* </View> */}
       {renderSlider(
         'Wind',
         WindIcon,
         <Text>{getRegionTechnologySummary(currRegion, 'Wind')}</Text>,
       )}
       {renderTutorial ? (
-        <>
-          <View
-            style={{ shadowColor: 'gray', shadowRadius: 5, shadowOpacity: 0.5 }}
-          >
-            <Tooltip5 />
-          </View>
-          <View style={styles.onBoardingButtonWrapper}>
-            <TouchableOpacity
-              style={styles.onboardingButton}
-              onPress={() => {
-                setRenderTutorial(false)
-                setTutorialState(10)
+        tutorialState === 9 ? (
+          <>
+            <View
+              style={{
+                shadowColor: 'gray',
+                shadowRadius: 5,
+                shadowOpacity: 0.5,
               }}
             >
-              <Text style={styles.onboardingButtonText}>Next</Text>
-            </TouchableOpacity>
-          </View>
-        </>
+              <Tooltip5 />
+            </View>
+            <View style={styles.onBoardingButtonWrapper}>
+              <TouchableOpacity
+                style={styles.onboardingButton}
+                onPress={() => {
+                  setTutorialState(10)
+                }}
+              >
+                <Text style={styles.onboardingButtonText}>Next</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : (
+          <>
+            <View
+              style={{
+                shadowColor: 'gray',
+                shadowRadius: 5,
+                shadowOpacity: 0.5,
+              }}
+            >
+              <Tooltip6 />
+            </View>
+            <View style={styles.onBoardingButtonWrapper}>
+              <TouchableOpacity
+                style={styles.onboardingButton}
+                onPress={() => {
+                  setTutorialState(9)
+                }}
+              >
+                <Text style={styles.onboardingButtonText}>Back</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.onboardingButton}
+                onPress={() => {
+                  setRenderTutorial(false)
+                  setTutorialState(11)
+                }}
+              >
+                <Text style={styles.onboardingButtonText}>Next</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )
       ) : (
         <></>
       )}
@@ -870,6 +900,7 @@ const styles = StyleSheet.create({
   },
   trackMarkContainer: {
     paddingTop: 10,
+    width: 20,
     gap: 4,
     alignItems: 'center',
   },

@@ -40,41 +40,44 @@ const leftMargin = 65
 const xMin = 2025
 const xMax = 2030
 
+/**
+ * Regional Comparison graph on regional dashboards
+ */
 export const RegionalComparison = ({
   region,
   data,
 }: RegionalComparisonProps) => {
   const [dropdown, setDropdown] = useState<boolean>(false)
   const [dropdownOptions, setDropDownOptions] = useState<RegionObject[]>([
-    { region: 'North America', selected: false, data: data.nam.total.slice(1) },
-    { region: 'Latin America', selected: false, data: data.lam.total.slice(1) },
-    { region: 'Europe', selected: false, data: data.eur.total.slice(1) },
+    { region: 'North America', selected: false, data: data.nam.total },
+    { region: 'Latin America', selected: false, data: data.lam.total },
+    { region: 'Europe', selected: false, data: data.eur.total },
     {
       region: 'Middle East & N. Africa',
       selected: false,
-      data: data.mea.total.slice(1),
+      data: data.mea.total,
     },
     {
       region: 'Sub-Saharan Africa',
       selected: false,
-      data: data.ssa.total.slice(1),
+      data: data.ssa.total,
     },
     {
       region: 'North East Eurasia',
       selected: false,
-      data: data.nee.total.slice(1),
+      data: data.nee.total,
     },
     {
       region: 'South East Asia',
       selected: false,
-      data: data.sea.total.slice(1),
+      data: data.sea.total,
     },
-    { region: 'OECD Pacific', selected: false, data: data.opa.total.slice(1) },
-    { region: 'Greater China', selected: false, data: data.chn.total.slice(1) },
+    { region: 'OECD Pacific', selected: false, data: data.opa.total },
+    { region: 'Greater China', selected: false, data: data.chn.total },
     {
       region: 'Indian Subcontinent',
       selected: false,
-      data: data.ind.total.slice(1),
+      data: data.ind.total,
     },
   ]) //keeps track of state of every checkbox
   const [numSelected, setNumSelected] = useState<number>(0) //easier way to keep track than parsing above state every time

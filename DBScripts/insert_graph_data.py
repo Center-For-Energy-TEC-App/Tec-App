@@ -135,11 +135,11 @@ def insert_fossil_emissions_data():
 def drop_all_tables():
     cursor.execute("DROP TABLE IF EXISTS secondary_calculations_capacity_factor,secondary_calculations_forecast_cagr, secondary_calculations_forecast_growth_rate,data_aggregation_installed_capacity,data_aggregation_electricity_generation,transpose_electricity_generation,transpose_installed_capacity,transpose_energy_consumption,transpose_co2_emissions")
 
-insert_secondary_calculations()
-insert_data_aggregation()
-insert_transpose()
+# insert_secondary_calculations()
+# insert_data_aggregation()
+# insert_transpose()
 
-# insert_initial_graph_data()
+insert_initial_graph_data()
 # insert_fossil_emissions_data()
 
 

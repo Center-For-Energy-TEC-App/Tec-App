@@ -20,18 +20,18 @@ type TutorialProps = {
 const vh = Dimensions.get('window').height
 
 export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
-  //states 0-4 represent 5 slides; state 5 represents popup to click on global dashboard, state 6 represents popup to click on a region
+  //full description of each tutorial state can be found in the TEC developer documentation google doc
   const [tutorialState, setTutorialState] = useState(0)
 
   useEffect(() => {
     getData('tutorial').then((value) => {
       if (value === 'complete') {
-        setTutorialState(11)
-        sendStateHome(11)
+        setTutorialState(12)
+        sendStateHome(12)
       } else {
         state == 0 && setTutorialState(state)
       }
-      if (state === 11) {
+      if (state === 12) {
         storeData('tutorial', 'complete').then(() => {
           console.log('tutorial complete')
         })
@@ -145,8 +145,8 @@ export const Tutorial = ({ refresh, state, sendStateHome }: TutorialProps) => {
                   sendStateHome(5)
                   setTutorialState(5)
                 } else {
-                  setTutorialState(11)
-                  sendStateHome(11)
+                  setTutorialState(12)
+                  sendStateHome(12)
                   storeData('tutorial', 'complete')
                 }
               }}

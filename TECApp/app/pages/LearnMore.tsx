@@ -2,6 +2,9 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
+/**
+ * Learn More page on the global dashboard
+ */
 export default function LearnMore() {
   return (
     <ScrollView contentContainerStyle={styles.wrapper}>

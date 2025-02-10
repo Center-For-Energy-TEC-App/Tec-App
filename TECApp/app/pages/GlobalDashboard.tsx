@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity } from 'react-native'
 import { Dimensions, Platform, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Tracker } from '../components/Tracker'
-import { DataPoint } from '../components/DataVisualizations/BAUComparison'
+import { DataPoint } from '../components/DataVisualizations/ForecastComparison'
 import DataVisualizations from '../components/DataVisualizations/DataVisualizations'
 import { RegionData } from '../api/requests'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -34,6 +34,9 @@ export default function GlobalDashboard() {
   const technologyComparisonRef = useRef(null)
   const trackerRef = useRef(null)
 
+  /**
+   * Pulls all data from the app; cannot be sent as a prop so has to be obtained asynchronously
+   */
   useEffect(() => {
     getData('bau-graph-data').then((value) => {
       setInitialGraphData(JSON.parse(value))
@@ -55,7 +58,7 @@ export default function GlobalDashboard() {
 
                 getData('tutorial').then((value) => {
                   if (value === 'complete') {
-                    setTutorialState(11)
+                    setTutorialState(12)
                   } else {
                     setTutorialState(6)
                   }
@@ -93,11 +96,12 @@ export default function GlobalDashboard() {
               Tripling our renewable capacity by 2030 to 12 TW globally will
               make reaching this goal possible.
             </Text>
-            <View ref={trackerRef} style={styles.trackersWrapper}>
-              <Tracker type="temperature" temperatureData={temperatureData} />
-              <Tracker type="renewable" totalGlobalEnergy={globalEnergy} />
-              {tutorialState == 6 ? (
-                <View style={{ position: 'absolute', top: 90, left: 50 }}>
+            <View ref={trackerRef} style={styles.trackersRow}>
+              <View style={styles.trackersWrapper}>
+                <Tracker type="temperature" temperatureData={temperatureData} />
+                <Tracker type="renewable" totalGlobalEnergy={globalEnergy} />
+                {tutorialState == 6 ? (
+                <View style={{ position: 'absolute', top: 90 }}>
                   <Tooltip2 />
                   <View style={styles.onBoardingButtonWrapper}>
                     <TouchableOpacity
@@ -111,8 +115,8 @@ export default function GlobalDashboard() {
               ) : (
                 <></>
               )}
-              {tutorialState == 7 ? (
-                <View style={{ position: 'absolute', top: 90, right: 0 }}>
+               {tutorialState == 7 ? (
+                <View style={{ position: 'absolute', top: 90 }}>
                   <Tooltip3 />
                   <View style={styles.onBoardingButtonWrapper}>
                     <TouchableOpacity
@@ -122,7 +126,7 @@ export default function GlobalDashboard() {
                       <Text style={styles.onboardingButtonText}>Back</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      onPress={() => setTutorialState(11)}
+                      onPress={() => setTutorialState(12)}
                       style={styles.onboardingButton}
                     >
                       <Text style={styles.onboardingButtonText}>Next</Text>
@@ -132,8 +136,9 @@ export default function GlobalDashboard() {
               ) : (
                 <></>
               )}
+              </View>
             </View>
-            {tutorialState == 11 ? (
+            {tutorialState == 12 ? (
               <>
                 <DataVisualizations
                   initialGlobalData={initialGraphData}
@@ -194,14 +199,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
-  trackersWrapper: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
+  trackersRow: {
+    alignItems: 'center',
     width: '100%',
     marginTop: 32,
     zIndex: 1,
+  },
+  
+  trackersWrapper:{
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 16
   },
 
   iPadText: {

@@ -36,14 +36,17 @@ const deviceType = () => {
 
 const isIpad = deviceType() === 'ipad'
 
+/**
+ * Forecast Comparison graph on both regional and global dashboards
+ */
 export const BAUComparison = ({
   region,
   BAUData,
   dynamicData,
   bauRef,
 }: BAUComparisonProps) => {
-  const BAU_data = BAUData.total.slice(1)
-  const altered_data = dynamicData.total.slice(1)
+  const BAU_data = BAUData.total
+  const altered_data = dynamicData.total
 
   //min of both datasets
   const yMin = Math.min(

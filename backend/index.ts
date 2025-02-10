@@ -11,6 +11,9 @@ app.use(express.json())
 
 const port = process.env.LOCAL_PORT
 
+/**
+ * Establish connection to DigitalOcean
+ */
 const newPool = Pool.Pool;
 export const pool = new newPool({
     user: process.env.DB_USER,

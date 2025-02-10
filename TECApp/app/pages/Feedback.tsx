@@ -11,9 +11,11 @@ import {
 } from 'react-native'
 import { insertFeedback } from '../api/requests'
 
-const vw = Dimensions.get('window').width
 const vh = Dimensions.get('window').height
 
+/**
+ * Feedback page on the Home screen
+ */
 export default function Feedback() {
   const [text, setText] = useState<string>()
   const [submitMessage, setSubmitMessage] = useState<string>(null)
@@ -82,7 +84,7 @@ export default function Feedback() {
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: vw,
+    width: '100%',
     // backgroundColor: "red",
     display: 'flex',
     flexDirection: 'column',

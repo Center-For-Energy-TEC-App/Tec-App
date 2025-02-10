@@ -3,8 +3,8 @@
     "name": "Triton Energy Climate",
     "slug": "AwesomeProject",
     "scheme": "tec-app",
-    "version": "1.0.1",
-    "orientation": "portrait",
+    "version": "1.0.3",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -17,7 +17,9 @@
     ],
     "ios": {
       "bundleIdentifier": "com.CER.Tec-App",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "buildNumber": "1",
+      "requireFullScreen": true
     },
     "android": {
       "adaptiveIcon": {
@@ -34,7 +36,14 @@
         "projectId": "34278a3e-ba24-4041-81dc-9c190a29c4b4"
       }
     },
-    "plugins": [],
+    "plugins": [
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "PORTRAIT"
+        }
+      ]
+    ],
     "runtimeVersion": {
       "policy": "appVersion"
     },
