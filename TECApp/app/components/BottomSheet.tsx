@@ -183,7 +183,6 @@ export const BottomSheet = ({
               .then((val) => {
                 setInitialGraphData(val)
                 setDynamicGraphData(val)
-                console.log(val[getAbbrv(selectedRegion)])
 
                 storeData('bau-graph-data', JSON.stringify(val.global))
                 storeData('dynamic-graph-data', JSON.stringify(val.global))
