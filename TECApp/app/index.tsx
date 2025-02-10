@@ -16,7 +16,7 @@ export default function App() {
   const checkNeedsUpdate = async () => {
     const version = await checkVersion({
       bundleId: 'com.CER.Tec-App',
-      currentVersion: '1.0.2',
+      currentVersion: '1.0.3'
     })
     return version
   }
